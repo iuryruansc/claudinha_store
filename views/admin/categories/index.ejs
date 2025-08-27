@@ -1,0 +1,70 @@
+<%- include('../../partials/header.ejs') %>
+    <%- include('../../partials/navbar.ejs') %>
+
+        <div class="container">
+            <hr>
+            <h2>Categorias</h2>
+            <a href="/admin/categories/new" class="btn btn-success">Criar Nova Categoria</a>
+            <hr>
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Categorias</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody id="category-table-body">
+                    <label>
+                        <input type="checkbox" id="toggleExcluir">
+                        Habilitar botão Excluir
+                    </label>
+                    <% categories.forEach(category=> { %>
+                        <tr>
+                            <td>
+                                <%= category.id_categoria %>
+                            </td>
+                            <td>
+                                <%= category.nome %>
+                            </td>
+                            <td>
+                                <a href="/admin/categories/edit/<%= category.id_categoria %>"
+                                    class="btn btn-warning">Editar</a>
+                                <a href="/admin/produtos/<%= category.id_categoria %>" class="btn btn-primary">Ver
+                                    Produtos</a>
+                                <form action="/admin/categories/delete/<%= category.id_categoria %>" method="POST"
+                                    style="display: inline;">
+                                    <input type="hidden" name="id_categoria" value="<%= category.id_categoria %>">
+
+                                    <button class="btn btn-danger excluir-btn" style="display: none;">Excluir</button>
+                                </form>
+                            </td>
+                        </tr>
+                        <% }) %>
+                </tbody>
+            </table>
+        </div>
+
+        <%- include('../../partials/footer.ejs') %>
+
+            <script>
+
+                document.addEventListener('DOMContentLoaded', function () {
+                    const deleteForms = document.querySelectorAll('form[action^="/admin/categories/delete"]');
+                    const toggleExcluir = document.getElementById('toggleExcluir');
+                    const tableBody = document.getElementById('category-table-body');
+
+                    toggleExcluir.addEventListener('change', function () {
+                        tableBody.classList.toggle('delete-enabled', this.checked);
+                    });
+
+                    deleteForms.forEach(form => {
+                        form.addEventListener('submit', function (event) {
+                            event.preventDefault();
+                            if (confirm('Você tem certeza que deseja excluir esta categoria?')) {
+                                this.submit();
+                            }
+                        });
+                    });
+                });
+            </script>

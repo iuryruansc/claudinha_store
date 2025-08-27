@@ -1,0 +1,40 @@
+<%- include('../../partials/header.ejs') %>
+    <%- include('../../partials/navbar.ejs') %>
+
+        <div class="container">
+            <hr>
+            <div class="card">
+                <div class="card-header">
+                    <h2>Edição de Produto</h2>
+                </div>
+                <div class="card-body">
+                    <form method="POST" action="/admin/produtos/update/<%= produto.id_produto %>">
+                        <input class="form-control" type="text" name="nome" placeholder="Defina o nome do produto"
+                            value="<%= produto.nome %>"><br>
+                        <input class="form-control" type="text" name="descricao" placeholder="Descreva o produto"
+                            value="<%= produto.descricao %>"><br>
+                        <input class="form-control" type="text" name="preco" placeholder="Defina o preço do produto"
+                            value="<%= produto.preco %>"><br>
+                        <input class="form-control" type="text" name="codigo_barras"
+                            placeholder="Defina o código de barras do produto" value="<%= produto.codigo_barras %>"><br>
+                        <select name="id_categoria" class="form-select">
+                            <% categories.forEach(category=> { %>
+                                <% if (category.id_categoria==produto.id_categoria) { %>
+                                    <option value="<%= category.id_categoria %>" selected>
+                                        <%= category.nome %>
+                                    </option>
+                                    <% } else { %>
+                                        <option value="<%= category.id_categoria %>">
+                                            <%= category.nome %>
+                                        </option>
+                                        <% } %>
+                                            <% }) %>
+                        </select><br>
+                        <input type="hidden" name="id_produto" value="<%= produto.id_produto %>">
+                        <button class="btn btn-success">Atualizar</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <%- include('../../partials/footer.ejs') %>

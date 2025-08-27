@@ -1,0 +1,78 @@
+<%- include('../../partials/header.ejs') %>
+    <%- include('../../partials/navbar.ejs') %>
+
+        <div class="container">
+            <hr>
+            <h2>Funcionarios</h2>
+            <a href="/admin/funcionarios/new" class="btn btn-success">Cadastrar Funcionario</a>
+            <hr>
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nome</th>
+                        <th>CPF</th>
+                        <th>Cargo</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <label>
+                        <input type="checkbox" id="toggleExcluir">
+                        Habilitar botão Excluir
+                    </label>
+                    <% funcionarios.forEach(funcionario=> { %>
+                        <tr>
+                            <td>
+                                <%= funcionario.id_funcionario %>
+                            </td>
+                            <td>
+                                <%= funcionario.nome %>
+                            </td>
+                            <td>
+                                <%= funcionario.cpf %>
+                            </td>
+                            <td>
+                                <%= funcionario.cargo %>
+                            </td>
+                            <td>
+                                <a href="/admin/funcionarios/edit/<%= funcionario.id_funcionario %>"
+                                    class="btn btn-warning">Editar</a>
+                                <form action="/admin/funcionarios/delete/<%= funcionario.id_funcionario %>"
+                                    method="POST" style="display: inline;">
+                                    <input type="hidden" name="id_funcionario"
+                                        value="<%= funcionario.id_funcionario %>">
+                                    <button class="btn btn-danger excluir-btn" style="display: none;">Excluir</button>
+                                </form>
+                            </td>
+                        </tr>
+                        <% }) %>
+                </tbody>
+            </table>
+        </div>
+
+        <%- include('../../partials/footer.ejs') %>
+
+            <script>
+
+                document.addEventListener('DOMContentLoaded', function () {
+                    const deleteForms = document.querySelectorAll('form[action^="/admin/funcionarios/delete/]');
+                    const toggleExcluir = document.getElementById('toggleExcluir');
+
+                    toggleExcluir.addEventListener('change', function () {
+                        const excluirButtons = document.querySelectorAll('.excluir-btn');
+                        excluirButtons.forEach(btn => {
+                            btn.style.display = this.checked ? 'inline-block' : 'none';
+                        });
+                    });
+
+                    deleteForms.forEach(form => {
+                        form.addEventListener('submit', function (event) {
+                            event.preventDefault();
+                            if (confirm('Você tem certeza que deseja remover este funcionario?')) {
+                                this.submit();
+                            }
+                        });
+                    });
+                });
+            </script>

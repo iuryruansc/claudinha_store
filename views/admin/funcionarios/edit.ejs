@@ -1,0 +1,25 @@
+<%- include('../../partials/header.ejs') %>
+    <%- include('../../partials/navbar.ejs') %>
+
+        <div class="container">
+            <hr>
+            <div class="card">
+                <div class="card-header">
+                    <h2>Edição de Categoria</h2>
+                </div>
+                <div class="card-body">
+                    <form method="POST" action="/admin/funcionarios/update/<%= funcionario.id_funcionario %>">
+                        <input class="form-control" type="text" name="nome" placeholder="Nome do Funcionario"
+                            value="<%= funcionario.nome %>"><br>
+                        <input class="form-control" type="text" name="cpf" placeholder="CPF do Funcionario"
+                            value="<%= funcionario.cpf %>"><br>
+                        <input class="form-control" type="text" name="cargo" placeholder="Cargo do Funcionario"
+                            value="<%= funcionario.cargo %>"><br>
+                        <input type="hidden" name="id_funcionario" value="<%= funcionario.id_funcionario %>">
+                        <button class="btn btn-success">Atualizar</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <%- include('../../partials/footer.ejs') %>

@@ -1,0 +1,95 @@
+<%- include('../../partials/header.ejs') %>
+    <%- include('../../partials/navbar.ejs') %>
+
+        <div class="container">
+            <hr>
+            <h2>
+                <% if (categoria_nome) { %>
+                    Produtos da Categoria: <%= categoria_nome %>
+                        <% } else { %>
+                            Todos os Produtos
+                            <% } %>
+            </h2>
+            <hr>
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <% if (!categoria_nome) { %>
+                            <th>Categoria</th>
+                        <% } %>
+                        <th>Produto</th>
+                        <th>Descrição</th>
+                        <th>Preco</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <label>
+                        <input type="checkbox" id="toggleExcluir">
+                        Habilitar botão Excluir
+                    </label>
+                    <% produtos.forEach(produto=> { %>
+                        <tr>
+                            <td>
+                                <%= produto.id_produto %>
+                            </td>
+                            <% if (!categoria_nome) { %>
+                                <td>
+                                    <% 
+                                       const cat = categorias.find(c => c.id_categoria === produto.id_categoria);
+                                       if (cat) { %>
+                                          <%= cat.nome %>
+                                    <% } else { %>
+                                          -
+                                    <% } %>
+                                    </td>
+                            <% } %>
+                            <td>
+                                <%= produto.nome %>
+                            </td>
+                            <td>
+                                <%= produto.descricao %>
+                            </td>
+                            <td>
+                                <%= produto.preco %>
+                            </td>
+                            <td>
+                                <a href="/admin/produtos/edit/<%= produto.id_produto %>?categoria=<%= produto.id_categoria %>" input type="hidden"
+                                    name="id_categoria" value="<%= produto.id_categoria %>"
+                                    class="btn btn-warning">Editar</a>
+                                <form action="/admin/produtos/delete/<%= produto.id_produto %>" method="POST" style="display: inline;">
+                                    <input type="hidden" name="id_produto" value="<%= produto.id_produto %>">
+                                    <button class="btn btn-danger excluir-btn" style="display: none;">Excluir</button>
+                                </form>
+                            </td>
+                        </tr>
+                        <% }) %>
+                </tbody>
+            </table>
+        </div>
+
+        <%- include('../../partials/footer.ejs') %>
+
+            <script>
+
+                document.addEventListener('DOMContentLoaded', function () {
+                    const deleteForms = document.querySelectorAll('form[action="/admin/produtos/delete/');
+                    const toggleExcluir = document.getElementById('toggleExcluir');
+
+                    toggleExcluir.addEventListener('change', function () {
+                        const excluirButtons = document.querySelectorAll('.excluir-btn');
+                        excluirButtons.forEach(btn => {
+                            btn.style.display = this.checked ? 'inline-block' : 'none';
+                        });
+                    });
+
+                    deleteForms.forEach(form => {
+                        form.addEventListener('submit', function (event) {
+                            event.preventDefault();
+                            if (confirm('Você tem certeza que deseja excluir este produto?')) {
+                                this.submit();
+                            }
+                        });
+                    });
+                });
+            </script>
