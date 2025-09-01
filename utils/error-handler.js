@@ -1,9 +1,23 @@
 module.exports = ((err, req, res, next) => {
     console.error(err.stack);
-    res.status(err.status || 500).json({
+
+    if (err.name === 'SequelizeValidationError') {
+        const validationErrors = err.errors.map(e => e.message);
+        return res.status(400).json({
+            error: {
+                message: 'Erro de validação nos dados fornecidos.',
+                details: validationErrors,
+                code: 400,
+            },
+        });
+    }
+
+    const status = err.status || 500;
+    const message = err.message || 'Um erro inesperado aconteceu.';
+    res.status(status).json({
         error: {
-            message: err.message || 'An unexpected error occurred.',
-            code: err.status || 500,
+            message: message,
+            code: status,
         },
     });
 });

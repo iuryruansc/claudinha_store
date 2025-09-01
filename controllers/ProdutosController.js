@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const asyncHandler = require('../utils/async-handler');
+const { idValidation, modelValidation, stringValidation, numberValidation } = require('../utils/data-validation');
 const Category = require('../models/Category');
 const Produto = require('../models/Produto');
 
@@ -24,22 +25,14 @@ router.get('/produtos', asyncHandler(async (req, res) => {
 router.get('/produtos/:id_categoria', asyncHandler(async (req, res) => {
     const { id_categoria } = req.params;
 
-    if (isNaN(id_categoria)) {
-        const err = new Error('ID de categoria inválido.');
-        err.status = 400;
-        throw err;
-    }
+    idValidation(id_categoria);
 
     const [produtos, categoria] = await Promise.all([
         Produto.findAll({ where: { id_categoria } }),
         Category.findByPk(id_categoria)
     ]);
 
-    if (!categoria) {
-        const err = new Error('Categoria não encontrada.');
-        err.status = 404;
-        throw err;
-    }
+    modelValidation(categoria);
 
     res.render('admin/produtos/index', {
         produtos,
@@ -52,22 +45,15 @@ router.get('/produtos/edit/:id_produto', asyncHandler(async (req, res) => {
     const { id_produto } = req.params;
     const { id_categoria } = req.query;
 
-    if (isNaN(id_produto)) {
-        const err = new Error('ID do produto inválido.');
-        err.status = 400;
-        throw err;
-    }
+    idValidation(id_produto);
+    idValidation(id_categoria);
 
     const [produto, categories] = await Promise.all([
         Produto.findByPk(id_produto),
         Category.findAll()
     ]);
 
-    if (!produto) {
-        const err = new Error('Produto não encontrado.');
-        err.status = 404;
-        throw err;
-    }
+    modelValidation(produto);
 
     res.render('admin/produtos/edit', { produto, categories, id_categoria });
 }));
@@ -75,11 +61,12 @@ router.get('/produtos/edit/:id_produto', asyncHandler(async (req, res) => {
 router.post('/produtos/save', asyncHandler(async (req, res) => {
     const { nome, descricao, preco, codigo_barras, id_categoria } = req.body;
 
-    if (!nome || !descricao || isNaN(parseFloat(preco)) || !id_categoria) {
-        const err = new Error('Dados inválidos para criar produto.');
-        err.status = 400;
-        throw err;
-    }
+    idValidation(id_categoria);
+    stringValidation(nome, descricao, codigo_barras);
+    numberValidation(parseFloat(preco));
+
+    const category = await Category.findByPk(id_categoria);
+    modelValidation(category);
 
     await Produto.create({
         nome,
@@ -95,15 +82,12 @@ router.post('/produtos/save', asyncHandler(async (req, res) => {
 router.post('/produtos/delete/:id_produto', asyncHandler(async (req, res) => {
     const { id_produto } = req.params;
 
-    if (isNaN(id_produto)) {
-        const err = new Error('ID do produto inválido para exclusão.');
-        err.status = 400;
-        throw err;
-    }
+    idValidation(id_produto);
 
-    await Produto.destroy({
-        where: { id_produto }
-    });
+    const produto = await Produto.findByPk(id_produto);
+    modelValidation(produto);
+
+    await produto.destroy();
 
     res.redirect('/admin/produtos');
 }));
@@ -112,20 +96,20 @@ router.post('/produtos/update/:id_produto', asyncHandler(async (req, res) => {
     const { id_produto } = req.params;
     const { nome, descricao, preco, codigo_barras, id_categoria } = req.body;
 
-    if (isNaN(id_produto) || !nome || !descricao || isNaN(parseFloat(preco)) || !id_categoria) {
-        const err = new Error('Dados inválidos para atualizar produto.');
-        err.status = 400;
-        throw err;
-    }
+    idValidation(id_produto, id_categoria);
+    stringValidation(nome, descricao, codigo_barras);
+    numberValidation(parseFloat(preco));
 
-    await Produto.update({
+    const produto= await Produto.findByPk(id_produto);
+
+    modelValidation(produto);
+
+    await produto.update({
         nome,
         descricao,
         preco: parseFloat(preco),
         codigo_barras,
         id_categoria
-    }, {
-        where: { id_produto }
     });
 
     res.redirect('/admin/produtos');

@@ -8,13 +8,17 @@ const Estoque = connection.define('estoque', {
         primaryKey: true,
         autoIncrement: true
     },
+    id_produto: {
+        type: Sequelize.INTEGER,
+        allowNull: false
+    },
     quantidade_atual: {
         type: Sequelize.INTEGER,
-        allowNull: true
+        allowNull: false
     },
     localizacao: {
         type: Sequelize.STRING,
-        allowNull: true
+        allowNull: false
     }
 }, {
     tableName: 'estoque',
