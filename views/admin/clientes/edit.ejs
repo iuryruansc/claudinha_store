@@ -1,0 +1,27 @@
+<%- include('../../partials/header.ejs') %>
+    <%- include('../../partials/navbar.ejs') %>
+
+        <div class="container">
+            <hr>
+            <div class="card">
+                <div class="card-header">
+                    <h2>Edição de Cliente</h2>
+                </div>
+                <div class="card-body">
+                    <form method="POST" action="/admin/clientes/update/<%= cliente.id_cliente %>">
+                        <input class="form-control" type="text" name="nome" placeholder="Nome do Cliente"
+                            value="<%= cliente.nome %>"><br>
+                        <input class="form-control" type="text" name="email" placeholder="Email do Cliente"
+                            value="<%= cliente.email %>"><br>
+                        <input class="form-control" type="text" name="telefone" placeholder="Telefone do Cliente"
+                            value="<%= cliente.telefone %>"><br>
+                        <input class="form-control" type="text" name="cpf" placeholder="CPF do Cliente"
+                            value="<%= cliente.cpf %>"><br>
+                        <input type="hidden" name="id_cliente" value="<%= cliente.id_cliente %>">
+                        <button class="btn btn-success">Atualizar</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <%- include('../../partials/footer.ejs') %>

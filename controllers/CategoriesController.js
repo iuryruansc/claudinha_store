@@ -10,7 +10,7 @@ router.get('/categories/new', (req, res) => {
 router.get('/categories', asyncHandler(async (req, res) => {
     const categories = await Category.findAll();
     res.render('admin/categories/index', { categories })
-}))
+}));
 
 router.get('/categories/edit/:id_categoria', asyncHandler(async (req, res) => {
     const { id_categoria } = req.params;
@@ -30,7 +30,7 @@ router.get('/categories/edit/:id_categoria', asyncHandler(async (req, res) => {
     }
 
     res.render('admin/categories/edit', { category })
-}))
+}));
 
 router.post('/categories/save', asyncHandler(async (req, res) => {
     const { nome } = req.body;
@@ -43,7 +43,7 @@ router.post('/categories/save', asyncHandler(async (req, res) => {
 
     await Category.create({ nome });
     res.redirect('/admin/categories');
-}))
+}));
 
 router.post('/categories/delete/:id_categoria', asyncHandler(async (req, res) => {
     const { id_categoria } = req.params;
@@ -61,7 +61,7 @@ router.post('/categories/delete/:id_categoria', asyncHandler(async (req, res) =>
     });
 
     res.redirect('/admin/categories');
-}))
+}));
 
 router.post('/categories/update/:id_categoria', asyncHandler(async (req, res) => {
     const { id_categoria } = req.params;

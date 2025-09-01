@@ -13,16 +13,19 @@ const Clientes = connection.define('cliente', {
     },
     email: {
         type: Sequelize.STRING,
-        allowNull: true,
-        unique: true
+        allowNull: false,
+        unique: false,
+        validate: {
+            isEmail: true
+        }
     },
     telefone: {
         type: Sequelize.STRING,
-        allowNull: true
+        allowNull: false
     },
     cpf: {
         type: Sequelize.STRING,
-        allowNull: true,
+        allowNull: false,
         unique: true
     }
 }, {

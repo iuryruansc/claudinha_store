@@ -1,0 +1,81 @@
+<%- include('../../partials/header.ejs') %>
+    <%- include('../../partials/navbar.ejs') %>
+
+        <div class="container">
+            <hr>
+            <h2>Clientes</h2>
+            <a href="/admin/clientes/new" class="btn btn-success">Cadastrar Cliente</a>
+            <hr>
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nome</th>
+                        <th>Email</th>
+                        <th>Telefone</th>
+                        <th>CPF</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <label>
+                        <input type="checkbox" id="toggleExcluir">
+                        Habilitar botão Excluir
+                    </label>
+                    <% clientes.forEach(cliente=> { %>
+                        <tr>
+                            <td>
+                                <%= cliente.id_cliente %>
+                            </td>
+                            <td>
+                                <%= cliente.nome %>
+                            </td>
+                            <td>
+                                <%= cliente.email %>
+                            </td>
+                            <td>
+                                <%= cliente.telefone %>
+                            </td>
+                            <td>
+                                <%= cliente.cpf %>
+                            </td>
+                            <td>
+                                <a href="/admin/clientes/edit/<%= cliente.id_cliente %>"
+                                    class="btn btn-warning">Editar</a>
+                                <form action="/admin/clientes/delete/<%= cliente.id_cliente %>" method="POST"
+                                    style="display: inline;">
+                                    <input type="hidden" name="id_cliente" value="<%= cliente.id_cliente %>">
+                                    <button class="btn btn-danger excluir-btn" style="display: none;">Excluir</button>
+                                </form>
+                            </td>
+                        </tr>
+                        <% }) %>
+                </tbody>
+            </table>
+        </div>
+
+        <%- include('../../partials/footer.ejs') %>
+
+            <script>
+
+                document.addEventListener('DOMContentLoaded', function () {
+                    const deleteForms = document.querySelectorAll('form[action^="/admin/clientes/delete/]');
+                    const toggleExcluir = document.getElementById('toggleExcluir');
+
+                    toggleExcluir.addEventListener('change', function () {
+                        const excluirButtons = document.querySelectorAll('.excluir-btn');
+                        excluirButtons.forEach(btn => {
+                            btn.style.display = this.checked ? 'inline-block' : 'none';
+                        });
+                    });
+
+                    deleteForms.forEach(form => {
+                        form.addEventListener('submit', function (event) {
+                            event.preventDefault();
+                            if (confirm('Você tem certeza que deseja remover este cliente?')) {
+                                this.submit();
+                            }
+                        });
+                    });
+                });
+            </script>

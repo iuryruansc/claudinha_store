@@ -8,9 +8,11 @@ const port = process.env.PORT || 3000;
 const connection = require('./database/database');
 const errorHandler = require('./utils/error-handler');
 
+//Importing controllers
 const categoriesController = require('./controllers/CategoriesController');
-const produtoController = require('./controllers/ProdutoController');
+const produtoController = require('./controllers/ProdutosController');
 const funcionariosController = require('./controllers/FuncionariosController');
+const clientesController = require('./controllers/ClientesController')
 
 //View engine
 app.set('view engine', 'ejs');
@@ -42,14 +44,17 @@ connection
     console.error('Erro ao conectar ao banco de dados:', error);
   });
 
-app.use('/admin', categoriesController);
-app.use('/admin', produtoController);
-app.use('/admin', funcionariosController);
-app.use(errorHandler);
-
+//Routes
 app.get('/', (req, res) => {
   res.send("Home");
 });
+app.use('/admin', categoriesController);
+app.use('/admin', produtoController);
+app.use('/admin', funcionariosController);
+app.use('/admin', clientesController)
+
+//Error handler middleware
+app.use(errorHandler);
 
 app.listen(port, () => {
   console.log(`Servidor rodando em http://localhost:${port}`);

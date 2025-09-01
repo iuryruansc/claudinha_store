@@ -10,7 +10,7 @@ router.get('/funcionarios/new', asyncHandler(async (req, res) => {
 router.get('/funcionarios', asyncHandler(async (req, res) => {
     const funcionarios = await Funcionario.findAll();
     res.render('admin/funcionarios/index', { funcionarios })
-}))
+}));
 
 router.get('/funcionarios/edit/:id_funcionario', asyncHandler(async (req, res) => {
     const { id_funcionario } = req.params;
@@ -30,7 +30,7 @@ router.get('/funcionarios/edit/:id_funcionario', asyncHandler(async (req, res) =
     }
 
     res.render('admin/funcionarios/edit', { funcionario })
-}))
+}));
 
 router.post('/funcionarios/save', asyncHandler(async (req, res) => {
     const { nome, cpf, cargo } = req.body;
@@ -43,7 +43,7 @@ router.post('/funcionarios/save', asyncHandler(async (req, res) => {
 
     await Funcionario.create({ nome, cpf, cargo });
     res.redirect('/admin/funcionarios');
-}))
+}));
 
 router.post('/funcionarios/delete/:id_funcionario', asyncHandler(async (req, res) => {
     const { id_funcionario } = req.params;
@@ -61,7 +61,7 @@ router.post('/funcionarios/delete/:id_funcionario', asyncHandler(async (req, res
     });
 
     res.redirect('/admin/funcionarios');
-}))
+}));
 
 router.post('/funcionarios/update/:id_funcionario', asyncHandler(async (req, res) => {
     const { id_funcionario } = req.params;
