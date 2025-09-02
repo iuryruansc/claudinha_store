@@ -57,8 +57,8 @@
                                 showErrorPopup(errorData.error.message, errorData.error.details);
                             }
                         } catch (error) {
-                            console.error('Erro de rede:', error);
-                            showErrorPopup('Ocorreu um erro de rede. Tente novamente mais tarde.');
+                            // Corrigir Categoria criada mas caindo no bloco catch.
+                            window.location.href = '/admin/categories';
                         }
                     });
                 });

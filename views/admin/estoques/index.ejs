@@ -38,7 +38,6 @@
                             </td>
                             <td>
                                 <a href="/admin/estoques/edit/<%= estoque.id_estoque %>?produto=<%= estoque.id_produto %>"
-                                    input type="hidden" name="id_produto" value="<%= estoque.id_produto %>"
                                     class="btn btn-warning">Editar</a>
                                 <form action="/admin/estoques/delete/<%= estoque.id_estoque %>" method="POST"
                                     style="display: inline;">

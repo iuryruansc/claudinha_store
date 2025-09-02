@@ -43,10 +43,8 @@ router.get('/produtos/:id_categoria', asyncHandler(async (req, res) => {
 
 router.get('/produtos/edit/:id_produto', asyncHandler(async (req, res) => {
     const { id_produto } = req.params;
-    const { id_categoria } = req.query;
 
     idValidation(id_produto);
-    idValidation(id_categoria);
 
     const [produto, categories] = await Promise.all([
         Produto.findByPk(id_produto),
@@ -55,7 +53,7 @@ router.get('/produtos/edit/:id_produto', asyncHandler(async (req, res) => {
 
     modelValidation(produto);
 
-    res.render('admin/produtos/edit', { produto, categories, id_categoria });
+    res.render('admin/produtos/edit', { produto, categories});
 }));
 
 router.post('/produtos/save', asyncHandler(async (req, res) => {

@@ -37,7 +37,8 @@
                                     class="btn btn-warning">Editar</a>
                                 <a href="/admin/produtos/<%= category.id_categoria %>" class="btn btn-primary">Ver
                                     Produtos</a>
-                                <form action="/admin/categories/delete/<%= category.id_categoria %>" style="display: inline;">
+                                <form action="/admin/categories/delete/<%= category.id_categoria %>"
+                                    style="display: inline;">
                                     <input type="hidden" name="id_categoria" value="<%= category.id_categoria %>">
 
                                     <button class="btn btn-danger excluir-btn" style="display: none;">Excluir</button>
@@ -94,7 +95,7 @@
                                         method: 'POST'
                                     });
 
-                                    if(response.ok) {
+                                    if (response.ok) {
                                         const row = form.closest('tr');
                                         if (row) {
                                             row.remove();
@@ -104,8 +105,8 @@
                                         showErrorPopup(errorData.error.message, errorData.error.details);
                                     }
                                 } catch (error) {
-                                    console.error('Erro de rede:', error);
-                                    showErrorPopup('Ocorreu um erro de rede. Tente novamente mais tarde');
+                                    // Corrigir Categoria criada mas caindo no bloco catch.
+                                    window.location.href = '/admin/categories';
                                 }
                             }
                         });
@@ -113,4 +114,3 @@
                 });
 
             </script>
-            
