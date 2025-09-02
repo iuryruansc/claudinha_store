@@ -17,7 +17,7 @@
                         <th>Ações</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody id="category-table-body">
                     <label>
                         <input type="checkbox" id="toggleExcluir">
                         Habilitar botão Excluir
@@ -61,12 +61,10 @@
                 document.addEventListener('DOMContentLoaded', function () {
                     const deleteForms = document.querySelectorAll('form[action^="/admin/clientes/delete/]');
                     const toggleExcluir = document.getElementById('toggleExcluir');
+                    const tableBody = document.getElementById('category-table-body');
 
                     toggleExcluir.addEventListener('change', function () {
-                        const excluirButtons = document.querySelectorAll('.excluir-btn');
-                        excluirButtons.forEach(btn => {
-                            btn.style.display = this.checked ? 'inline-block' : 'none';
-                        });
+                        tableBody.classList.toggle('delete-enabled', this.checked);
                     });
 
                     deleteForms.forEach(form => {

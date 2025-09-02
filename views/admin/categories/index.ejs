@@ -6,6 +6,11 @@
             <h2>Categorias</h2>
             <a href="/admin/categories/new" class="btn btn-success">Criar Nova Categoria</a>
             <hr>
+
+            <div class="mb-3">
+                <label for="search-input" class="form-label">Filtrar por nome:</label>
+                <input type="text" id="search-input" class="form-control" placeholder="Digite o nome da categoria">
+            </div>
             <table class="table table-bordered">
                 <thead>
                     <tr>
@@ -32,8 +37,7 @@
                                     class="btn btn-warning">Editar</a>
                                 <a href="/admin/produtos/<%= category.id_categoria %>" class="btn btn-primary">Ver
                                     Produtos</a>
-                                <form action="/admin/categories/delete/<%= category.id_categoria %>" method="POST"
-                                    style="display: inline;">
+                                <form action="/admin/categories/delete/<%= category.id_categoria %>" style="display: inline;">
                                     <input type="hidden" name="id_categoria" value="<%= category.id_categoria %>">
 
                                     <button class="btn btn-danger excluir-btn" style="display: none;">Excluir</button>
@@ -45,26 +49,68 @@
             </table>
         </div>
 
+        <div id="error-popup-container"></div>
+
         <%- include('../../partials/footer.ejs') %>
 
-            <script>
+            <script type="module">
+
+                import { showErrorPopup } from '/js/show-error-popup.js'
 
                 document.addEventListener('DOMContentLoaded', function () {
                     const deleteForms = document.querySelectorAll('form[action^="/admin/categories/delete"]');
                     const toggleExcluir = document.getElementById('toggleExcluir');
                     const tableBody = document.getElementById('category-table-body');
+                    const searchInput = document.getElementById('search-input');
+
+                    searchInput.addEventListener('input', function () {
+                        const filterValue = this.value.toLowerCase();
+                        const rows = tableBody.querySelectorAll('tr');
+
+                        rows.forEach(row => {
+                            const categoryNameCell = row.querySelector('td:nth-child(2)');
+                            if (categoryNameCell) {
+                                const categoryName = categoryNameCell.textContent.toLowerCase();
+                                if (categoryName.includes(filterValue)) {
+                                    row.style.display = '';
+                                } else {
+                                    row.style.display = 'none';
+                                }
+                            }
+                        });
+                    });
 
                     toggleExcluir.addEventListener('change', function () {
                         tableBody.classList.toggle('delete-enabled', this.checked);
                     });
 
                     deleteForms.forEach(form => {
-                        form.addEventListener('submit', function (event) {
+                        form.addEventListener('submit', async function (event) {
                             event.preventDefault();
                             if (confirm('Você tem certeza que deseja excluir esta categoria?')) {
-                                this.submit();
+                                const formAction = this.getAttribute('action');
+                                try {
+                                    const response = await fetch(formAction, {
+                                        method: 'POST'
+                                    });
+
+                                    if(response.ok) {
+                                        const row = form.closest('tr');
+                                        if (row) {
+                                            row.remove();
+                                        }
+                                    } else {
+                                        const errorData = await response.json();
+                                        showErrorPopup(errorData.error.message, errorData.error.details);
+                                    }
+                                } catch (error) {
+                                    console.error('Erro de rede:', error);
+                                    showErrorPopup('Ocorreu um erro de rede. Tente novamente mais tarde');
+                                }
                             }
                         });
                     });
                 });
+
             </script>
+            

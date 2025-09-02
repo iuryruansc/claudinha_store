@@ -3,24 +3,16 @@
 
         <div class="container">
             <hr>
-            <h2>
-                <% if (categoria_nome) { %>
-                    Produtos da Categoria: <%= categoria_nome %>
-                        <% } else { %>
-                            Todos os Produtos
-                            <% } %>
-            </h2>
+            <h2>Estoques</h2>
+            <a href="/admin/estoques/new" class="btn btn-success">Cadastrar Estoque</a>
             <hr>
             <table class="table table-bordered">
                 <thead>
                     <tr>
                         <th>ID</th>
-                        <% if (!categoria_nome) { %>
-                            <th>Categoria</th>
-                        <% } %>
                         <th>Produto</th>
-                        <th>Descrição</th>
-                        <th>Preco</th>
+                        <th>Quantidade Atual</th>
+                        <th>Localização</th>
                         <th>Ações</th>
                     </tr>
                 </thead>
@@ -29,37 +21,28 @@
                         <input type="checkbox" id="toggleExcluir">
                         Habilitar botão Excluir
                     </label>
-                    <% produtos.forEach(produto=> { %>
+                    <% estoques.forEach(estoque=> { %>
                         <tr>
                             <td>
-                                <%= produto.id_produto %>
-                            </td>
-                            <% if (!categoria_nome) { %>
-                                <td>
-                                    <% 
-                                       const cat = categorias.find(c => c.id_categoria === produto.id_categoria);
-                                       if (cat) { %>
-                                          <%= cat.nome %>
-                                    <% } else { %>
-                                          -
-                                    <% } %>
-                                    </td>
-                            <% } %>
-                            <td>
-                                <%= produto.nome %>
+                                <%= estoque.id_estoque %>
                             </td>
                             <td>
-                                <%= produto.descricao %>
+                                <% const produto=produtos.find(p=> p.id_produto === estoque.id_produto); %>
+                                    <%= produto ? produto.nome : 'Produto não encontrado' %>
                             </td>
                             <td>
-                                <%= produto.preco %>
+                                <%= estoque.quantidade_atual %>
                             </td>
                             <td>
-                                <a href="/admin/produtos/edit/<%= produto.id_produto %>?categoria=<%= produto.id_categoria %>" input type="hidden"
-                                    name="id_categoria" value="<%= produto.id_categoria %>"
+                                <%= estoque.localizacao %>
+                            </td>
+                            <td>
+                                <a href="/admin/estoques/edit/<%= estoque.id_estoque %>?produto=<%= estoque.id_produto %>"
+                                    input type="hidden" name="id_produto" value="<%= estoque.id_produto %>"
                                     class="btn btn-warning">Editar</a>
-                                <form action="/admin/produtos/delete/<%= produto.id_produto %>" method="POST" style="display: inline;">
-                                    <input type="hidden" name="id_produto" value="<%= produto.id_produto %>">
+                                <form action="/admin/estoques/delete/<%= estoque.id_estoque %>" method="POST"
+                                    style="display: inline;">
+                                    <input type="hidden" name="id_estoque" value="<%= estoque.id_estoque %>">
                                     <button class="btn btn-danger excluir-btn" style="display: none;">Excluir</button>
                                 </form>
                             </td>
@@ -74,7 +57,7 @@
             <script>
 
                 document.addEventListener('DOMContentLoaded', function () {
-                    const deleteForms = document.querySelectorAll('form[action^="/admin/produtos/delete"]');
+                    const deleteForms = document.querySelectorAll('form[action^="/admin/estoques/delete"]');
                     const toggleExcluir = document.getElementById('toggleExcluir');
                     const tableBody = document.getElementById('category-table-body');
 
@@ -85,7 +68,7 @@
                     deleteForms.forEach(form => {
                         form.addEventListener('submit', function (event) {
                             event.preventDefault();
-                            if (confirm('Você tem certeza que deseja excluir este produto?')) {
+                            if (confirm('Você tem certeza que deseja excluir este estoque?')) {
                                 this.submit();
                             }
                         });
