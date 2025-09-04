@@ -1,0 +1,100 @@
+<%- include('../../partials/header.ejs') %>
+    <%- include('../../partials/navbar.ejs') %>
+
+        <div class="container">
+            <hr>
+            <h2>Caixa</h2>
+            <a href="/admin/caixas/new" class="btn btn-success">Cadastrar Caixa</a>
+            <hr>
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Funcionario</th>
+                        <th>Ponto de Venda</th>
+                        <th>Saldo Inicial</th>
+                        <th>Saldo Final</th>
+                        <th>Status</th>
+                        <th>Abertura</th>
+                        <th>Fechamento</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody id="category-table-body">
+                    <label>
+                        <input type="checkbox" id="toggleExcluir">
+                        Habilitar botão Excluir
+                    </label>
+                    <% caixas.forEach(caixa=> { %>
+                        <tr>
+                            <td>
+                                <%= caixa.id_caixa %>
+                            </td>
+                            <td>
+                                <% const funcionario=funcionarios.find(c=> c.id_funcionario === caixa.id_funcionario);
+                                    if (funcionario) { %>
+                                    <%= funcionario.nome %>
+                                        <% } else { %>
+                                            -
+                                            <% } %>
+                            </td>
+                            <td>
+                                <% const pdv=pdvs.find(c=> c.id_pdv === caixa.id_pdv);
+                                    if (pdv) { %>
+                                    <%= pdv.identificacao %>
+                                        <% } else { %>
+                                            -
+                                            <% } %>
+                            </td>
+                            <td>
+                                <%= caixa.saldo_inicial %>
+                            </td>
+                            <td>
+                                <%= caixa.saldo_final %>
+                            </td>
+                            <td>
+                                <%= caixa.status %>
+                            </td>
+                            <td>
+                                <%= formatDate(caixa.data_abertura) %>
+                            </td>
+                            <td>
+                                <%= caixa.data_fechamento %>
+                            </td>
+                            <td>
+                                <a href="/admin/caixas/edit/<%= caixa.id_caixa %>" class="btn btn-warning">Editar</a>
+                                <form action="/admin/caixas/delete/<%= caixa.id_caixa %>" method="POST"
+                                    style="display: inline;">
+                                    <input type="hidden" name="id_caixa" value="<%= caixa.id_caixa %>">
+                                    <button class="btn btn-danger excluir-btn" style="display: none;">Excluir</button>
+                                </form>
+                            </td>
+                        </tr>
+                        <% }) %>
+                </tbody>
+            </table>
+        </div>
+
+        <%- include('../../partials/footer.ejs') %>
+
+            <script>
+
+                document.addEventListener('DOMContentLoaded', function () {
+                    const deleteForms = document.querySelectorAll('form[action^="/admin/caixas/delete/]');
+                    const toggleExcluir = document.getElementById('toggleExcluir');
+                    const tableBody = document.getElementById('category-table-body');
+
+                    toggleExcluir.addEventListener('change', function () {
+                        tableBody.classList.toggle('delete-enabled', this.checked);
+                    });
+
+                    deleteForms.forEach(form => {
+                        form.addEventListener('submit', function (event) {
+                            event.preventDefault();
+                            if (confirm('Você tem certeza que deseja remover este funcionario?')) {
+                                this.submit();
+                            }
+                        });
+                    });
+                });
+            </script>

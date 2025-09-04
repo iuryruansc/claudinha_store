@@ -19,11 +19,13 @@ const Caixa = connection.define('caixa', {
     },
     data_abertura: {
         type: Sequelize.DATE,
-        allowNull: true
+        allowNull: true,
+        defaultValue: Sequelize.NOW
     },
     data_fechamento: {
         type: Sequelize.DATE,
-        allowNull: true
+        allowNull: true,
+        defaultValue: null
     },
     saldo_inicial: {
         type: Sequelize.DECIMAL(10, 2),
@@ -35,7 +37,7 @@ const Caixa = connection.define('caixa', {
     },
     status: {
         type: Sequelize.ENUM('aberto', 'fechado'),
-        allowNull: true,
+        allowNull: false,
     }
 }, {
     tableName: 'caixa',

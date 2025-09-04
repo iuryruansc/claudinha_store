@@ -5,7 +5,7 @@ const app = express();
 const helmet = require('helmet');
 const bodyParser = require('body-parser');
 const connection = require('./database/database');
-const errorHandler = require('./utils/error-handler');
+const errorHandler = require('./utils/handlers/error-handler');
 
 //Routers
 const adminRouter = require('./routes/admin');

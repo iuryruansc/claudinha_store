@@ -1,0 +1,76 @@
+<%- include('../../partials/header.ejs') %>
+    <%- include('../../partials/navbar.ejs') %>
+
+        <div class="container">
+            <hr>
+            <h2>Funcionarios</h2>
+            <a href="/admin/pdvs/new" class="btn btn-success">Cadastrar PDV</a>
+            <hr>
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Identificação</th>
+                        <th>Descrição</th>
+                        <th>Status</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody id="category-table-body">
+                    <label>
+                        <input type="checkbox" id="toggleExcluir">
+                        Habilitar botão Excluir
+                    </label>
+                    <% pdvs.forEach(pdv=> { %>
+                        <tr>
+                            <td>
+                                <%= pdv.id_pdv %>
+                            </td>
+                            <td>
+                                <%= pdv.identificacao %>
+                            </td>
+                            <td>
+                                <%= pdv.descricao %>
+                            </td>
+                            <td>
+                                <%= pdv.status %>
+                            </td>
+                            <td>
+                                <a href="/admin/pdvs/edit/<%= pdv.id_pdv %>"
+                                    class="btn btn-warning">Editar</a>
+                                <form action="/admin/pdvs/delete/<%= pdv.id_pdv %>"
+                                    method="POST" style="display: inline;">
+                                    <input type="hidden" name="id_pdv"
+                                        value="<%= pdv.id_pdv %>">
+                                    <button class="btn btn-danger excluir-btn" style="display: none;">Excluir</button>
+                                </form>
+                            </td>
+                        </tr>
+                        <% }) %>
+                </tbody>
+            </table>
+        </div>
+
+        <%- include('../../partials/footer.ejs') %>
+
+            <script>
+
+                document.addEventListener('DOMContentLoaded', function () {
+                    const deleteForms = document.querySelectorAll('form[action^="/admin/pdvs/delete/]');
+                    const toggleExcluir = document.getElementById('toggleExcluir');
+                    const tableBody = document.getElementById('category-table-body');
+
+                    toggleExcluir.addEventListener('change', function () {
+                        tableBody.classList.toggle('delete-enabled', this.checked);
+                    });
+
+                    deleteForms.forEach(form => {
+                        form.addEventListener('submit', function (event) {
+                            event.preventDefault();
+                            if (confirm('Você tem certeza que deseja remover este funcionario?')) {
+                                this.submit();
+                            }
+                        });
+                    });
+                });
+            </script>

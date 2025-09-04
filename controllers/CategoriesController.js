@@ -1,9 +1,10 @@
 const express = require('express');
 const router = express.Router();
-const asyncHandler = require('../utils/async-handler');
-const { idValidation, modelValidation, stringValidation, checkAssociations } = require('../utils/data-validation');
+const asyncHandler = require('../utils/handlers/async-handler');
+const { modelValidation, stringValidation, checkAssociations, numberValidation } = require('../utils/data-validation');
+const { parseIntValue } = require('../utils/data-parsers');
 const Category = require('../models/Category');
-const Produtos = require('../models/Produto')
+const Produtos = require('../models/Produto');
 
 router.get('/categories/new', (req, res) => {
     res.render('admin/categories/new', { title: 'Nova Categoria' });
@@ -15,11 +16,11 @@ router.get('/categories', asyncHandler(async (req, res) => {
 }));
 
 router.get('/categories/edit/:id_categoria', asyncHandler(async (req, res) => {
-    const { id_categoria } = req.params;
+    const [parsedId] = parseIntValue(req.params.id_categoria);
 
-    idValidation(id_categoria);
+    numberValidation(parsedId);
 
-    const category = await Category.findByPk(id_categoria);
+    const category = await Category.findByPk(parsedId);
 
     modelValidation(category);
 
@@ -36,17 +37,17 @@ router.post('/categories/save', asyncHandler(async (req, res) => {
 }));
 
 router.post('/categories/delete/:id_categoria', asyncHandler(async (req, res) => {
-    const { id_categoria } = req.params;
+    const [parsedId] = parseIntValue(req.params.id_categoria);
 
-    idValidation(id_categoria);
+    numberValidation(parsedId);
 
-    const category = await Category.findByPk(id_categoria);
+    const category = await Category.findByPk(parsedId);
 
     modelValidation(category);
 
     await checkAssociations(Produtos,
         'id_categoria',
-        id_categoria,
+        parsedId,
         "Não é possível excluir a categoria, pois exitem produtos associados a ela."
     );
 
@@ -56,16 +57,16 @@ router.post('/categories/delete/:id_categoria', asyncHandler(async (req, res) =>
 }));
 
 router.post('/categories/update/:id_categoria', asyncHandler(async (req, res) => {
-    const { id_categoria } = req.params;
     const { nome } = req.body;
+    const [parsedId] = parseIntValue(req.params.id_categoria);
 
-    idValidation(id_categoria);
+    numberValidation(parsedId);
     stringValidation(nome);
 
-    const category = await Category.findByPk(id_categoria);
+    const category = await Category.findByPk(parsedId);
     modelValidation(category);
 
-    await category.update()
+    await category.update({ nome });
 
     res.redirect('/admin/categories');
 }));

@@ -1,7 +1,8 @@
 const express = require('express');
 const router = express.Router();
-const asyncHandler = require('../utils/async-handler');
-const { idValidation, modelValidation, stringValidation } = require('../utils/data-validation');
+const asyncHandler = require('../utils/handlers/async-handler');
+const { modelValidation, stringValidation, numberValidation } = require('../utils/data-validation');
+const { parseIntValue } = require('../utils/data-parsers');
 const Cliente = require('../models/Clientes');
 
 router.get('/clientes/new', asyncHandler(async (req, res) => {
@@ -14,11 +15,11 @@ router.get('/clientes', asyncHandler(async (req, res) => {
 }));
 
 router.get('/clientes/edit/:id_cliente', asyncHandler(async (req, res) => {
-    const { id_cliente } = req.params;
+    const [parsedId] = parseIntValue(req.params.id_cliente);
 
-    idValidation(id_cliente);
+    numberValidation(parsedId);
 
-    const cliente = await Cliente.findByPk(id_cliente);
+    const cliente = await Cliente.findByPk(parsedId);
 
     modelValidation(cliente);
 
@@ -36,11 +37,11 @@ router.post('/clientes/save', asyncHandler(async (req, res) => {
 }));
 
 router.post('/clientes/delete/:id_cliente', asyncHandler(async (req, res) => {
-    const { id_cliente } = req.params;
+    const [parsedId] = parseIntValue(req.params.id_cliente);
 
-    idValidation(id_cliente);
+    numberValidation(parsedId);
 
-    const cliente = await Cliente.findByPk(id_cliente);
+    const cliente = await Cliente.findByPk(parsedId);
 
     modelValidation(cliente);
 
@@ -50,13 +51,13 @@ router.post('/clientes/delete/:id_cliente', asyncHandler(async (req, res) => {
 }));
 
 router.post('/clientes/update/:id_cliente', asyncHandler(async (req, res) => {
-    const { id_cliente } = req.params;
+    const [parsedId] = parseIntValue(req.params.id_cliente);
     const { nome, email, telefone, cpf } = req.body;
 
-    idValidation(id_cliente);
+    numberValidation(parsedId);
     stringValidation(nome, telefone, cpf);
 
-    const cliente = await Cliente.findByPk(id_cliente);
+    const cliente = await Cliente.findByPk(parsedId);
 
     modelValidation(cliente);
 

@@ -13,7 +13,7 @@ const Pdvs = connection.define('pdv', {
     },
     descricao: {
         type: Sequelize.STRING,
-        allowNull: true
+        allowNull: false
     },
     status: {
         type: Sequelize.ENUM('ativo', 'inativo'),

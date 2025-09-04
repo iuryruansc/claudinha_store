@@ -14,18 +14,6 @@
                             value="<%= estoque.quantidade_atual %>"><br>
                         <input class="form-control" type="text" name="localizacao"
                             placeholder="Onde está localizado o produto?" value="<%= estoque.localizacao %>"><br>
-                        <select name="id_produto" class="form-select">
-                            <% produtos.forEach(produto=> { %>
-                                <% if (produto.id_produto==estoque.id_produto) { %>
-                                    <option value="<%= produto.id_produto %>" selected>
-                                        <%= produto.nome %>
-                                    </option>
-                                    <% } else { %>
-                                        <option value="<%= produto.id_produto %>">
-                                            <%= produto.nome %>
-                                        </option>
-                                        <% } %>
-                                            <% }) %>
                         </select><br>
                         <input type="hidden" name="id_estoque" value="<%= estoque.id_estoque %>">
                         <button class="btn btn-success">Atualizar</button>

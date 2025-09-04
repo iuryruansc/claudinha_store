@@ -1,0 +1,22 @@
+<%- include('../../partials/header.ejs') %>
+    <%- include('../../partials/navbar.ejs') %>
+
+        <div class="container">
+            <hr>
+            <div class="card">
+                <div class="card-header">
+                    <h2>Registrar Ponto de Venda</h2>
+                </div>
+                <div class="card-body">
+                    <form method="POST" action="/admin/pdvs/save">
+                        <input class="form-control" type="text" name="identificacao" placeholder="Identificação do Ponto de Venda"><br>
+                        <input class="form-control" type="text" name="descricao" placeholder="Descreva o Ponto de Venda"><br>
+                        <input class="form-control" type="text" name="status" placeholder="Status do PDV (ativo ou inativo)"><br>
+                        <button class="btn btn-success">Cadastrar</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <%- include('../../partials/footer.ejs') %>
+        

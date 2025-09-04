@@ -18,7 +18,7 @@ const Produto = connection.define('produto', {
     },
     descricao: {
         type: Sequelize.TEXT,
-        allowNull: true
+        allowNull: false
     },
     id_categoria: {
         type: Sequelize.INTEGER,
@@ -26,7 +26,7 @@ const Produto = connection.define('produto', {
     },
     codigo_barras: {
         type: Sequelize.STRING,
-        allowNull: true,
+        allowNull: false,
         unique: true
     }
 }, {

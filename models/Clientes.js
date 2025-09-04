@@ -13,8 +13,8 @@ const Clientes = connection.define('cliente', {
     },
     email: {
         type: Sequelize.STRING,
-        allowNull: false,
-        unique: false,
+        allowNull: true,
+        unique: true,
         validate: {
             isEmail: true
         }
@@ -25,7 +25,7 @@ const Clientes = connection.define('cliente', {
     },
     cpf: {
         type: Sequelize.STRING,
-        allowNull: false,
+        allowNull: true,
         unique: true
     }
 }, {

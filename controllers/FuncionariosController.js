@@ -1,7 +1,8 @@
 const express = require('express');
 const router = express.Router();
-const asyncHandler = require('../utils/async-handler');
-const { idValidation, modelValidation, stringValidation } = require('../utils/data-validation');
+const asyncHandler = require('../utils/handlers/async-handler');
+const { modelValidation, stringValidation, numberValidation } = require('../utils/data-validation');
+const { parseIntValue } = require('../utils/data-parsers');
 const Funcionario = require('../models/Funcionarios');
 
 router.get('/funcionarios/new', asyncHandler(async (req, res) => {
@@ -14,11 +15,11 @@ router.get('/funcionarios', asyncHandler(async (req, res) => {
 }));
 
 router.get('/funcionarios/edit/:id_funcionario', asyncHandler(async (req, res) => {
-    const { id_funcionario } = req.params;
+    const [parsedId] = parseIntValue(req.params.id_funcionario);
 
-    idValidation(id_funcionario);
+    numberValidation(parsedId);
 
-    const funcionario = await Funcionario.findByPk(id_funcionario);
+    const funcionario = await Funcionario.findByPk(parsedId);
 
     modelValidation(funcionario);
 
@@ -35,11 +36,11 @@ router.post('/funcionarios/save', asyncHandler(async (req, res) => {
 }));
 
 router.post('/funcionarios/delete/:id_funcionario', asyncHandler(async (req, res) => {
-    const { id_funcionario } = req.params;
+    const [parsedId] = parseIntValue(req.params.id_funcionario);
 
-    idValidation(id_funcionario);
-    
-    const funcionario = await Funcionario.findByPk(id_funcionario);
+    numberValidation(parsedId);
+
+    const funcionario = await Funcionario.findByPk(parsedId);
     modelValidation(funcionario);
 
     await funcionario.destroy()
@@ -48,16 +49,16 @@ router.post('/funcionarios/delete/:id_funcionario', asyncHandler(async (req, res
 }));
 
 router.post('/funcionarios/update/:id_funcionario', asyncHandler(async (req, res) => {
-    const { id_funcionario } = req.params;
+    const [parsedId] = parseIntValue(req.params.id_funcionario);
     const { nome, cpf, cargo } = req.body;
 
-    idValidation(id_funcionario);
+    numberValidation(parsedId);
     stringValidation(nome, cpf, cargo);
 
-    const funcionario = await Funcionario.findByPk(id_funcionario);
+    const funcionario = await Funcionario.findByPk(parsedId);
     modelValidation(funcionario);
 
-    await funcionario.update({ nome, cpf, cargo});
+    await funcionario.update({ nome, cpf, cargo });
 
     res.redirect('/admin/funcionarios');
 }));

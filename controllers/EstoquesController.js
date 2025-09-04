@@ -1,7 +1,8 @@
 const express = require('express');
 const router = express.Router();
-const asyncHandler = require('../utils/async-handler');
-const { idValidation, modelValidation, stringValidation, numberValidation } = require('../utils/data-validation');
+const asyncHandler = require('../utils/handlers/async-handler');
+const { modelValidation, stringValidation, numberValidation } = require('../utils/data-validation');
+const { parseIntValue, parseFloatValue } = require('../utils/data-parsers');
 const Estoque = require('../models/Estoque');
 const Produto = require('../models/Produto');
 
@@ -19,12 +20,12 @@ router.get('/estoques', asyncHandler(async (req, res) => {
 }));
 
 router.get('/estoques/edit/:id_estoque', asyncHandler(async (req, res) => {
-    const { id_estoque } = req.params;
+    const [parsedId] = parseIntValue(req.params.id_estoque);
 
-    idValidation(id_estoque);
+    numberValidation(parsedId);
 
     const [estoque, produtos] = await Promise.all([
-        Estoque.findByPk(id_estoque),
+        Estoque.findByPk(parsedId),
         Produto.findAll()
     ]);
 
@@ -34,23 +35,28 @@ router.get('/estoques/edit/:id_estoque', asyncHandler(async (req, res) => {
 }));
 
 router.post('/estoques/save', asyncHandler(async (req, res) => {
-    const { id_produto, quantidade_atual, localizacao } = req.body;
+    const { localizacao } = req.body;
+    const [parsedId] = parseIntValue(req.body.id_produto);
+    const [parsedQuant] = parseFloatValue(req.body.quantidade_atual);
 
-    idValidation(id_produto);
-    numberValidation(parseInt(quantidade_atual));
+    numberValidation(parsedId, parsedQuant);
     stringValidation(localizacao);
 
-    await Estoque.create({ id_produto, quantidade_atual, localizacao });
+    await Estoque.create({
+        id_produto: parsedId,
+        quantidade_atual: parsedQuant,
+        localizacao
+    });
 
     res.redirect('/admin/estoques');
 }));
 
 router.post('/estoques/delete/:id_estoque', asyncHandler(async (req, res) => {
-    const { id_estoque } = req.params;
+    const [parsedId] = parseIntValue(req.params.id_estoque);
 
-    idValidation(id_estoque);
+    numberValidation(parsedId);
 
-    const estoque = await Estoque.findByPk(id_estoque);
+    const estoque = await Estoque.findByPk(parsedId);
 
     modelValidation(estoque);
 
@@ -60,21 +66,20 @@ router.post('/estoques/delete/:id_estoque', asyncHandler(async (req, res) => {
 }));
 
 router.post('/estoques/update/:id_estoque', asyncHandler(async (req, res) => {
-    const { id_estoque } = req.params;
-    const { quantidade_atual, localizacao } = req.body;
+    const [parsedId] = parseIntValue(req.params.id_estoque);
+    const [parsedQuant] = parseFloatValue(req.body.quantidade_atual);
+    const { localizacao } = req.body;
 
-    idValidation(id_estoque);
+
+    numberValidation(parsedId, parsedQuant);
     stringValidation(localizacao);
-    numberValidation(parseInt(quantidade_atual));
 
-    const estoque = await Estoque.findByPk(id_estoque);
+    const estoque = await Estoque.findByPk(parsedId);
 
     modelValidation(estoque);
 
-    console.log('Dados a serem atualizados:', req.body)
-
     await estoque.update({
-        quantidade_atual: parseInt(quantidade_atual),
+        quantidade_atual: parsedQuant,
         localizacao
     });
 

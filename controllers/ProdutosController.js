@@ -1,7 +1,8 @@
 const express = require('express');
 const router = express.Router();
-const asyncHandler = require('../utils/async-handler');
-const { idValidation, modelValidation, stringValidation, numberValidation } = require('../utils/data-validation');
+const asyncHandler = require('../utils/handlers/async-handler');
+const { numberValidation, modelValidation, stringValidation } = require('../utils/data-validation');
+const { parseIntValue, parseFloatValue } = require('../utils/data-parsers');
 const Category = require('../models/Category');
 const Produto = require('../models/Produto');
 
@@ -23,13 +24,13 @@ router.get('/produtos', asyncHandler(async (req, res) => {
 }));
 
 router.get('/produtos/:id_categoria', asyncHandler(async (req, res) => {
-    const { id_categoria } = req.params;
+    const [parsedId] = parseIntValue(req.params.id_categoria);
 
-    idValidation(id_categoria);
+    numberValidation(parsedId);
 
     const [produtos, categoria] = await Promise.all([
-        Produto.findAll({ where: { id_categoria } }),
-        Category.findByPk(id_categoria)
+        Produto.findAll({ where: { id_categoria: parsedId } }),
+        Category.findByPk(parsedId)
     ]);
 
     modelValidation(categoria);
@@ -42,47 +43,48 @@ router.get('/produtos/:id_categoria', asyncHandler(async (req, res) => {
 }));
 
 router.get('/produtos/edit/:id_produto', asyncHandler(async (req, res) => {
-    const { id_produto } = req.params;
+    const [parsedId] = parseIntValue(req.params.id_produto);
 
-    idValidation(id_produto);
+    numberValidation(parsedId);
 
     const [produto, categories] = await Promise.all([
-        Produto.findByPk(id_produto),
+        Produto.findByPk(parsedId),
         Category.findAll()
     ]);
 
     modelValidation(produto);
 
-    res.render('admin/produtos/edit', { produto, categories});
+    res.render('admin/produtos/edit', { produto, categories });
 }));
 
 router.post('/produtos/save', asyncHandler(async (req, res) => {
-    const { nome, descricao, preco, codigo_barras, id_categoria } = req.body;
+    const { nome, descricao, codigo_barras } = req.body;
+    const [parsedId] = parseIntValue(req.body.id_categoria);
+    const [parsedPreco] = parseFloatValue(req.body.preco);
 
-    idValidation(id_categoria);
+    numberValidation(parsedId, parsedPreco);
     stringValidation(nome, descricao, codigo_barras);
-    numberValidation(parseFloat(preco));
 
-    const category = await Category.findByPk(id_categoria);
+    const category = await Category.findByPk(parsedId);
     modelValidation(category);
 
     await Produto.create({
         nome,
         descricao,
-        preco: parseFloat(preco),
+        preco: parsedPreco,
         codigo_barras,
-        id_categoria,
+        id_categoria: parsedId,
     });
 
     res.redirect('/admin/produtos');
 }));
 
 router.post('/produtos/delete/:id_produto', asyncHandler(async (req, res) => {
-    const { id_produto } = req.params;
+    const [parsedId] = parseIntValue(req.params.id_produto);
 
-    idValidation(id_produto);
+    numberValidation(parsedId);
 
-    const produto = await Produto.findByPk(id_produto);
+    const produto = await Produto.findByPk(parsedId);
     modelValidation(produto);
 
     await produto.destroy();
@@ -91,23 +93,23 @@ router.post('/produtos/delete/:id_produto', asyncHandler(async (req, res) => {
 }));
 
 router.post('/produtos/update/:id_produto', asyncHandler(async (req, res) => {
-    const { id_produto } = req.params;
-    const { nome, descricao, preco, codigo_barras, id_categoria } = req.body;
+    const [parsedIdProd, parsedIdCat] = parseIntValue(req.params.id_produto, req.params.id_categoria)
+    const { nome, descricao, codigo_barras } = req.body;
+    const [parsedPreco] = parseFloatValue(req.body.preco);
 
-    idValidation(id_produto, id_categoria);
+    numberValidation(parsedIdProd, parsedIdCat, parsedPreco);
     stringValidation(nome, descricao, codigo_barras);
-    numberValidation(parseFloat(preco));
 
-    const produto= await Produto.findByPk(id_produto);
+    const produto = await Produto.findByPk(parsedIdProd);
 
     modelValidation(produto);
 
     await produto.update({
         nome,
         descricao,
-        preco: parseFloat(preco),
+        preco: parsedPreco,
         codigo_barras,
-        id_categoria
+        id_categoria: parsedIdCat
     });
 
     res.redirect('/admin/produtos');

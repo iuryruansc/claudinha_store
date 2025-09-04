@@ -17,11 +17,12 @@
                         <th>ID</th>
                         <% if (!categoria_nome) { %>
                             <th>Categoria</th>
-                        <% } %>
-                        <th>Produto</th>
-                        <th>Descrição</th>
-                        <th>Preco</th>
-                        <th>Ações</th>
+                            <% } %>
+                                <th>Produto</th>
+                                <th>Descrição</th>
+                                <th>Preco</th>
+                                <th>Código de Barras</th>
+                                <th>Ações</th>
                     </tr>
                 </thead>
                 <tbody id="category-table-body">
@@ -36,33 +37,36 @@
                             </td>
                             <% if (!categoria_nome) { %>
                                 <td>
-                                    <% 
-                                       const cat = categorias.find(c => c.id_categoria === produto.id_categoria);
-                                       if (cat) { %>
-                                          <%= cat.nome %>
-                                    <% } else { %>
-                                          -
-                                    <% } %>
+                                    <% const cat=categorias.find(c=> c.id_categoria === produto.id_categoria);
+                                        if (cat) { %>
+                                        <%= cat.nome %>
+                                            <% } else { %>
+                                                -
+                                                <% } %>
+                                </td>
+                                <% } %>
+                                    <td>
+                                        <%= produto.nome %>
                                     </td>
-                            <% } %>
-                            <td>
-                                <%= produto.nome %>
-                            </td>
-                            <td>
-                                <%= produto.descricao %>
-                            </td>
-                            <td>
-                                <%= produto.preco %>
-                            </td>
-                            <td>
-                                <a href="/admin/produtos/edit/<%= produto.id_produto %>?categoria=<%= produto.id_categoria %>" input type="hidden"
-                                    name="id_categoria" value="<%= produto.id_categoria %>"
-                                    class="btn btn-warning">Editar</a>
-                                <form action="/admin/produtos/delete/<%= produto.id_produto %>" method="POST" style="display: inline;">
-                                    <input type="hidden" name="id_produto" value="<%= produto.id_produto %>">
-                                    <button class="btn btn-danger excluir-btn" style="display: none;">Excluir</button>
-                                </form>
-                            </td>
+                                    <td>
+                                        <%= produto.descricao %>
+                                    </td>
+                                    <td>
+                                        <%= produto.preco %>
+                                    </td>
+                                    <td>
+                                        <%= produto.codigo_barras %>
+                                    </td>
+                                    <td>
+                                        <a href="/admin/produtos/edit/<%= produto.id_produto %>?categoria=<%= produto.id_categoria %>"
+                                            input type="hidden" class="btn btn-warning">Editar</a>
+                                        <form action="/admin/produtos/delete/<%= produto.id_produto %>" method="POST"
+                                            style="display: inline;">
+                                            <input type="hidden" name="id_produto" value="<%= produto.id_produto %>">
+                                            <button class="btn btn-danger excluir-btn"
+                                                style="display: none;">Excluir</button>
+                                        </form>
+                                    </td>
                         </tr>
                         <% }) %>
                 </tbody>
