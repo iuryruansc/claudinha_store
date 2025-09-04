@@ -1,16 +1,16 @@
 const express = require('express');
 const router = express.Router();
 const asyncHandler = require('../utils/handlers/async-handler');
-const { modelValidation, stringValidation, numberValidation } = require('../utils/data-validation');
+const { stringValidation, numberValidation } = require('../utils/data-validation');
 const { parseIntValue } = require('../utils/data-parsers');
-const Cliente = require('../models/Clientes');
+const { getAllClientes, findClienteById, createCliente, deleteCliente, updateCliente } = require('../services/clientesService');
 
 router.get('/clientes/new', asyncHandler(async (req, res) => {
     res.render('admin/clientes/new', { title: 'Novo Cliente' });
 }));
 
 router.get('/clientes', asyncHandler(async (req, res) => {
-    const clientes = await Cliente.findAll();
+    const clientes = await getAllClientes();
     res.render('admin/clientes/index', { clientes })
 }));
 
@@ -19,9 +19,7 @@ router.get('/clientes/edit/:id_cliente', asyncHandler(async (req, res) => {
 
     numberValidation(parsedId);
 
-    const cliente = await Cliente.findByPk(parsedId);
-
-    modelValidation(cliente);
+    const cliente = await findClienteById(parsedId);
 
     res.render('admin/clientes/edit', { cliente })
 }));
@@ -31,7 +29,7 @@ router.post('/clientes/save', asyncHandler(async (req, res) => {
 
     stringValidation(nome, telefone, cpf);
 
-    await Cliente.create({ nome, email, telefone, cpf });
+    await createCliente({ nome, email, telefone, cpf });
 
     res.redirect('/admin/clientes');
 }));
@@ -40,12 +38,8 @@ router.post('/clientes/delete/:id_cliente', asyncHandler(async (req, res) => {
     const [parsedId] = parseIntValue(req.params.id_cliente);
 
     numberValidation(parsedId);
-
-    const cliente = await Cliente.findByPk(parsedId);
-
-    modelValidation(cliente);
-
-    await cliente.destroy();
+    
+    await deleteCliente(parsedId);
 
     res.redirect('/admin/clientes');
 }));
@@ -57,11 +51,7 @@ router.post('/clientes/update/:id_cliente', asyncHandler(async (req, res) => {
     numberValidation(parsedId);
     stringValidation(nome, telefone, cpf);
 
-    const cliente = await Cliente.findByPk(parsedId);
-
-    modelValidation(cliente);
-
-    await cliente.update({ nome, email, telefone, cpf });
+    await updateCliente(parsedId, {nome, email, telefone, cpf});
 
     res.redirect('/admin/clientes');
 }));

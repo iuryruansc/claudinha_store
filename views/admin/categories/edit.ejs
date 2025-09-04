@@ -8,10 +8,9 @@
                     <h2>Edição de Categoria</h2>
                 </div>
                 <div class="card-body">
-                    <form id="category-form"
-                        action="/admin/categories/update/<%= category.id_categoria %>">
-                        <input class="form-control" type="text" id="category-name-input" name="nome" placeholder="Defina o nome da categoria"
-                            value="<%= category.nome %>"><br>
+                    <form id="category-form" action="/admin/categories/update/<%= category.id_categoria %>">
+                        <input class="form-control" type="text" id="category-name-input" name="nome"
+                            placeholder="Defina o nome da categoria" value="<%= category.nome %>"><br>
                         <input type="hidden" name="id_categoria" value="<%= category.id_categoria %>">
                         <button class="btn btn-success" id="submit-button">Atualizar</button>
                     </form>
@@ -48,24 +47,24 @@
                             return;
                         }
 
-                        const formAction = this.getAttibute('action');
+                        const formAction = this.getAttribute('action');
 
                         try {
                             const response = await fetch(formAction, {
                                 method: 'POST',
-                                headers: { 'Content-Type': 'application/json'},
-                                body: JSON.stringify({ nome: newCategoryName}),
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ nome: newCategoryName }),
                             });
 
                             if (response.ok) {
-                                window.location.ref = '/admin/categories';
+                                window.location.href = '/admin/categories';
                             } else {
                                 const errorData = await response.json();
                                 showErrorPopup(errorData.error.message, errorData.error.details);
                             }
                         } catch (error) {
-                            // Corrigir Categoria criada mas caindo no bloco catch.
-                            window.location.href = '/admin/categories';
+                            console.error('Erro de rede:', error);
+                            showErrorPopup('Ocorreu um erro de rede. Tente novamente mais tarde');
                         }
                     });
 

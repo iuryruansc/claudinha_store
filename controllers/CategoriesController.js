@@ -1,17 +1,17 @@
 const express = require('express');
 const router = express.Router();
 const asyncHandler = require('../utils/handlers/async-handler');
-const { modelValidation, stringValidation, checkAssociations, numberValidation } = require('../utils/data-validation');
+const Produtos = require('../models/produto')
+const { stringValidation, checkAssociations, numberValidation } = require('../utils/data-validation');
 const { parseIntValue } = require('../utils/data-parsers');
-const Category = require('../models/Category');
-const Produtos = require('../models/Produto');
+const { getAllCategories, findCategoryById, createCategory, deleteCategory, updateCategory, getViewDependencies } = require('../services/categoriesService');
 
 router.get('/categories/new', (req, res) => {
     res.render('admin/categories/new', { title: 'Nova Categoria' });
 });
 
 router.get('/categories', asyncHandler(async (req, res) => {
-    const categories = await Category.findAll();
+    const categories = await getAllCategories();
     res.render('admin/categories/index', { categories })
 }));
 
@@ -20,9 +20,7 @@ router.get('/categories/edit/:id_categoria', asyncHandler(async (req, res) => {
 
     numberValidation(parsedId);
 
-    const category = await Category.findByPk(parsedId);
-
-    modelValidation(category);
+    const category = await findCategoryById(parsedId);
 
     res.render('admin/categories/edit', { category })
 }));
@@ -32,7 +30,8 @@ router.post('/categories/save', asyncHandler(async (req, res) => {
 
     stringValidation(nome);
 
-    await Category.create({ nome });
+    await createCategory({ nome });
+
     res.redirect('/admin/categories');
 }));
 
@@ -41,9 +40,7 @@ router.post('/categories/delete/:id_categoria', asyncHandler(async (req, res) =>
 
     numberValidation(parsedId);
 
-    const category = await Category.findByPk(parsedId);
-
-    modelValidation(category);
+    const category = await findCategoryById(parsedId);
 
     await checkAssociations(Produtos,
         'id_categoria',
@@ -51,7 +48,7 @@ router.post('/categories/delete/:id_categoria', asyncHandler(async (req, res) =>
         "Não é possível excluir a categoria, pois exitem produtos associados a ela."
     );
 
-    await category.destroy();
+    await deleteCategory(parsedId);
 
     res.redirect('/admin/categories');
 }));
@@ -63,10 +60,7 @@ router.post('/categories/update/:id_categoria', asyncHandler(async (req, res) =>
     numberValidation(parsedId);
     stringValidation(nome);
 
-    const category = await Category.findByPk(parsedId);
-    modelValidation(category);
-
-    await category.update({ nome });
+    await updateCategory(parsedId, { nome });
 
     res.redirect('/admin/categories');
 }));

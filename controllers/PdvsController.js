@@ -1,16 +1,16 @@
 const express = require('express');
 const router = express.Router();
 const asyncHandler = require('../utils/handlers/async-handler');
-const { modelValidation, stringValidation, enumValidation, numberValidation } = require('../utils/data-validation');
+const { stringValidation, enumValidation, numberValidation } = require('../utils/data-validation');
 const { parseIntValue } = require('../utils/data-parsers');
-const Pdv = require('../models/Pdvs');
+const { getAllPdvs, findPdvById, createPdv, deletePdv, updatePdv } = require('../services/pdvsService');
 
 router.get('/pdvs/new', asyncHandler(async (req, res) => {
     res.render('admin/pdvs/new', { title: 'Novo Ponto de Vendas' });
 }));
 
 router.get('/pdvs', asyncHandler(async (req, res) => {
-    const pdvs = await Pdv.findAll();
+    const pdvs = await getAllPdvs();
     res.render('admin/pdvs/index', { pdvs })
 }));
 
@@ -19,9 +19,7 @@ router.get('/pdvs/edit/:id_pdv', asyncHandler(async (req, res) => {
 
     numberValidation(parsedId);
 
-    const pdv = await Pdv.findByPk(parsedId);
-
-    modelValidation(pdv);
+    const pdv = await findPdvById(parsedId);
 
     res.render('admin/pdvs/edit', { pdv })
 }));
@@ -32,7 +30,7 @@ router.post('/pdvs/save', asyncHandler(async (req, res) => {
     stringValidation(identificacao, descricao);
     enumValidation(status, 'ativo', 'inativo');
 
-    await Pdv.create({ identificacao, descricao, status });
+    await createPdv({ identificacao, descricao, status });
     res.redirect('/admin/pdvs');
 }));
 
@@ -41,10 +39,7 @@ router.post('/pdvs/delete/:id_pdv', asyncHandler(async (req, res) => {
 
     numberValidation(parsedId);
 
-    const pdv = await Pdv.findByPk(parsedId);
-    modelValidation(pdv);
-
-    await pdv.destroy()
+    await deletePdv(parsedId);
 
     res.redirect('/admin/pdvs');
 }));
@@ -57,10 +52,7 @@ router.post('/pdvs/update/:id_pdv', asyncHandler(async (req, res) => {
     stringValidation(identificacao, descricao);
     enumValidation(status, 'ativo', 'inativo');
 
-    const pdv = await Pdv.findByPk(parsedId);
-    modelValidation(pdv);
-
-    await pdv.update({ identificacao, descricao, status });
+    await updatePdv(parsedId, { identificacao, descricao, status });
 
     res.redirect('/admin/pdvs');
 }));

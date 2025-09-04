@@ -1,7 +1,7 @@
 const Sequelize = require('sequelize');
 const connection = require('../database/database');
-const Pdv = require('./Pdvs');
-const Funcionario = require('./Funcionarios');
+const Pdv = require('./pdvs');
+const Funcionario = require('./funcionarios');
 
 const Caixa = connection.define('caixa', {
     id_caixa: {

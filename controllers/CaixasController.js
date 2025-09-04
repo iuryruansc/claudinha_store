@@ -1,42 +1,26 @@
 const express = require('express');
 const router = express.Router();
 const asyncHandler = require('../utils/handlers/async-handler');
-const { modelValidation, stringValidation, enumValidation, numberValidation, dateValidation } = require('../utils/data-validation');
+const { stringValidation, enumValidation, numberValidation, dateValidation } = require('../utils/data-validation');
 const { parseIntValue, parseFloatValue, parseDateValue } = require('../utils/data-parsers');
-const Caixa = require('../models/Caixa');
-const Pdv = require('../models/Pdvs');
-const Funcionario = require('../models/Funcionarios');
-const  formatDate = require('../utils/date-formatter');
+const formatDate = require('../utils/date-formatter');
+const { getViewDependencies, getAllCaixas, createCaixa, getEditData, updateCaixa, deleteCaixa } = require('../services/caixasService');
 
 router.get('/caixas/new', asyncHandler(async (req, res) => {
-    const [pdvs, funcionarios] = await Promise.all([
-        Pdv.findAll(),
-        Funcionario.findAll()
-    ]);
-    res.render('admin/caixas/new', { pdvs, funcionarios});
+    const {pdvs, funcionarios} = await getViewDependencies();
+    res.render('admin/caixas/new', { pdvs, funcionarios });
 }));
 
 router.get('/caixas', asyncHandler(async (req, res) => {
-    const [caixas, pdvs, funcionarios] = await Promise.all([
-        Caixa.findAll(),
-        Pdv.findAll(),
-        Funcionario.findAll()
-    ]);
+    const {caixas, pdvs, funcionarios} = await getAllCaixas();
     res.render('admin/caixas/index', { caixas, pdvs, funcionarios, formatDate })
 }));
 
 router.get('/caixas/edit/:id_caixa', asyncHandler(async (req, res) => {
     const [parsedId] = parseIntValue(req.params.id_caixa);
-
     numberValidation(parsedId);
 
-        const [caixa, pdvs, funcionarios] = await Promise.all([
-        Caixa.findByPk(parsedId),
-        Pdv.findAll(),
-        Funcionario.findAll()
-    ]);
-
-    modelValidation(caixa);
+    const {caixa, pdvs, funcionarios} = await getEditData(parsedId);
 
     res.render('admin/caixas/edit', { caixa, pdvs, funcionarios })
 }));
@@ -53,7 +37,7 @@ router.post('/caixas/save', asyncHandler(async (req, res) => {
     dateValidation(parsedDataAbertura, parsedDataFechamento);
     enumValidation(status, 'aberto', 'fechado');
 
-    await Caixa.create({
+    await createCaixa({
         id_pdv: parsedIdPdv,
         id_funcionario: parsedIdFun,
         data_abertura: parsedDataAbertura,
@@ -68,13 +52,10 @@ router.post('/caixas/save', asyncHandler(async (req, res) => {
 
 router.post('/caixas/delete/:id_caixa', asyncHandler(async (req, res) => {
     const [parsedId] = parseIntValue(req.params.id_caixa);
-
+    
     numberValidation(parsedId);
 
-    const caixa = await Caixa.findByPk(parsedId);
-    modelValidation(caixa);
-
-    await caixa.destroy()
+    await deleteCaixa(parsedId);
 
     res.redirect('/admin/caixas');
 }));
@@ -92,10 +73,7 @@ router.post('/caixas/update/:id_caixa', asyncHandler(async (req, res) => {
     dateValidation(parsedDataAbertura, parsedDataFechamento);
     enumValidation(status, 'aberto', 'fechado');
 
-    const caixa = await Caixa.findByPk(parsedIdCaixa);
-    modelValidation(caixa);
-
-    await caixa.update({
+    await updateCaixa(parsedIdCaixa, {
         id_pdv: parsedIdPdv,
         id_funcionario: parsedIdFun,
         data_abertura: parsedDataAbertura,

@@ -1,20 +1,12 @@
 const express = require('express');
+const fs = require('fs');
+const path = require('path');
 const router = express.Router();
+const controllersPath = path.join(__dirname, '../controllers')
 
-const categoriesController = require('../controllers/CategoriesController');
-const produtosController = require('../controllers/ProdutosController');
-const funcionariosController = require('../controllers/FuncionariosController');
-const clientesController = require('../controllers/ClientesController');
-const estoquesController = require('../controllers/EstoquesController');
-const pdvsController = require('../controllers/PdvsController');
-const caixasController = require('../controllers/CaixasController');
-
-router.use('/', categoriesController);
-router.use('/', produtosController);
-router.use('/', funcionariosController);
-router.use('/', clientesController);
-router.use('/', estoquesController);
-router.use('/', pdvsController);
-router.use('/', caixasController);
+fs.readdirSync(controllersPath).forEach(file => {
+    const controller = require(path.join(controllersPath, file));
+    router.use('/', controller);
+});
 
 module.exports = router;

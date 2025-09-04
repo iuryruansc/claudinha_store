@@ -1,0 +1,44 @@
+<%- include('../../partials/header.ejs') %>
+    <%- include('../../partials/navbar.ejs') %>
+
+        <div class="container">
+            <hr>
+            <div class="card">
+                <div class="card-header">
+                    <h2>Registrar Venda</h2>
+                </div>
+                <div class="card-body">
+                    <form method="POST" action="/admin/vendas/save">
+                        <small class="form-text text-muted">
+                            Se deixado em branco, será preenchido com a data e hora atual automaticamente.
+                        </small>
+                        <input class="form-control" type="datetime-local" name="data_abertura"><br>
+                        <select name="id_cliente" class="form-select">
+                            <% clientes.forEach(cliente=> { %>
+                                <option value="<%= cliente.id_cliente %>">
+                                    <%= cliente.nome %>
+                                </option>
+                                <% }) %>
+                        </select><br>
+                        <select name="id_funcionario" class="form-select">
+                            <% funcionarios.forEach(funcionario=> { %>
+                                <option value="<%= funcionario.id_funcionario %>">
+                                    <%= funcionario.nome %>
+                                </option>
+                                <% }) %>
+                        </select><br>
+                        <select name="id_caixa" class="form-select">
+                            <% caixas.forEach(caixa=> { %>
+                                <option value="<%= caixa.id_caixa %>">
+                                    <%= caixa.id_caixa %>
+                                </option>
+                                <% }) %>
+                        </select><br>
+                        <button class="btn btn-success">Cadastrar</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <%- include('../../partials/footer.ejs') %>
+        

@@ -16,9 +16,9 @@
                         <input class="form-control" type="text" name="codigo_barras"
                             placeholder="Defina o código de barras do produto"><br>
                         <select name="id_categoria" class="form-select">
-                            <% categories.forEach(category=> { %>
-                                <option value="<%= category.id_categoria %>">
-                                    <%= category.nome %>
+                            <% categorias.forEach(categoria=> { %>
+                                <option value="<%= categoria.id_categoria %>">
+                                    <%= categoria.nome %>
                                 </option>
                                 <% }) %>
                         </select><br>

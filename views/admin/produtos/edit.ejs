@@ -18,14 +18,14 @@
                         <input class="form-control" type="text" name="codigo_barras"
                             placeholder="Defina o código de barras do produto" value="<%= produto.codigo_barras %>"><br>
                         <select name="id_categoria" class="form-select">
-                            <% categories.forEach(category=> { %>
-                                <% if (category.id_categoria==produto.id_categoria) { %>
-                                    <option value="<%= category.id_categoria %>" selected>
-                                        <%= category.nome %>
+                            <% categorias.forEach(categoria=> { %>
+                                <% if (categoria.id_categoria==produto.id_categoria) { %>
+                                    <option value="<%= categoria.id_categoria %>" selected>
+                                        <%= categoria.nome %>
                                     </option>
                                     <% } else { %>
-                                        <option value="<%= category.id_categoria %>">
-                                            <%= category.nome %>
+                                        <option value="<%= categoria.id_categoria %>">
+                                            <%= categoria.nome %>
                                         </option>
                                         <% } %>
                                             <% }) %>

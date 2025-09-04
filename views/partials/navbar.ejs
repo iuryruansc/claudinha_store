@@ -3,33 +3,28 @@
         CSDB
     </a>
     <ul class="navbar-nav me-auto">
-        <li class="nav-item">
-            <a class="nav-link" href="/admin/categories">Categorias</a>
-        </li>
-        <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown"
-                aria-expanded="false">
-                Produtos
-            </a>
-            <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                <li><a class="dropdown-item" href="/admin/produtos">Ver Produtos</a></li>
-                <li><a class="dropdown-item" href="/admin/produtos/new">Cadastrar Produto</a></li>
-            </ul>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" href="/admin/funcionarios">Funcionarios</a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" href="/admin/clientes">Clientes</a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" href="/admin/estoques">Estoques</a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" href="/admin/pdvs">PDVs</a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" href="/admin/caixas">Caixas</a>
-        </li>
+        <% navLinks.forEach(link=> { %>
+            <% if (link.dropdown) { %>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown-<%= link.label %>" role="button"
+                        data-bs-toggle="dropdown" aria-expanded="false">
+                        <%= link.label %>
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="navbarDropdown-<%= link.label %>">
+                        <% link.dropdown.forEach(item=> { %>
+                            <li><a class="dropdown-item" href="<%= item.href %>">
+                                    <%= item.label %>
+                                </a></li>
+                            <% }) %>
+                    </ul>
+                </li>
+                <% } else { %>
+                    <li class="nav-item">
+                        <a class="nav-link" href="<%= link.href %>">
+                            <%= link.label %>
+                        </a>
+                    </li>
+                    <% } %>
+                        <% }) %>
     </ul>
 </nav>

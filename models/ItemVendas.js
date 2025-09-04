@@ -1,7 +1,7 @@
 const Sequelize = require('sequelize');
 const connection = require('../database/database');
-const Vendas = require('./Vendas');
-const Produto = require('./Produto');
+const Vendas = require('./vendas');
+const Produto = require('./produto');
 
 const ItemVendas = connection.define('itemvenda', {
     id_item: {

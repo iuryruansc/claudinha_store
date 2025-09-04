@@ -1,16 +1,16 @@
 const express = require('express');
 const router = express.Router();
 const asyncHandler = require('../utils/handlers/async-handler');
-const { modelValidation, stringValidation, numberValidation } = require('../utils/data-validation');
+const { stringValidation, numberValidation } = require('../utils/data-validation');
 const { parseIntValue } = require('../utils/data-parsers');
-const Funcionario = require('../models/Funcionarios');
+const { getAllFuncionarios, findFuncionarioById, createFuncionario, deleteFuncionario, updateFuncionario } = require('../services/funcionariosService');
 
 router.get('/funcionarios/new', asyncHandler(async (req, res) => {
     res.render('admin/funcionarios/new', { title: 'Novo Funcionario' });
 }));
 
 router.get('/funcionarios', asyncHandler(async (req, res) => {
-    const funcionarios = await Funcionario.findAll();
+    const funcionarios = await getAllFuncionarios();
     res.render('admin/funcionarios/index', { funcionarios })
 }));
 
@@ -19,9 +19,7 @@ router.get('/funcionarios/edit/:id_funcionario', asyncHandler(async (req, res) =
 
     numberValidation(parsedId);
 
-    const funcionario = await Funcionario.findByPk(parsedId);
-
-    modelValidation(funcionario);
+    const funcionario = await findFuncionarioById(parsedId);
 
     res.render('admin/funcionarios/edit', { funcionario })
 }));
@@ -31,7 +29,8 @@ router.post('/funcionarios/save', asyncHandler(async (req, res) => {
 
     stringValidation(nome, cpf, cargo);
 
-    await Funcionario.create({ nome, cpf, cargo });
+    await createFuncionario({ nome, cpf, cargo });
+
     res.redirect('/admin/funcionarios');
 }));
 
@@ -40,10 +39,7 @@ router.post('/funcionarios/delete/:id_funcionario', asyncHandler(async (req, res
 
     numberValidation(parsedId);
 
-    const funcionario = await Funcionario.findByPk(parsedId);
-    modelValidation(funcionario);
-
-    await funcionario.destroy()
+    await deleteFuncionario(parsedId);
 
     res.redirect('/admin/funcionarios');
 }));
@@ -54,11 +50,8 @@ router.post('/funcionarios/update/:id_funcionario', asyncHandler(async (req, res
 
     numberValidation(parsedId);
     stringValidation(nome, cpf, cargo);
-
-    const funcionario = await Funcionario.findByPk(parsedId);
-    modelValidation(funcionario);
-
-    await funcionario.update({ nome, cpf, cargo });
+    
+    await updateFuncionario(parsedId, { nome, cpf, cargo });
 
     res.redirect('/admin/funcionarios');
 }));

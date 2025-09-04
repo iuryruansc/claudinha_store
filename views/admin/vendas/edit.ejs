@@ -5,43 +5,49 @@
             <hr>
             <div class="card">
                 <div class="card-header">
-                    <h2>Atualizar Caixa</h2>
+                    <h2>Registrar Venda</h2>
                 </div>
                 <div class="card-body">
-                    <form method="POST" action="/admin/caixas/update/<%= caixa.id_caixa %>">
+                    <form method="POST" action="/admin/vendas/update/<%= venda.id_venda %>">
                         <small class="form-text text-muted">
                             Se deixado em branco, manterá a data já cadastrada.
                         </small>
                         <input class="form-control" type="datetime-local" name="data_abertura"><br>
-                        <input class="form-control" type="datetime-local" name="data_fechamento"><br>
-                        <input class="form-control" type="text" name="saldo_inicial"
-                            placeholder="Insira o saldo inicial" value="<%= caixa.saldo_inicial %>"><br>
-                        <input class="form-control" type="text" name="saldo_final" placeholder="Insira o saldo final"
-                            value="<%= caixa.saldo_final %>"><br>
-                        <input class="form-control" type="text" name="status"
-                            placeholder="Qual o status do caixa: aberto ou fechado." value="<%= caixa.status %>"><br>
-                        <select name="id_pdv" class="form-select">
-                            <% pdvs.forEach(pdv=> { %>
-                                <% if (pdv.id_pdv==caixa.id_pdv) { %>
-                                    <option value="<%= pdv.id_pdv %>" selected>
-                                        <%= pdv.identificacao %>
+                        <select name="id_cliente" class="form-select">
+                            <% clientes.forEach(cliente=> { %>
+                                <% if (cliente.id_cliente==venda.id_cliente) { %>
+                                    <option value="<%= cliente.id_cliente %>" selected>
+                                        <%= cliente.nome %>
                                     </option>
                                     <% } else { %>
-                                        <option value="<%= pdv.id_pdv %>">
-                                            <%= pdv.identificacao %>
+                                        <option value="<%= cliente.id_cliente %>">
+                                            <%= cliente.nome %>
                                         </option>
                                         <% } %>
                                             <% }) %>
                         </select><br>
                         <select name="id_funcionario" class="form-select">
                             <% funcionarios.forEach(funcionario=> { %>
-                                <% if (funcionario.id_funcionario==caixa.id_funcionario) { %>
+                                <% if (funcionario.id_funcionario==venda.id_funcionario) { %>
                                     <option value="<%= funcionario.id_funcionario %>" selected>
                                         <%= funcionario.nome %>
                                     </option>
                                     <% } else { %>
                                         <option value="<%= funcionario.id_funcionario %>">
                                             <%= funcionario.nome %>
+                                        </option>
+                                        <% } %>
+                                            <% }) %>
+                        </select><br>
+                        <select name="id_caixa" class="form-select">
+                            <% caixas.forEach(caixa=> { %>
+                                <% if (caixa.id_caixa==venda.id_caixa) { %>
+                                    <option value="<%= caixa.id_caixa %>" selected>
+                                        <%= caixa.id_caixa %>
+                                    </option>
+                                    <% } else { %>
+                                        <option value="<%= caixa.id_caixa %>">
+                                            <%= caixa.id_caixa %>
                                         </option>
                                         <% } %>
                                             <% }) %>

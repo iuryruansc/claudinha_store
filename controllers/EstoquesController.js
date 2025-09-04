@@ -1,21 +1,17 @@
 const express = require('express');
 const router = express.Router();
 const asyncHandler = require('../utils/handlers/async-handler');
-const { modelValidation, stringValidation, numberValidation } = require('../utils/data-validation');
+const { stringValidation, numberValidation } = require('../utils/data-validation');
 const { parseIntValue, parseFloatValue } = require('../utils/data-parsers');
-const Estoque = require('../models/Estoque');
-const Produto = require('../models/Produto');
+const { getAllEstoques, getEditData, createEstoque, getViewDependencies, deleteEstoque, updateEstoque } = require('../services/estoquesService');
 
 router.get('/estoques/new', asyncHandler(async (req, res) => {
-    const produtos = await Produto.findAll();
+    const produtos = await getViewDependencies();
     res.render('admin/estoques/new', { produtos });
 }));
 
 router.get('/estoques', asyncHandler(async (req, res) => {
-    const [estoques, produtos] = await Promise.all([
-        Estoque.findAll(),
-        Produto.findAll()
-    ]);
+    const { estoques, produtos } = await getAllEstoques();
     res.render('admin/estoques/index', { estoques, produtos });
 }));
 
@@ -24,12 +20,7 @@ router.get('/estoques/edit/:id_estoque', asyncHandler(async (req, res) => {
 
     numberValidation(parsedId);
 
-    const [estoque, produtos] = await Promise.all([
-        Estoque.findByPk(parsedId),
-        Produto.findAll()
-    ]);
-
-    modelValidation(estoque);
+    const { estoque, produtos } = await getEditData(parsedId);
 
     res.render('admin/estoques/edit', { estoque, produtos })
 }));
@@ -42,7 +33,7 @@ router.post('/estoques/save', asyncHandler(async (req, res) => {
     numberValidation(parsedId, parsedQuant);
     stringValidation(localizacao);
 
-    await Estoque.create({
+    await createEstoque({
         id_produto: parsedId,
         quantidade_atual: parsedQuant,
         localizacao
@@ -56,11 +47,7 @@ router.post('/estoques/delete/:id_estoque', asyncHandler(async (req, res) => {
 
     numberValidation(parsedId);
 
-    const estoque = await Estoque.findByPk(parsedId);
-
-    modelValidation(estoque);
-
-    await estoque.destroy();
+    await deleteEstoque(parsedId);
 
     res.redirect('/admin/estoques');
 }));
@@ -74,14 +61,10 @@ router.post('/estoques/update/:id_estoque', asyncHandler(async (req, res) => {
     numberValidation(parsedId, parsedQuant);
     stringValidation(localizacao);
 
-    const estoque = await Estoque.findByPk(parsedId);
-
-    modelValidation(estoque);
-
-    await estoque.update({
+    await updateEstoque(parsedId, ({
         quantidade_atual: parsedQuant,
         localizacao
-    });
+    }));
 
     res.redirect('/admin/estoques');
 }));

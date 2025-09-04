@@ -2,10 +2,13 @@ require('dotenv').config();
 
 const express = require('express');
 const app = express();
+const https = require('https')
+const fs = require('fs')
 const helmet = require('helmet');
 const bodyParser = require('body-parser');
 const connection = require('./database/database');
 const errorHandler = require('./utils/handlers/error-handler');
+const navLinks = require('./utils/nav-links');
 
 //Routers
 const adminRouter = require('./routes/admin');
@@ -13,6 +16,11 @@ const adminRouter = require('./routes/admin');
 //Configuration
 const port = process.env.PORT || 3000;
 app.set('view engine', 'ejs');
+
+const options = {
+  key: fs.readFileSync('localhost+2-key.pem'),
+  cert: fs.readFileSync('localhost+2.pem')
+}
 
 //Database connection
 connection
@@ -37,6 +45,10 @@ app.use(express.static('public'));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
+app.use((req, res, next) => {
+  res.locals.navLinks = navLinks;
+  next();
+});
 
 //Main Routes
 app.get('/', (req, res) => {
@@ -48,6 +60,6 @@ app.use('/admin', adminRouter);
 app.use(errorHandler);
 
 //Server Listen
-app.listen(port, () => {
-  console.log(`Servidor rodando em http://localhost:${port}`);
+https.createServer(options, app).listen(port, () => {
+  console.log(`HTTPS server running on https://localhost:${port}`);
 });

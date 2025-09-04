@@ -1,8 +1,8 @@
 const Sequelize = require('sequelize');
 const connection = require('../database/database');
-const Clientes = require('./Clientes');
-const Funcionarios = require('./Funcionarios');
-const Caixa = require('./Caixa');
+const Clientes = require('./clientes');
+const Funcionarios = require('./funcionarios');
+const Caixa = require('./caixa');
 
 const Vendas = connection.define('venda', {
     id_venda: {
@@ -13,10 +13,11 @@ const Vendas = connection.define('venda', {
     data_hora: {
         type: Sequelize.DATE,
         allowNull: true,
+        defaultValue: Sequelize.NOW
     },
     id_cliente: {
         type: Sequelize.INTEGER,
-        allowNull: true,
+        allowNull: false,
     },
     id_funcionario: {
         type: Sequelize.INTEGER,
@@ -24,7 +25,7 @@ const Vendas = connection.define('venda', {
     },
     id_caixa: {
         type: Sequelize.INTEGER,
-        allowNull: true,
+        allowNull: false,
     }
 }, {
     tableName: 'venda',

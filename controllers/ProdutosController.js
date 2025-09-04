@@ -1,21 +1,18 @@
 const express = require('express');
 const router = express.Router();
 const asyncHandler = require('../utils/handlers/async-handler');
-const { numberValidation, modelValidation, stringValidation } = require('../utils/data-validation');
+const { numberValidation, stringValidation } = require('../utils/data-validation');
 const { parseIntValue, parseFloatValue } = require('../utils/data-parsers');
-const Category = require('../models/Category');
-const Produto = require('../models/Produto');
+const { getAllProdutos, getViewDependencies, getProdutosByCategoria, getEditData, createProduto, deleteProduto, updateProduto } = require('../services/produtosService');
 
 router.get('/produtos/new', asyncHandler(async (req, res) => {
-    const categories = await Category.findAll();
-    res.render('admin/produtos/new', { categories });
+    const categorias = await getViewDependencies();
+    res.render('admin/produtos/new', { categorias });
 }));
 
 router.get('/produtos', asyncHandler(async (req, res) => {
-    const [produtos, categorias] = await Promise.all([
-        Produto.findAll(),
-        Category.findAll()
-    ]);
+    const { produtos, categorias } = await getAllProdutos();
+
     res.render('admin/produtos/index', {
         produtos,
         categorias,
@@ -28,12 +25,7 @@ router.get('/produtos/:id_categoria', asyncHandler(async (req, res) => {
 
     numberValidation(parsedId);
 
-    const [produtos, categoria] = await Promise.all([
-        Produto.findAll({ where: { id_categoria: parsedId } }),
-        Category.findByPk(parsedId)
-    ]);
-
-    modelValidation(categoria);
+    const { produtos, categoria } = await getProdutosByCategoria(parsedId);
 
     res.render('admin/produtos/index', {
         produtos,
@@ -47,14 +39,9 @@ router.get('/produtos/edit/:id_produto', asyncHandler(async (req, res) => {
 
     numberValidation(parsedId);
 
-    const [produto, categories] = await Promise.all([
-        Produto.findByPk(parsedId),
-        Category.findAll()
-    ]);
+    const { produto, categorias } = await getEditData(parsedId);
 
-    modelValidation(produto);
-
-    res.render('admin/produtos/edit', { produto, categories });
+    res.render('admin/produtos/edit', { produto, categorias });
 }));
 
 router.post('/produtos/save', asyncHandler(async (req, res) => {
@@ -65,10 +52,7 @@ router.post('/produtos/save', asyncHandler(async (req, res) => {
     numberValidation(parsedId, parsedPreco);
     stringValidation(nome, descricao, codigo_barras);
 
-    const category = await Category.findByPk(parsedId);
-    modelValidation(category);
-
-    await Produto.create({
+    await createProduto({
         nome,
         descricao,
         preco: parsedPreco,
@@ -84,10 +68,7 @@ router.post('/produtos/delete/:id_produto', asyncHandler(async (req, res) => {
 
     numberValidation(parsedId);
 
-    const produto = await Produto.findByPk(parsedId);
-    modelValidation(produto);
-
-    await produto.destroy();
+    await deleteProduto(parsedId);
 
     res.redirect('/admin/produtos');
 }));
@@ -100,17 +81,13 @@ router.post('/produtos/update/:id_produto', asyncHandler(async (req, res) => {
     numberValidation(parsedIdProd, parsedIdCat, parsedPreco);
     stringValidation(nome, descricao, codigo_barras);
 
-    const produto = await Produto.findByPk(parsedIdProd);
-
-    modelValidation(produto);
-
-    await produto.update({
+    await updateProduto(parsedIdProd, ({
         nome,
         descricao,
         preco: parsedPreco,
         codigo_barras,
         id_categoria: parsedIdCat
-    });
+    }));
 
     res.redirect('/admin/produtos');
 }));

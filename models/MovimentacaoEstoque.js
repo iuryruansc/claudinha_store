@@ -1,7 +1,7 @@
 const Sequelize = require('sequelize');
 const connection = require('../database/database');
-const Estoque = require('./Estoque');
-const Funcionario = require('./Funcionarios');
+const Estoque = require('./estoque');
+const Funcionario = require('./funcionarios');
 
 const MovimentacaoEstoque = connection.define('movimentacaoestoque', {
     id_movimentacao: {
