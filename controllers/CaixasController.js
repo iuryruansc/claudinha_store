@@ -18,6 +18,7 @@ router.get('/caixas', asyncHandler(async (req, res) => {
 
 router.get('/caixas/edit/:id_caixa', asyncHandler(async (req, res) => {
     const [parsedId] = parseIntValue(req.params.id_caixa);
+    
     numberValidation(parsedId);
 
     const {caixa, pdvs, funcionarios} = await getEditData(parsedId);

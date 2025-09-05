@@ -7,6 +7,7 @@ const { getAllProdutos, getViewDependencies, getProdutosByCategoria, getEditData
 
 router.get('/produtos/new', asyncHandler(async (req, res) => {
     const categorias = await getViewDependencies();
+    
     res.render('admin/produtos/new', { categorias });
 }));
 

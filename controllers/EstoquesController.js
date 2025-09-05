@@ -12,6 +12,7 @@ router.get('/estoques/new', asyncHandler(async (req, res) => {
 
 router.get('/estoques', asyncHandler(async (req, res) => {
     const { estoques, produtos } = await getAllEstoques();
+    
     res.render('admin/estoques/index', { estoques, produtos });
 }));
 

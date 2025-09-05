@@ -11,6 +11,7 @@ router.get('/funcionarios/new', asyncHandler(async (req, res) => {
 
 router.get('/funcionarios', asyncHandler(async (req, res) => {
     const funcionarios = await getAllFuncionarios();
+    
     res.render('admin/funcionarios/index', { funcionarios })
 }));
 

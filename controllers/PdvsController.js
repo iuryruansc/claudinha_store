@@ -11,6 +11,7 @@ router.get('/pdvs/new', asyncHandler(async (req, res) => {
 
 router.get('/pdvs', asyncHandler(async (req, res) => {
     const pdvs = await getAllPdvs();
+    
     res.render('admin/pdvs/index', { pdvs })
 }));
 

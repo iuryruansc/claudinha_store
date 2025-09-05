@@ -8,11 +8,13 @@ const formatDate = require('../utils/date-formatter');
 
 router.get('/vendas/new', asyncHandler(async (req, res) => {
     const { caixas, clientes, funcionarios } = await getViewDependencies();
+    
     res.render('admin/vendas/new', { caixas, clientes, funcionarios });
 }));
 
 router.get('/vendas', asyncHandler(async (req, res) => {
     const { vendas, caixas, clientes, funcionarios } = await getAllVendas();
+
     res.render('admin/vendas/index', { vendas, caixas, clientes, funcionarios, formatDate })
 }));
 

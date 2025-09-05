@@ -11,6 +11,7 @@ router.get('/clientes/new', asyncHandler(async (req, res) => {
 
 router.get('/clientes', asyncHandler(async (req, res) => {
     const clientes = await getAllClientes();
+    
     res.render('admin/clientes/index', { clientes })
 }));
 

@@ -12,6 +12,7 @@ router.get('/categories/new', (req, res) => {
 
 router.get('/categories', asyncHandler(async (req, res) => {
     const categories = await getAllCategories();
+    
     res.render('admin/categories/index', { categories })
 }));
 
