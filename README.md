@@ -1,1 +1,0 @@
-# claudinha_store
