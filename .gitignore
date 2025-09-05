@@ -24,3 +24,7 @@ yarn-debug.log*
 # OS-generated files
 .DS_Store
 Thumbs.db
+
+# Localhost SSL certificate and key
+localhost+2-key.pem
+localhost+2.pem
