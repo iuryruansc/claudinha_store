@@ -17,11 +17,11 @@ const Vendas = connection.define('venda', {
     },
     id_cliente: {
         type: Sequelize.INTEGER,
-        allowNull: false,
+        allowNull: true,
     },
     id_funcionario: {
         type: Sequelize.INTEGER,
-        allowNull: false,
+        allowNull: true,
     },
     id_caixa: {
         type: Sequelize.INTEGER,

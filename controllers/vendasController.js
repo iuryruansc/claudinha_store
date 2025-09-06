@@ -8,7 +8,7 @@ const formatDate = require('../utils/date-formatter');
 
 router.get('/vendas/new', asyncHandler(async (req, res) => {
     const { caixas, clientes, funcionarios } = await getViewDependencies();
-    
+
     res.render('admin/vendas/new', { caixas, clientes, funcionarios });
 }));
 
@@ -24,7 +24,7 @@ router.get('/vendas/edit/:id_venda', asyncHandler(async (req, res) => {
     numberValidation(parsedId);
 
     const { venda, caixas, clientes, funcionarios } = await getEditData(parsedId);
- 
+
     res.render('admin/vendas/edit', { venda, caixas, clientes, funcionarios })
 }));
 
@@ -32,17 +32,17 @@ router.post('/vendas/save', asyncHandler(async (req, res) => {
     const [parsedIdCliente, parsedIdFun, parsedIdCaixa] = parseIntValue(req.body.id_cliente, req.body.id_funcionario, req.body.id_caixa);
     const parsedDataHora = req.body.data_hora ? parseDateValue(req.body.data_hora) : undefined;
 
-    numberValidation(parsedIdCliente,parsedIdFun, parsedIdCaixa);
+    numberValidation(parsedIdCliente, parsedIdFun, parsedIdCaixa);
     dateValidation(parsedDataHora);
 
-    await createVenda({
+    const venda = await createVenda({
         id_cliente: parsedIdCliente,
         id_funcionario: parsedIdFun,
         id_caixa: parsedIdCaixa,
         data_hora: parsedDataHora
     });
 
-    res.redirect('/admin/vendas');
+    res.redirect(`/admin/pagamentos/new/${venda.id_venda}`);
 }));
 
 router.post('/vendas/delete/:id_venda', asyncHandler(async (req, res) => {
@@ -60,7 +60,7 @@ router.post('/vendas/update/:id_venda', asyncHandler(async (req, res) => {
     const [parsedIdCliente, parsedIdFun, parsedIdCaixa] = parseIntValue(req.body.id_cliente, req.body.id_funcionario, req.body.id_caixa);
     const parsedDataHora = req.body.data_hora ? parseDateValue(req.body.data_hora) : undefined;
 
-    numberValidation(parsedIdCliente,parsedIdFun, parsedIdCaixa);
+    numberValidation(parsedIdCliente, parsedIdFun, parsedIdCaixa);
     dateValidation(parsedDataHora);
 
     await updateVenda(parsedIdVenda, {

@@ -9,13 +9,21 @@ export function showErrorPopup(message, details = []) {
     const popup = document.createElement('div');
     popup.className = 'alert alert-danger alert-dismissible fade show mt-3';
     popup.setAttribute('role', 'alert');
-    popup.innerHTML = `
-        <strong>${message}</strong>
-        ${details && details.length > 0 ? `<ul>${details.map(d => `<li>${d}</li>`).join('')}</ul>` : ''}
-        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-        </button>
-    `;
+
+    let detailsHtml = '';
+    if (Array.isArray(details) && details.length > 0) {
+        const listItems = details.map(d => `<li>${d}</li>`).join('');
+        detailsHtml = `<ul>${listItems}</ul>`;
+    }
+
+    popup.innerHTML =
+        '<strong>' + message + '</strong>' +
+        detailsHtml +
+        '<button type="button" class="close" data-dismiss="alert" aria-label="Close">' +
+        '<span aria-hidden="true">&times;</span>' +
+        '</button>';
+
+    popup.innerHTML = htmlParts.join('\n');
 
     popupContainer.appendChild(popup);
 

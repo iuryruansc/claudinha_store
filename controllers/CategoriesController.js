@@ -4,7 +4,7 @@ const asyncHandler = require('../utils/handlers/async-handler');
 const Produtos = require('../models/produto')
 const { stringValidation, checkAssociations, numberValidation } = require('../utils/data-validation');
 const { parseIntValue } = require('../utils/data-parsers');
-const { getAllCategories, findCategoryById, createCategory, deleteCategory, updateCategory, getViewDependencies } = require('../services/categoriesService');
+const { getAllCategories, findCategoryById, createCategory, deleteCategory, updateCategory } = require('../services/categoriesService');
 
 router.get('/categories/new', (req, res) => {
     res.render('admin/categories/new', { title: 'Nova Categoria' });
@@ -40,8 +40,6 @@ router.post('/categories/delete/:id_categoria', asyncHandler(async (req, res) =>
     const [parsedId] = parseIntValue(req.params.id_categoria);
 
     numberValidation(parsedId);
-
-    const category = await findCategoryById(parsedId);
 
     await checkAssociations(Produtos,
         'id_categoria',
