@@ -1,6 +1,5 @@
 const Sequelize = require('sequelize');
 const connection = require('../database/database');
-const Category = require('./category');
 
 const Produto = connection.define('produto', {
     id_produto: {
@@ -41,8 +40,5 @@ Produto.sync({ force: false })
     .catch((error) => {
         console.error("Erro ao criar a tabela Produto:", error);
     });
-
-Produto.belongsTo(Category, { foreignKey: 'id_categoria' });
-Category.hasMany(Produto, { foreignKey: 'id_categoria' });
-
+    
 module.exports = Produto;

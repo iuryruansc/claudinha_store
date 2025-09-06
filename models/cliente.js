@@ -1,7 +1,7 @@
 const Sequelize = require('sequelize');
 const connection = require('../database/database');
 
-const Clientes = connection.define('cliente', {
+const Cliente = connection.define('cliente', {
     id_cliente: {
         type: Sequelize.INTEGER,
         primaryKey: true,
@@ -33,7 +33,7 @@ const Clientes = connection.define('cliente', {
     timestamps: true
 });
 
-Clientes.sync({ force: false })
+Cliente.sync({ force: false })
     .then(() => {
         console.log("Tabela Cliente criada ou já existe.");
     })
@@ -41,4 +41,4 @@ Clientes.sync({ force: false })
         console.error("Erro ao criar a tabela Cliente:", error);
     });
 
-module.exports = Clientes;
+module.exports = Cliente;

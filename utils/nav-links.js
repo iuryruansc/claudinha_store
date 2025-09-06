@@ -12,5 +12,6 @@ module.exports = [
   { label: 'Estoques', href: '/admin/estoques' },
   { label: 'PDVs', href: '/admin/pdvs' },
   { label: 'Caixas', href: '/admin/caixas' },
-  { label: 'Vendas', href: '/admin/vendas' }
+  { label: 'Vendas', href: '/admin/vendas' },
+  { label: 'Movimentações', href: '/admin/movimentacoes'}
 ];

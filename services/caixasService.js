@@ -1,6 +1,6 @@
 const Caixa = require('../models/caixa');
-const Pdv = require('../models/pdvs');
-const Funcionario = require('../models/funcionarios');
+const Pdv = require('../models/pdv');
+const Funcionario = require('../models/funcionario');
 const { modelValidation } = require('../utils/data-validation');
 
 const findCaixaById = async (id) => {

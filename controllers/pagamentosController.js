@@ -32,8 +32,6 @@ router.post('/pagamentos/save', asyncHandler(async (req, res) => {
     const [parsedId, parsedParcelas] = parseIntValue(req.body.id_venda, req.body.parcelas);
     const [parsedValor] = parseFloatValue(req.body.valor_total);
 
-    console.log(req.body);
-
     numberValidation(parsedId, parsedValor, parsedParcelas);
     enumValidation(forma_pagamento, 'dinheiro', 'cartao_credito', 'cartao_debito', 'pix', 'outro');
 

@@ -13,6 +13,7 @@
                         <th>Funcionario</th>
                         <th>Cliente</th>
                         <th>Caixa</th>
+                        <th>Produtos</th>
                         <th>Data</th>
                         <th>Ações</th>
                     </tr>
@@ -50,6 +51,21 @@
                                         <% } else { %>
                                             -
                                             <% } %>
+                            </td>
+                            <td>
+                                <ul>
+                                    <% if (venda.itemvendas && venda.itemvendas.length> 0) { %>
+                                        <% venda.itemvendas.forEach(item=> { %>
+                                            <li>
+                                                <% const produto=produtos.find(p=> p.id_produto === item.id_produto); %>
+                                                    <%= produto ? produto.nome : 'Produto Desconhecido' %>
+                                                        (<%= item.quantidade %>)
+                                            </li>
+                                            <% }) %>
+                                                <% } else { %>
+                                                    <li>Nenhum item</li>
+                                                    <% } %>
+                                </ul>
                             </td>
                             <td>
                                 <%= formatDate(venda.data_hora) %>
@@ -91,4 +107,3 @@
                     });
                 });
             </script>
-            

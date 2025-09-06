@@ -1,7 +1,5 @@
 const Sequelize = require('sequelize');
 const connection = require('../database/database');
-const Pdv = require('./pdvs');
-const Funcionario = require('./funcionarios');
 
 const Caixa = connection.define('caixa', {
     id_caixa: {
@@ -51,10 +49,5 @@ Caixa.sync({ force: false })
     .catch((error) => {
         console.error("Erro ao criar a tabela Caixa:", error);
     });
-
-Caixa.belongsTo(Pdv, { foreignKey: 'id_pdv' });
-Caixa.belongsTo(Funcionario, { foreignKey: 'id_funcionario' });
-Pdv.hasMany(Caixa, { foreignKey: 'id_pdv' });
-Funcionario.hasMany(Caixa, { foreignKey: 'id_funcionario' });
 
 module.exports = Caixa;

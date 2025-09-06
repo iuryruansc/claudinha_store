@@ -1,4 +1,4 @@
-const Funcionario = require('../models/funcionarios');
+const Funcionario = require('../models/funcionario');
 const { modelValidation } = require('../utils/data-validation');
 
 const findFuncionarioById = async (id) => {

@@ -10,6 +10,8 @@ const connection = require('./database/database');
 const errorHandler = require('./utils/handlers/error-handler');
 const navLinks = require('./utils/nav-links');
 
+require('./models/associations');
+
 //Routers
 const adminRouter = require('./routes/admin');
 

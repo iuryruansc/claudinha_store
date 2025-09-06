@@ -1,8 +1,7 @@
 const Sequelize = require('sequelize');
 const connection = require('../database/database');
-const Pagamento = require('./pagamentos');
 
-const ParcelaPagamentos = connection.define('parcelapagamento', {
+const ParcelaPagamento = connection.define('parcelapagamento', {
     id_parcelapagamento: {
         type: Sequelize.INTEGER,
         primaryKey: true,
@@ -37,7 +36,7 @@ const ParcelaPagamentos = connection.define('parcelapagamento', {
     timestamps: true
 });
 
-ParcelaPagamentos.sync({ force: false })
+ParcelaPagamento.sync({ force: false })
     .then(() => {
         console.log("Tabela ParcelaPagamento criada ou já existe.");
     })
@@ -45,7 +44,4 @@ ParcelaPagamentos.sync({ force: false })
         console.error("Erro ao criar a tabela ParcelaPagamento:", error);
     });
 
-ParcelaPagamentos.belongsTo(Pagamento, { foreignKey: 'id_pagamento' });
-Pagamento.hasMany(ParcelaPagamentos, { foreignKey: 'id_pagamento' });
-
-module.exports = ParcelaPagamentos;
+module.exports = ParcelaPagamento;

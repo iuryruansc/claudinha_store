@@ -1,7 +1,7 @@
 const Sequelize = require('sequelize');
 const connection = require('../database/database');
 
-const Pdvs = connection.define('pdv', {
+const Pdv = connection.define('pdv', {
     id_pdv: {
         type: Sequelize.INTEGER,
         primaryKey: true,
@@ -24,7 +24,7 @@ const Pdvs = connection.define('pdv', {
     timestamps: true
 });
 
-Pdvs.sync({ force: false })
+Pdv.sync({ force: false })
     .then(() => {
         console.log("Tabela PDV criada ou já existe.");
     })
@@ -32,4 +32,4 @@ Pdvs.sync({ force: false })
         console.error("Erro ao criar a tabela PDV:", error);
     });
 
-module.exports = Pdvs;
+module.exports = Pdv;

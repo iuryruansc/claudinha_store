@@ -34,6 +34,20 @@
                                 </option>
                                 <% }) %>
                         </select><br>
+                        <div id="itens-venda-container">
+                            <div class="item-row">
+                                <select name="itens[0][id_produto]" class="form-select">
+                                    <% produtos.forEach(produto=> { %>
+                                        <option value="<%= produto.id_produto %>">
+                                            <%= produto.nome %>
+                                        </option>
+                                        <% }) %>
+                                </select>
+                                <input type="number" name="itens[0][quantidade]" placeholder="Quantidade">
+                            </div>
+                        </div>
+
+                        <button type="button" id="add-item-btn" class="btn btn-primary">Adicionar outro produto</button>
                         <button class="btn btn-success">Cadastrar</button>
                     </form>
                 </div>
@@ -41,3 +55,28 @@
         </div>
 
         <%- include('../../partials/footer.ejs') %>
+
+            <script>
+                document.addEventListener('DOMContentLoaded', () => {
+                    const addItemBtn = document.getElementById('add-item-btn');
+                    const itemsContainer = document.getElementById('itens-venda-container');
+                    let itemIndex = 1;
+
+                    addItemBtn.addEventListener('click', () => {
+
+                        const firstItemRow = document.querySelector('.item-row');
+                        const newItemRow = firstItemRow.cloneNode(true);
+
+                        const selectField = newItemRow.querySelector('select');
+                        const inputField = newItemRow.querySelector('input');
+
+                        selectField.name = `itens[${itemIndex}][id_produto]`;
+                        inputField.name = `itens[${itemIndex}][quantidade]`;
+                        inputField.value = '';
+
+                        itemsContainer.appendChild(newItemRow);
+
+                        itemIndex++;
+                    });
+                });
+            </script>

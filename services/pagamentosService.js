@@ -1,5 +1,5 @@
-const Pagamentos = require('../models/pagamentos');
-const Vendas = require('../models/vendas');
+const Pagamentos = require('../models/pagamento');
+const Vendas = require('../models/venda');
 const { modelValidation } = require('../utils/data-validation');
 
 const findPagamentoById = async (id) => {

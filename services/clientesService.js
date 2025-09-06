@@ -1,4 +1,4 @@
-const Cliente = require('../models/clientes');
+const Cliente = require('../models/cliente');
 const { modelValidation } = require('../utils/data-validation');
 
 const findClienteById = async (id) => {

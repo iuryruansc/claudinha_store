@@ -1,7 +1,7 @@
 const Sequelize = require('sequelize');
 const connection = require('../database/database');
 
-const Funcionarios = connection.define('funcionario', {
+const Funcionario = connection.define('funcionario', {
     id_funcionario: {
         type: Sequelize.INTEGER,
         primaryKey: true,
@@ -25,7 +25,7 @@ const Funcionarios = connection.define('funcionario', {
     timestamps: true
 });
 
-Funcionarios.sync({ force: false })
+Funcionario.sync({ force: false })
     .then(() => {
         console.log("Tabela Funcionario criada ou já existe.");
     })
@@ -33,4 +33,4 @@ Funcionarios.sync({ force: false })
         console.error("Erro ao criar a tabela Funcionario:", error);
     });
 
-module.exports = Funcionarios;
+module.exports = Funcionario;

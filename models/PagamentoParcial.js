@@ -1,6 +1,5 @@
 const Sequelize = require('sequelize');
 const connection = require('../database/database');
-const Vendas = require('./vendas');
 
 const PagamentoParcial = connection.define('pagamentoparcial', {
     id_pagamento_parcial: {
@@ -40,8 +39,5 @@ PagamentoParcial.sync({ force: false })
     .catch((error) => {
         console.error("Erro ao criar a tabela pagamentoparcial:", error);
     });
-
-PagamentoParcial.belongsTo(Vendas, { foreignKey: 'id_venda' });
-Vendas.hasMany(PagamentoParcial, { foreignKey: 'id_venda' });
 
 module.exports = PagamentoParcial;

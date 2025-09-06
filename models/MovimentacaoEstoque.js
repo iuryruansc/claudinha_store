@@ -1,7 +1,5 @@
 const Sequelize = require('sequelize');
 const connection = require('../database/database');
-const Estoque = require('./estoque');
-const Funcionario = require('./funcionarios');
 
 const MovimentacaoEstoque = connection.define('movimentacaoestoque', {
     id_movimentacao: {
@@ -12,6 +10,14 @@ const MovimentacaoEstoque = connection.define('movimentacaoestoque', {
     id_estoque: {
         type: Sequelize.INTEGER,
         allowNull: false
+    },
+    id_venda: {
+        type: Sequelize.INTEGER,
+        allowNull: true,
+        references: {
+            model: 'venda',
+            key: 'id_venda'
+        }
     },
     data_hora: {
         type: Sequelize.DATE,
@@ -45,11 +51,5 @@ MovimentacaoEstoque.sync({ force: false })
     .catch((error) => {
         console.error("Erro ao criar a tabela MovimentacaoEstoque:", error);
     });
-
-
-MovimentacaoEstoque.belongsTo(Estoque, { foreignKey: 'id_estoque' });
-MovimentacaoEstoque.belongsTo(Funcionario, { foreignKey: 'id_funcionario' });
-Estoque.hasMany(MovimentacaoEstoque, { foreignKey: 'id_estoque' });
-Funcionario.hasMany(MovimentacaoEstoque, { foreignKey: 'id_funcionario' });
 
 module.exports = MovimentacaoEstoque;

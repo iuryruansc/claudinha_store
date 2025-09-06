@@ -1,10 +1,7 @@
 const Sequelize = require('sequelize');
 const connection = require('../database/database');
-const Clientes = require('./clientes');
-const Funcionarios = require('./funcionarios');
-const Caixa = require('./caixa');
 
-const Vendas = connection.define('venda', {
+const Venda = connection.define('venda', {
     id_venda: {
         type: Sequelize.INTEGER,
         primaryKey: true,
@@ -32,7 +29,7 @@ const Vendas = connection.define('venda', {
     timestamps: true
 });
 
-Vendas.sync({ force: false })
+Venda.sync({ force: false })
     .then(() => {
         console.log("Tabela Venda criada ou já existe.");
     })
@@ -40,11 +37,4 @@ Vendas.sync({ force: false })
         console.error("Erro ao criar a tabela Venda:", error);
     });
 
-Vendas.belongsTo(Clientes, { foreignKey: 'id_cliente' });
-Vendas.belongsTo(Funcionarios, { foreignKey: 'id_funcionario' });
-Vendas.belongsTo(Caixa, { foreignKey: 'id_caixa' });
-Clientes.hasMany(Vendas, { foreignKey: 'id_cliente' });
-Funcionarios.hasMany(Vendas, { foreignKey: 'id_funcionario' });
-Caixa.hasMany(Vendas, { foreignKey: 'id_caixa' });
-
-module.exports = Vendas;
+module.exports = Venda;

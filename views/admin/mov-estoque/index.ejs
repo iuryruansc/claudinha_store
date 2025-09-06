@@ -1,0 +1,67 @@
+<%- include('../../partials/header.ejs') %>
+    <%- include('../../partials/navbar.ejs') %>
+
+        <div class="container">
+            <hr>
+            <h2>Funcionarios</h2>
+            <a href="/admin/movs/new" class="btn btn-success">Cadastrar mov</a>
+            <hr>
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>Data e Hora</th>
+                        <th>Tipo</th>
+                        <th>Produtos</th>
+                        <th>Quantidade</th>
+                        <th>Funcionario</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody id="category-table-body">
+                    <label>
+                        <input type="checkbox" id="toggleExcluir">
+                        Habilitar botão Excluir
+                    </label>
+                    <% movs.forEach(mov=> { %>
+                        <tr>
+                            <td>
+                                <%= formatDate(mov.data_hora) %>
+                            </td>
+                            <td>
+                                <%= mov.tipo %>
+                            </td>
+                            <td>
+                                <% const estoque=mov.estoque; %>
+                                    <% if (estoque) { %>
+                                        <% const produto=produtos.find(p=> p.id_produto === estoque.id_produto); %>
+                                            <%= produto ? produto.nome : 'Produto Desconhecido' %>
+                                                <% } else { %>
+                                                    -
+                                                    <% } %>
+                            </td>
+                            <td>
+                                <%= mov.quantidade %>
+                            </td>
+                            <td>
+                                <% const funcionario=funcionarios.find(c=> c.id_funcionario === mov.id_funcionario);
+                                    if (funcionario) { %>
+                                    <%= funcionario.nome %>
+                                        <% } else { %>
+                                            -
+                                            <% } %>
+                            </td>
+                            <td>
+                                <a href="/admin/movs/edit/<%= mov.id_mov %>" class="btn btn-warning">Editar</a>
+                                <form action="/admin/movs/delete/<%= mov.id_mov %>" method="POST"
+                                    style="display: inline;">
+                                    <input type="hidden" name="id_mov" value="<%= mov.id_mov %>">
+                                    <button class="btn btn-danger excluir-btn" style="display: none;">Excluir</button>
+                                </form>
+                            </td>
+                        </tr>
+                        <% }) %>
+                </tbody>
+            </table>
+        </div>
+
+        <%- include('../../partials/footer.ejs') %>

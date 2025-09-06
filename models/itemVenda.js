@@ -1,9 +1,7 @@
 const Sequelize = require('sequelize');
 const connection = require('../database/database');
-const Vendas = require('./vendas');
-const Produto = require('./produto');
 
-const ItemVendas = connection.define('itemvenda', {
+const ItemVenda = connection.define('itemvenda', {
     id_item: {
         type: Sequelize.INTEGER,
         primaryKey: true,
@@ -11,11 +9,19 @@ const ItemVendas = connection.define('itemvenda', {
     },
     id_venda: {
         type: Sequelize.INTEGER,
-        allowNull: true
+        allowNull: false,
+        references: {
+            model: 'venda',
+            key: 'id_venda'
+        }
     },
     id_produto: {
         type: Sequelize.INTEGER,
-        allowNull: true
+        allowNull: false,
+        references: {
+            model: 'produto',
+            key: 'id_produto'
+        }
     },
     quantidade: {
         type: Sequelize.INTEGER,
@@ -27,10 +33,10 @@ const ItemVendas = connection.define('itemvenda', {
     }
 }, {
     tableName: 'itemvenda',
-    timestamps: true
+    timestamps: false
 });
 
-ItemVendas.sync({ force: false })
+ItemVenda.sync({ force: false })
     .then(() => {
         console.log("Tabela ItemVenda criada ou já existe.");
     })
@@ -38,9 +44,4 @@ ItemVendas.sync({ force: false })
         console.error("Erro ao criar a tabela ItemVenda:", error);
     });
 
-ItemVendas.belongsTo(Vendas, { foreignKey: 'id_venda' });
-ItemVendas.belongsTo(Produto, { foreignKey: 'id_produto' });
-Vendas.hasMany(ItemVendas, { foreignKey: 'id_venda' });
-Produto.hasMany(ItemVendas, { foreignKey: 'id_produto' });
-
-module.exports = ItemVendas;
+module.exports = ItemVenda;
