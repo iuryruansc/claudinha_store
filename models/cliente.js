@@ -33,12 +33,4 @@ const Cliente = connection.define('cliente', {
     timestamps: true
 });
 
-Cliente.sync({ force: false })
-    .then(() => {
-        console.log("Tabela Cliente criada ou já existe.");
-    })
-    .catch((error) => {
-        console.error("Erro ao criar a tabela Cliente:", error);
-    });
-
 module.exports = Cliente;

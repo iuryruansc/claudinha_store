@@ -14,7 +14,7 @@ const Funcionario = connection.define('funcionario', {
     cpf: {
         type: Sequelize.STRING,
         allowNull: false,
-        unique: false
+        unique: true
     },
     cargo: {
         type: Sequelize.STRING,
@@ -24,13 +24,5 @@ const Funcionario = connection.define('funcionario', {
     tableName: 'funcionario',
     timestamps: true
 });
-
-Funcionario.sync({ force: false })
-    .then(() => {
-        console.log("Tabela Funcionario criada ou já existe.");
-    })
-    .catch((error) => {
-        console.error("Erro ao criar a tabela Funcionario:", error);
-    });
 
 module.exports = Funcionario;

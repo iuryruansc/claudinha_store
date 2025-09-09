@@ -1,27 +1,27 @@
 const express = require('express');
 const router = express.Router();
-const asyncHandler = require('../utils/handlers/async-handler');
-const { stringValidation, enumValidation, numberValidation, dateValidation } = require('../utils/data-validation');
-const { parseIntValue, parseFloatValue, parseDateValue } = require('../utils/data-parsers');
-const formatDate = require('../utils/date-formatter');
-const { getViewDependencies, getAllCaixas, createCaixa, getEditData, updateCaixa, deleteCaixa } = require('../services/caixasService');
+const asyncHandler = require('../../utils/handlers/async-handler');
+const { stringValidation, enumValidation, numberValidation, dateValidation } = require('../../utils/data/data-validation');
+const { parseIntValue, parseFloatValue, parseDateValue } = require('../../utils/data/data-parsers');
+const formatDate = require('../../utils/data/date-formatter');
+const { getViewDependencies, getAllCaixas, createCaixa, getEditData, updateCaixa, deleteCaixa } = require('../../services/admin/caixasService');
 
 router.get('/caixas/new', asyncHandler(async (req, res) => {
-    const {pdvs, funcionarios} = await getViewDependencies();
+    const { pdvs, funcionarios } = await getViewDependencies();
     res.render('admin/caixas/new', { pdvs, funcionarios });
 }));
 
 router.get('/caixas', asyncHandler(async (req, res) => {
-    const {caixas, pdvs, funcionarios} = await getAllCaixas();
+    const { caixas, pdvs, funcionarios } = await getAllCaixas();
     res.render('admin/caixas/index', { caixas, pdvs, funcionarios, formatDate })
 }));
 
 router.get('/caixas/edit/:id_caixa', asyncHandler(async (req, res) => {
     const [parsedId] = parseIntValue(req.params.id_caixa);
-    
+
     numberValidation(parsedId);
 
-    const {caixa, pdvs, funcionarios} = await getEditData(parsedId);
+    const { caixa, pdvs, funcionarios } = await getEditData(parsedId);
 
     res.render('admin/caixas/edit', { caixa, pdvs, funcionarios })
 }));
@@ -53,7 +53,7 @@ router.post('/caixas/save', asyncHandler(async (req, res) => {
 
 router.post('/caixas/delete/:id_caixa', asyncHandler(async (req, res) => {
     const [parsedId] = parseIntValue(req.params.id_caixa);
-    
+
     numberValidation(parsedId);
 
     await deleteCaixa(parsedId);

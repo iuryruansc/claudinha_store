@@ -32,12 +32,4 @@ const PagamentoParcial = connection.define('pagamentoparcial', {
     timestamps: true
 });
 
-PagamentoParcial.sync({ force: false })
-    .then(() => {
-        console.log("Tabela pagamentoparcial criada ou já existe.");
-    })
-    .catch((error) => {
-        console.error("Erro ao criar a tabela pagamentoparcial:", error);
-    });
-
 module.exports = PagamentoParcial;

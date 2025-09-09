@@ -1,7 +1,7 @@
-const Caixa = require('../models/caixa');
-const Pdv = require('../models/pdv');
-const Funcionario = require('../models/funcionario');
-const { modelValidation } = require('../utils/data-validation');
+const Caixa = require('../../models/caixa');
+const Pdv = require('../../models/pdv');
+const Funcionario = require('../../models/funcionario');
+const { modelValidation } = require('../../utils/data/data-validation');
 
 const findCaixaById = async (id) => {
     const caixa = await Caixa.findByPk(id);
@@ -22,7 +22,7 @@ const getAllCaixas = async () => {
     const dependenciesPromise = getViewDependencies()
 
     const [caixas, dependencies] = await Promise.all([caixaPromise, dependenciesPromise]);
-    
+
     return { caixas, ...dependencies };
 };
 

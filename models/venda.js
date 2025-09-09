@@ -18,23 +18,24 @@ const Venda = connection.define('venda', {
     },
     id_funcionario: {
         type: Sequelize.INTEGER,
-        allowNull: true,
+        allowNull: false,
     },
     id_caixa: {
         type: Sequelize.INTEGER,
         allowNull: false,
+    },
+    valor_total: {
+        type: Sequelize.DECIMAL(10, 2),
+        allowNull: false,
+    },
+    status: {
+        type: Sequelize.STRING,
+        allowNull: false,
+        defaultValue: 'PENDENTE'
     }
 }, {
     tableName: 'venda',
     timestamps: true
 });
-
-Venda.sync({ force: false })
-    .then(() => {
-        console.log("Tabela Venda criada ou já existe.");
-    })
-    .catch((error) => {
-        console.error("Erro ao criar a tabela Venda:", error);
-    });
 
 module.exports = Venda;

@@ -28,12 +28,4 @@ const Pagamento = connection.define('pagamento', {
     timestamps: true
 });
 
-Pagamento.sync({ force: false })
-    .then(() => {
-        console.log("Tabela Pagamento criada ou já existe.");
-    })
-    .catch((error) => {
-        console.error("Erro ao criar a tabela Pagamento:", error);
-    });
-
 module.exports = Pagamento;

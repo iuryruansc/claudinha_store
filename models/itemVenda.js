@@ -15,12 +15,12 @@ const ItemVenda = connection.define('itemvenda', {
             key: 'id_venda'
         }
     },
-    id_produto: {
+    id_lote: {
         type: Sequelize.INTEGER,
         allowNull: false,
         references: {
-            model: 'produto',
-            key: 'id_produto'
+            model: 'lote',
+            key: 'id_lote'
         }
     },
     quantidade: {
@@ -35,13 +35,5 @@ const ItemVenda = connection.define('itemvenda', {
     tableName: 'itemvenda',
     timestamps: false
 });
-
-ItemVenda.sync({ force: false })
-    .then(() => {
-        console.log("Tabela ItemVenda criada ou já existe.");
-    })
-    .catch((error) => {
-        console.error("Erro ao criar a tabela ItemVenda:", error);
-    });
 
 module.exports = ItemVenda;

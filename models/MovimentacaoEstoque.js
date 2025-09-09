@@ -7,7 +7,7 @@ const MovimentacaoEstoque = connection.define('movimentacaoestoque', {
         primaryKey: true,
         autoIncrement: true
     },
-    id_estoque: {
+    id_lote: {
         type: Sequelize.INTEGER,
         allowNull: false
     },
@@ -43,13 +43,5 @@ const MovimentacaoEstoque = connection.define('movimentacaoestoque', {
     tableName: 'movimentacaoestoque',
     timestamps: true
 });
-
-MovimentacaoEstoque.sync({ force: false })
-    .then(() => {
-        console.log("Tabela MovimentacaoEstoque criada ou já existe.");
-    })
-    .catch((error) => {
-        console.error("Erro ao criar a tabela MovimentacaoEstoque:", error);
-    });
 
 module.exports = MovimentacaoEstoque;

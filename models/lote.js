@@ -1,8 +1,8 @@
 const Sequelize = require('sequelize');
 const connection = require('../database/database');
 
-const Estoque = connection.define('estoque', {
-    id_estoque: {
+const Lote = connection.define('lote', {
+    id_lote: {
         type: Sequelize.INTEGER,
         primaryKey: true,
         autoIncrement: true
@@ -11,7 +11,15 @@ const Estoque = connection.define('estoque', {
         type: Sequelize.INTEGER,
         allowNull: false
     },
-    quantidade_atual: {
+    numero_lote: {
+        type: Sequelize.INTEGER,
+        allowNull: false
+    },
+    quantidade: {
+        type: Sequelize.INTEGER,
+        allowNull: false
+    },
+    data_validade: {
         type: Sequelize.INTEGER,
         allowNull: false
     },
@@ -20,16 +28,8 @@ const Estoque = connection.define('estoque', {
         allowNull: false
     }
 }, {
-    tableName: 'estoque',
+    tableName: 'lote',
     timestamps: true
 });
 
-Estoque.sync({ force: false })
-    .then(() => {
-        console.log("Tabela Estoque criada ou já existe.");
-    })
-    .catch((error) => {
-        console.error("Erro ao criar a tabela Estoque:", error);
-    });
-
-module.exports = Estoque;
+module.exports = Lote;

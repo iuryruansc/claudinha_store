@@ -1,7 +1,7 @@
 const Caixa = require('./caixa');
 const Category = require('./category');
 const Cliente = require('./cliente');
-const Estoque = require('./estoque');
+const Lote = require('./lote');
 const Funcionario = require('./funcionario');
 const ItemVenda = require('./itemVenda');
 const MovimentacaoEstoque = require('./movimentacaoEstoque');
@@ -56,21 +56,21 @@ Caixa.belongsTo(Pdv, { foreignKey: 'id_pdv' });
 Category.hasMany(Produto, { foreignKey: 'id_categoria' });
 Produto.belongsTo(Category, { foreignKey: 'id_categoria' });
 
-// Produto -> Estoque, ItemVenda
-Produto.hasMany(Estoque, { foreignKey: 'id_produto' });
-Estoque.belongsTo(Produto, { foreignKey: 'id_produto' });
+// Produto -> Lote, ItemVenda
+Produto.hasMany(Lote, { foreignKey: 'id_produto' });
+Lote.belongsTo(Produto, { foreignKey: 'id_produto' });
 Produto.hasMany(ItemVenda, { foreignKey: 'id_produto' });
 ItemVenda.belongsTo(Produto, { foreignKey: 'id_produto' });
 
 // Estoque -> MovimentacaoEstoque
-Estoque.hasMany(MovimentacaoEstoque, { foreignKey: 'id_estoque' });
-MovimentacaoEstoque.belongsTo(Estoque, { foreignKey: 'id_estoque' });
+Lote.hasMany(MovimentacaoEstoque, { foreignKey: 'id_lote' });
+MovimentacaoEstoque.belongsTo(Lote, { foreignKey: 'id_lote' });
 
 module.exports = {
   Caixa,
   Category,
   Cliente,
-  Estoque,
+  Lote,
   Funcionario,
   ItemVenda,
   MovimentacaoEstoque,

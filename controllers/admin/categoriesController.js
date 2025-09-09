@@ -1,10 +1,10 @@
 const express = require('express');
 const router = express.Router();
-const asyncHandler = require('../utils/handlers/async-handler');
-const Produtos = require('../models/produto')
-const { stringValidation, checkAssociations, numberValidation } = require('../utils/data-validation');
-const { parseIntValue } = require('../utils/data-parsers');
-const { getAllCategories, findCategoryById, createCategory, deleteCategory, updateCategory } = require('../services/categoriesService');
+const asyncHandler = require('../../utils/handlers/async-handler');
+const Produtos = require('../../models/produto')
+const { stringValidation, checkAssociations, numberValidation } = require('../../utils/data/data-validation');
+const { parseIntValue } = require('../../utils/data/data-parsers');
+const { getAllCategories, findCategoryById, createCategory, deleteCategory, updateCategory } = require('../../services/admin/categoriesService');
 
 router.get('/categories/new', (req, res) => {
     res.render('admin/categories/new', { title: 'Nova Categoria' });
@@ -12,7 +12,7 @@ router.get('/categories/new', (req, res) => {
 
 router.get('/categories', asyncHandler(async (req, res) => {
     const categories = await getAllCategories();
-    
+
     res.render('admin/categories/index', { categories })
 }));
 

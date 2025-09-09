@@ -33,12 +33,4 @@ const Produto = connection.define('produto', {
     timestamps: true
 });
 
-Produto.sync({ force: false })
-    .then(() => {
-        console.log("Tabela Produto criada ou já existe.");
-    })
-    .catch((error) => {
-        console.error("Erro ao criar a tabela Produto:", error);
-    });
-    
 module.exports = Produto;

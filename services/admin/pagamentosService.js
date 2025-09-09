@@ -1,6 +1,6 @@
-const Pagamentos = require('../models/pagamento');
-const Vendas = require('../models/venda');
-const { modelValidation } = require('../utils/data-validation');
+const Pagamentos = require('../../models/pagamento');
+const Vendas = require('../../models/venda');
+const { modelValidation } = require('../../utils/data/data-validation');
 
 const findPagamentoById = async (id) => {
     const pagamento = await Pagamentos.findByPk(id);

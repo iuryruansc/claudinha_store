@@ -1,6 +1,6 @@
-const Category = require('../models/category');
-const Produto = require('../models/produto');
-const { modelValidation } = require('../utils/data-validation');
+const Category = require('../../models/category');
+const Produto = require('../../models/produto');
+const { modelValidation } = require('../../utils/data/data-validation');
 
 const findCategoryById = async (id) => {
     const category = await Category.findByPk(id);

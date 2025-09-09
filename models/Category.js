@@ -16,12 +16,4 @@ const Category = connection.define('categoria', {
     timestamps: true
 });
 
-Category.sync({ force: false })
-  .then(() => {
-    console.log("Tabela Categoria criada ou já existe.");
-  })
-  .catch((error) => {
-    console.error("Erro ao criar a tabela Categoria:", error);
-  });
-
 module.exports = Category;

@@ -1,9 +1,9 @@
 const express = require('express');
 const router = express.Router();
-const asyncHandler = require('../utils/handlers/async-handler');
-const { stringValidation, numberValidation } = require('../utils/data-validation');
-const { parseIntValue } = require('../utils/data-parsers');
-const { getAllFuncionarios, findFuncionarioById, createFuncionario, deleteFuncionario, updateFuncionario } = require('../services/funcionariosService');
+const asyncHandler = require('../../utils/handlers/async-handler');
+const { stringValidation, numberValidation } = require('../../utils/data/data-validation');
+const { parseIntValue } = require('../../utils/data/data-parsers');
+const { getAllFuncionarios, findFuncionarioById, createFuncionario, deleteFuncionario, updateFuncionario } = require('../../services/admin/funcionariosService');
 
 router.get('/funcionarios/new', asyncHandler(async (req, res) => {
     res.render('admin/funcionarios/new', { title: 'Novo Funcionario' });
@@ -11,7 +11,7 @@ router.get('/funcionarios/new', asyncHandler(async (req, res) => {
 
 router.get('/funcionarios', asyncHandler(async (req, res) => {
     const funcionarios = await getAllFuncionarios();
-    
+
     res.render('admin/funcionarios/index', { funcionarios })
 }));
 
@@ -51,7 +51,7 @@ router.post('/funcionarios/update/:id_funcionario', asyncHandler(async (req, res
 
     numberValidation(parsedId);
     stringValidation(nome, cpf, cargo);
-    
+
     await updateFuncionario(parsedId, { nome, cpf, cargo });
 
     res.redirect('/admin/funcionarios');

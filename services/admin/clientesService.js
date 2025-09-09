@@ -1,5 +1,5 @@
-const Cliente = require('../models/cliente');
-const { modelValidation } = require('../utils/data-validation');
+const Cliente = require('../../models/cliente');
+const { modelValidation } = require('../../utils/data/data-validation');
 
 const findClienteById = async (id) => {
     const cliente = await Cliente.findByPk(id);

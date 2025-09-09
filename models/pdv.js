@@ -24,12 +24,4 @@ const Pdv = connection.define('pdv', {
     timestamps: true
 });
 
-Pdv.sync({ force: false })
-    .then(() => {
-        console.log("Tabela PDV criada ou já existe.");
-    })
-    .catch((error) => {
-        console.error("Erro ao criar a tabela PDV:", error);
-    });
-
 module.exports = Pdv;

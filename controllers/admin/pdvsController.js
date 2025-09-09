@@ -1,9 +1,9 @@
 const express = require('express');
 const router = express.Router();
-const asyncHandler = require('../utils/handlers/async-handler');
-const { stringValidation, enumValidation, numberValidation } = require('../utils/data-validation');
-const { parseIntValue } = require('../utils/data-parsers');
-const { getAllPdvs, findPdvById, createPdv, deletePdv, updatePdv } = require('../services/pdvsService');
+const asyncHandler = require('../../utils/handlers/async-handler');
+const { stringValidation, enumValidation, numberValidation } = require('../../utils/data/data-validation');
+const { parseIntValue } = require('../../utils/data/data-parsers');
+const { getAllPdvs, findPdvById, createPdv, deletePdv, updatePdv } = require('../../services/admin/pdvsService');
 
 router.get('/pdvs/new', asyncHandler(async (req, res) => {
     res.render('admin/pdvs/new', { title: 'Novo Ponto de Vendas' });
@@ -11,7 +11,7 @@ router.get('/pdvs/new', asyncHandler(async (req, res) => {
 
 router.get('/pdvs', asyncHandler(async (req, res) => {
     const pdvs = await getAllPdvs();
-    
+
     res.render('admin/pdvs/index', { pdvs })
 }));
 

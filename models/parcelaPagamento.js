@@ -36,12 +36,4 @@ const ParcelaPagamento = connection.define('parcelapagamento', {
     timestamps: true
 });
 
-ParcelaPagamento.sync({ force: false })
-    .then(() => {
-        console.log("Tabela ParcelaPagamento criada ou já existe.");
-    })
-    .catch((error) => {
-        console.error("Erro ao criar a tabela ParcelaPagamento:", error);
-    });
-
 module.exports = ParcelaPagamento;

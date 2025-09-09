@@ -1,9 +1,9 @@
 const express = require('express');
 const router = express.Router();
-const asyncHandler = require('../utils/handlers/async-handler');
-const { numberValidation, enumValidation } = require('../utils/data-validation');
-const { parseIntValue, parseFloatValue } = require('../utils/data-parsers');
-const { getAllPagamentos, getViewDependencies, deletePagamento, createPagamento } = require('../services/pagamentosService');
+const asyncHandler = require('../../utils/handlers/async-handler');
+const { numberValidation, enumValidation } = require('../../utils/data/data-validation');
+const { parseIntValue, parseFloatValue } = require('../../utils/data/data-parsers');
+const { getAllPagamentos, getViewDependencies, deletePagamento, createPagamento } = require('../../services/admin/pagamentosService');
 
 router.get('/pagamentos/new/:id_venda', asyncHandler(async (req, res) => {
     const [parsedId] = parseIntValue(req.params.id_venda)

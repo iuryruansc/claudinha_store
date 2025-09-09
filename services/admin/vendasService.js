@@ -1,14 +1,14 @@
-const connection = require('../database/database');
-const Venda = require('../models/venda');
-const Caixa = require('../models/caixa');
-const Cliente = require('../models/cliente');
-const Funcionario = require('../models/funcionario');
-const ItemVenda = require('../models/itemVenda');
-const Estoque = require('../models/estoque');
-const Produto = require('../models/produto');
-const Pagamento = require('../models/pagamento')
-const MovimentacaoEstoque = require('../models/movimentacaoEstoque');
-const { modelValidation } = require('../utils/data-validation');
+const connection = require('../../database/database');
+const Venda = require('../../models/venda');
+const Caixa = require('../../models/caixa');
+const Cliente = require('../../models/cliente');
+const Funcionario = require('../../models/funcionario');
+const ItemVenda = require('../../models/itemVenda');
+const Lote = require('../../models/lote');
+const Produto = require('../../models/produto');
+const Pagamento = require('../../models/pagamento')
+const MovimentacaoEstoque = require('../../models/movimentacaoEstoque');
+const { modelValidation } = require('../../utils/data/data-validation');
 
 const findVendaById = async (id) => {
     const venda = await Venda.findByPk(id, {
@@ -55,7 +55,9 @@ const createVenda = async (vendaData) => {
         const novaVenda = await Venda.create({
             id_cliente: vendaData.id_cliente,
             id_funcionario: vendaData.id_funcionario,
-            id_caixa: vendaData.id_caixa
+            id_caixa: vendaData.id_caixa,
+            valor_total: vendaData.valor_total,
+            status: vendaData.status || 'PENDENTE',
         }, { transaction: t });
 
         const idVenda = novaVenda.id_venda;
@@ -81,26 +83,26 @@ const createVenda = async (vendaData) => {
             }
 
             // Finding the current product on the stock
-            const estoque = await Estoque.findOne({
+            const lote = await Lote.findOne({
                 where: { id_produto: item.id_produto },
                 lock: t.LOCK.UPDATE,
                 transaction: t
             });
 
             // Checking if the stock has sufficient quantity
-            if (!estoque || estoque.quantidade_atual < item.quantidade) {
+            if (!lote || lote.quantidade < item.quantidade) {
                 throw new Error(`Estoque insuficiente para o produto ID: ${item.id_produto}`);
             }
 
             // Decreasing the quantity in Estoque
-            await estoque.decrement('quantidade_atual', {
+            await lote.decrement('quantidade', {
                 by: item.quantidade,
                 transaction: t
             });
 
             // Creating the MovimentacaoEstoque record
             await MovimentacaoEstoque.create({
-                id_estoque: estoque.id_estoque,
+                id_lote: lote.id_lote,
                 data_hora: new Date(),
                 tipo: 'saida_venda',
                 quantidade: -item.quantidade,
@@ -111,7 +113,7 @@ const createVenda = async (vendaData) => {
             // Add the ItemVenda record to the bulk create array
             itensParaCriar.push({
                 id_venda: idVenda,
-                id_produto: item.id_produto,
+                id_lote: item.id_lote,
                 quantidade: item.quantidade,
                 preco_unitario: produto.preco
             });
@@ -173,7 +175,7 @@ const updateVenda = async (id, updateData) => {
 
             itensParaCriar.push({
                 id_venda: id,
-                id_produto: newItem.id_produto,
+                id_lote: newItem.id_lote,
                 quantidade: newItem.quantidade,
                 preco_unitario: produto.preco
             });
@@ -188,7 +190,10 @@ const updateVenda = async (id, updateData) => {
         await venda.update({
             id_cliente: updateData.id_cliente,
             id_funcionario: updateData.id_funcionario,
-            id_caixa: updateData.id_caixa
+            id_caixa: updateData.id_caixa,
+            valor_total: updateData.valor_total || newTotal,
+            status: updateData.status || venda.status,
+            data_hora: updateData.data_hora || venda.data_hora
         }, { transaction: t });
 
         // Create a new pagamento record with the updated total
@@ -204,27 +209,27 @@ const updateVenda = async (id, updateData) => {
 };
 
 const updateStockAndMovimentacao = async (t, id_produto, quantityChange, id_venda, id_funcionario, tipo) => {
-    const estoque = await Estoque.findOne({
+    const lote = await Lote.findOne({
         where: { id_produto: id_produto },
         lock: t.LOCK.UPDATE,
         transaction: t
     });
 
-    if (!estoque) {
+    if (!lote) {
         throw new Error(`Estoque para o produto ID: ${id_produto} não encontrado.`);
     }
 
-    if (quantityChange < 0 && estoque.quantidade_atual < Math.abs(quantityChange)) {
+    if (quantityChange < 0 && estoque.quantidade < Math.abs(quantityChange)) {
         throw new Error(`Estoque insuficiente para o produto ID: ${id_produto}`);
     }
 
-    await estoque.increment('quantidade_atual', {
+    await lote.increment('quantidade', {
         by: quantityChange,
         transaction: t
     });
 
     await MovimentacaoEstoque.create({
-        id_estoque: estoque.id_estoque,
+        id_lote: lote.id_lote,
         data_hora: new Date(),
         tipo: tipo,
         quantidade: quantityChange,
@@ -246,23 +251,23 @@ const deleteVenda = async (id) => {
         }
 
         for (const item of venda.itemvendas) {
-            const estoque = await Estoque.findOne({
+            const lote = await Lote.findOne({
                 where: { id_produto: item.id_produto },
                 lock: t.LOCK.UPDATE,
                 transaction: t
             });
 
-            if (!estoque) {
+            if (!lote) {
                 throw new Error(`Estoque para o produto ID: ${item.id_produto} não encontrado.`);
             }
 
-            await estoque.increment('quantidade_atual', {
+            await lote.increment('quantidade', {
                 by: item.quantidade,
                 transaction: t
             });
 
             await MovimentacaoEstoque.create({
-                id_estoque: estoque.id_estoque,
+                id_lote: lote.id_lote,
                 data_hora: new Date(),
                 tipo: 'retorno_venda',
                 quantidade: item.quantidade,

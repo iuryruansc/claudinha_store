@@ -42,12 +42,4 @@ const Caixa = connection.define('caixa', {
     timestamps: true
 });
 
-Caixa.sync({ force: false })
-    .then(() => {
-        console.log("Tabela Caixa criada ou já existe.");
-    })
-    .catch((error) => {
-        console.error("Erro ao criar a tabela Caixa:", error);
-    });
-
 module.exports = Caixa;

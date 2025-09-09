@@ -1,0 +1,73 @@
+<%- include('../partials/header.ejs') %>
+
+    <body class="bg-light">
+        <div class="container mt-5">
+            <div class="row justify-content-center">
+                <div class="col-md-5">
+                    <div class="card shadow-sm">
+                        <div class="card-body">
+                            <div class="text-center mb-4">
+                                <button id="showLogin" class="btn btn-outline-primary me-2" style="display: none;">Login</button>
+                                <button id="showRegister" class="btn btn-outline-success" style="display: none;">Criar Conta</button>
+                            </div>
+
+                            <!-- Login Form -->
+                            <form id="loginForm" action="/login" method="POST">
+                                <h3 class="text-center mb-3">Login</h3>
+                                <div class="mb-3">
+                                    <label for="usuario" class="form-label">Usuário</label>
+                                    <input type="text" class="form-control" id="usuario" name="usuario" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="senha" class="form-label">Senha</label>
+                                    <input type="password" class="form-control" id="senha" name="senha" required>
+                                </div>
+                                <div class="mb-3 text-end">
+                                    <a href="/forgot-password" class="text-decoration-none">Esqueceu a senha?</a>
+                                </div>
+                                <button type="submit" class="btn btn-primary w-100">Login</button>
+                            </form>
+
+                            <!-- Register Form -->
+                            <form id="registerForm" action="/register" method="POST" style="display: none;">
+                                <h3 class="text-center mb-3">Criar Conta</h3>
+                                <div class="mb-3">
+                                    <label for="usuarioReg" class="form-label">Nome</label>
+                                    <input type="text" class="form-control" id="usuarioReg" name="usuario" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="senhaReg" class="form-label">Senha</label>
+                                    <input type="password" class="form-control" id="senhaReg" name="senha" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="confirmarSenha" class="form-label">Confirmar Senha</label>
+                                    <input type="password" class="form-control" id="confirmarSenha"
+                                        name="confirmarSenha" required>
+                                </div>
+                                <button type="submit" class="btn btn-success w-100">Criar Conta</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            const loginForm = document.getElementById('loginForm');
+            const registerForm = document.getElementById('registerForm');
+            const showLogin = document.getElementById('showLogin');
+            const showRegister = document.getElementById('showRegister');
+
+            showLogin.addEventListener('click', () => {
+                loginForm.style.display = 'block';
+                registerForm.style.display = 'none';
+            });
+
+            showRegister.addEventListener('click', () => {
+                loginForm.style.display = 'none';
+                registerForm.style.display = 'block';
+            });
+        </script>
+    </body>
+
+    <%- include('../partials/footer.ejs') %>

@@ -1,13 +1,13 @@
 const express = require('express');
 const router = express.Router();
-const asyncHandler = require('../utils/handlers/async-handler');
-const { numberValidation, stringValidation } = require('../utils/data-validation');
-const { parseIntValue, parseFloatValue } = require('../utils/data-parsers');
-const { getAllProdutos, getViewDependencies, getProdutosByCategoria, getEditData, createProduto, deleteProduto, updateProduto } = require('../services/produtosService');
+const asyncHandler = require('../../utils/handlers/async-handler');
+const { numberValidation, stringValidation } = require('../../utils/data/data-validation');
+const { parseIntValue, parseFloatValue } = require('../../utils/data/data-parsers');
+const { getAllProdutos, getViewDependencies, getProdutosByCategoria, getEditData, createProduto, deleteProduto, updateProduto } = require('../../services/admin/produtosService');
 
 router.get('/produtos/new', asyncHandler(async (req, res) => {
     const categorias = await getViewDependencies();
-    
+
     res.render('admin/produtos/new', { categorias });
 }));
 

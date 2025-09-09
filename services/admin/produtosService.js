@@ -1,6 +1,6 @@
-const Produto = require('../models/produto');
-const Category = require('../models/category');
-const { modelValidation } = require('../utils/data-validation');
+const Produto = require('../../models/produto');
+const Category = require('../../models/category');
+const { modelValidation } = require('../../utils/data/data-validation');
 
 const findProdutoById = async (id) => {
     const produto = await Produto.findByPk(id);
@@ -36,7 +36,7 @@ const getEditData = async (id) => {
     const categoriasPromise = getViewDependencies();
 
     const [produto, categorias] = await Promise.all([produtoPromise, categoriasPromise]);
-    
+
     return { produto, categorias };
 }
 

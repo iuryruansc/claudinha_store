@@ -1,5 +1,5 @@
-const Pdv = require('../models/pdv');
-const { modelValidation } = require('../utils/data-validation');
+const Pdv = require('../../models/pdv');
+const { modelValidation } = require('../../utils/data/data-validation');
 
 const findPdvById = async (id) => {
     const pdv = await Pdv.findByPk(id);

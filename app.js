@@ -1,19 +1,22 @@
 require('dotenv').config();
 
+//Imports
 const express = require('express');
 const app = express();
+const session = require('express-session');
 const https = require('https')
 const fs = require('fs')
 const helmet = require('helmet');
-const bodyParser = require('body-parser');
 const connection = require('./database/database');
-const errorHandler = require('./utils/handlers/error-handler');
-const navLinks = require('./utils/nav-links');
+const syncDatabase = require('./utils/data/data-sync');
 
-require('./models/associations');
+//Utils
+const navLinks = require('./utils/navigation/nav-links');
+const errorHandler = require('./utils/handlers/error-handler');
 
 //Routers
-const adminRouter = require('./routes/admin');
+const adminRouter = require('./routes/adminRoutes');
+const loginRouter = require('./routes/loginRoutes');
 
 //Configuration
 const port = process.env.PORT || 3000;
@@ -27,12 +30,18 @@ const options = {
 //Database connection
 connection
   .authenticate()
-  .then(() => {
+  .then(async () => {
     console.log('Conexão com o banco de dados realizada com sucesso!');
+    await syncDatabase();
   })
   .catch((error) => {
     console.error('Erro ao conectar ao banco de dados:', error);
   });
+
+//Check for SESSION_SECRET
+if (!process.env.SESSION_SECRET) {
+  throw new Error('SESSION_SECRET is not set!');
+}
 
 //Middlewares
 app.use(helmet({
@@ -43,9 +52,20 @@ app.use(helmet({
     },
   },
 }));
+
+app.use(session({
+  secret: process.env.SESSION_SECRET,
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    secure: 'auto',
+    maxAge: 1000 * 60 * 60 * 24
+  }
+}));
+
 app.use(express.static('public'));
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
 
 app.use((req, res, next) => {
   res.locals.navLinks = navLinks;
@@ -54,9 +74,10 @@ app.use((req, res, next) => {
 
 //Main Routes
 app.get('/', (req, res) => {
-  res.send("Home");
+  res.render('login')
 });
 app.use('/admin', adminRouter);
+app.use('/', loginRouter);
 
 //Error Handling middleware
 app.use(errorHandler);
