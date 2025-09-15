@@ -3,7 +3,7 @@ const router = express.Router();
 const asyncHandler = require('../../utils/handlers/async-handler');
 const { getViewDependencies, getAllVendas, getEditData, deleteVenda, createVenda, updateVenda } = require('../../services/admin/vendasService');
 const { parseIntValue, parseDateValue } = require('../../utils/data/data-parsers');
-const { numberValidation, dateValidation, stringValidation } = require('../../utils/data/data-validation');
+const { numberValidation, dateValidation, stringValidation, modelValidation } = require('../../utils/data/data-validation');
 const formatDate = require('../../utils/data/date-formatter');
 const Produto = require('../../models/produto')
 
@@ -17,6 +17,14 @@ router.get('/vendas', asyncHandler(async (req, res) => {
     const { vendas, caixas, clientes, funcionarios, produtos } = await getAllVendas();
 
     res.render('admin/vendas/index', { vendas, caixas, clientes, funcionarios, produtos, formatDate })
+}));
+
+router.get('/vendas/produtos/codigobarras/:codigo', asyncHandler(async (req,res) => {
+    const codigo_barras = req.params.codigo;
+    const produto = await Produto.findOne( {where: { codigo_barras }})
+    modelValidation(produto);
+
+    res.json (produto);
 }));
 
 router.get('/vendas/edit/:id_venda', asyncHandler(async (req, res) => {

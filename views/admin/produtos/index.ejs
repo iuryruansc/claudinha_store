@@ -1,84 +1,81 @@
 <%- include('../../partials/header.ejs') %>
     <%- include('../../partials/navbar.ejs') %>
 
-        <div class="container">
-            <hr>
-            <h2>
-                <% if (categoria_nome) { %>
-                    Produtos da Categoria: <%= categoria_nome %>
-                        <% } else { %>
-                            Todos os Produtos
-                            <% } %>
-            </h2>
-            <hr>
-            <table class="table table-bordered">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <% if (!categoria_nome) { %>
-                            <th>Categoria</th>
-                            <% } %>
-                                <th>Produto</th>
-                                <th>Descrição</th>
-                                <th>Preco</th>
-                                <th>Código de Barras</th>
-                                <th>Ações</th>
-                    </tr>
-                </thead>
-                <tbody id="category-table-body">
+        <body>
+            <div class="container">
+                <hr>
+                <h2>
+                    <% if (categoria_nome) { %>
+                        Produtos da Categoria: <%= categoria_nome %>
+                            <% } else { %>
+                                Todos os Produtos
+                                <% } %>
+                </h2>
+                <hr>
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <% if (!categoria_nome) { %>
+                                <th>Categoria</th>
+                                <% } %>
+                                    <th>Produto</th>
+                                    <th>Descrição</th>
+                                    <th>Preço</th>
+                                    <th>Código de Barras</th>
+                                    <th>Ações</th>
+                        </tr>
+                    </thead>
                     <label>
                         <input type="checkbox" id="toggleExcluir">
                         Habilitar botão Excluir
                     </label>
-                    <% produtos.forEach(produto=> { %>
-                        <tr>
-                            <td>
-                                <%= produto.id_produto %>
-                            </td>
-                            <% if (!categoria_nome) { %>
-                                <td>
-                                    <% const cat=categorias.find(c=> c.id_categoria === produto.id_categoria);
-                                        if (cat) { %>
-                                        <%= cat.nome %>
-                                            <% } else { %>
-                                                -
-                                                <% } %>
-                                </td>
-                                <% } %>
+                    <tbody id="category-table-body">
+                        <% produtos.forEach(produto=> { %>
+                            <tr>
+                                <% if (!categoria_nome) { %>
                                     <td>
-                                        <%= produto.nome %>
+                                        <% const cat=categorias.find(c=> c.id_categoria === produto.id_categoria);
+                                            if (cat) { %>
+                                            <%= cat.nome %>
+                                                <% } else { %>
+                                                    -
+                                                    <% } %>
                                     </td>
-                                    <td>
-                                        <%= produto.descricao %>
-                                    </td>
-                                    <td>
-                                        <%= produto.preco %>
-                                    </td>
-                                    <td>
-                                        <%= produto.codigo_barras %>
-                                    </td>
-                                    <td>
-                                        <a href="/admin/produtos/edit/<%= produto.id_produto %>?categoria=<%= produto.id_categoria %>"
-                                            input type="hidden" class="btn btn-warning">Editar</a>
-                                        <form action="/admin/produtos/delete/<%= produto.id_produto %>" method="POST"
-                                            style="display: inline;">
-                                            <input type="hidden" name="id_produto" value="<%= produto.id_produto %>">
-                                            <button class="btn btn-danger excluir-btn"
-                                                style="display: none;">Excluir</button>
-                                        </form>
-                                    </td>
-                        </tr>
-                        <% }) %>
-                </tbody>
-            </table>
-        </div>
+                                    <% } %>
+                                        <td>
+                                            <%= produto.nome %>
+                                        </td>
+                                        <td>
+                                            <%= produto.descricao %>
+                                        </td>
+                                        <td>
+                                            <%= produto.preco.toLocaleString('pt-BR', { style: 'currency' ,
+                                                currency: 'BRL' }) %>
 
-        <%- include('../../partials/footer.ejs') %>
+                                        </td>
+                                        <td>
+                                            <%= produto.codigo_barras %>
+                                        </td>
+                                        <td>
+                                            <a href="/admin/produtos/edit/<%= produto.id_produto %>?categoria=<%= produto.id_categoria %>"
+                                                class="btn btn-warning">Editar</a>
+                                            <form data-delete-form action="/admin/produtos/delete/<%= produto.id_produto %>"
+                                                method="POST" style="display: inline;">
+                                                <input type="hidden" name="id_produto"
+                                                    value="<%= produto.id_produto %>">
+                                                <button class="btn btn-danger excluir-btn"
+                                                    title="Excluir produto" style="display: none;">Excluir</button>
+                                            </form>
+                                        </td>
+                            </tr>
+                            <% }) %>
+                    </tbody>
+                </table>
+            </div>
 
             <script>
-
                 document.addEventListener('DOMContentLoaded', function () {
-                    const deleteForms = document.querySelectorAll('form[action^="/admin/produtos/delete"]');
+                    const deleteForms = document.querySelectorAll('[data-delete-form]');
                     const toggleExcluir = document.getElementById('toggleExcluir');
                     const tableBody = document.getElementById('category-table-body');
 
@@ -96,4 +93,8 @@
                     });
                 });
             </script>
-            
+
+            <%- include('../../partials/footer.ejs') %>
+        </body>
+
+        </html>

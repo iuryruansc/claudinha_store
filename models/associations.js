@@ -11,6 +11,8 @@ const ParcelaPagamento = require('./parcelaPagamento');
 const Pdv = require('./pdv');
 const Produto = require('./produto');
 const Venda = require('./venda');
+const Usuario = require('./usuario')
+const UserMeta = require('./userMeta')
 
 // Venda -> ItemVenda
 Venda.hasMany(ItemVenda, { foreignKey: 'id_venda' });
@@ -65,6 +67,10 @@ ItemVenda.belongsTo(Produto, { foreignKey: 'id_produto' });
 // Estoque -> MovimentacaoEstoque
 Lote.hasMany(MovimentacaoEstoque, { foreignKey: 'id_lote' });
 MovimentacaoEstoque.belongsTo(Lote, { foreignKey: 'id_lote' });
+
+// Usuario -> UserMeta
+Usuario.hasOne(UserMeta, { foreignKey: 'id_usuario'});
+UserMeta.belongsTo(Usuario, {foreignKey: 'id_usuario'});
 
 module.exports = {
   Caixa,

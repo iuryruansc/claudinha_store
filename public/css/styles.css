@@ -1,3 +1,11 @@
 .delete-enabled .excluir-btn {
   display: inline-block !important; 
 }
+
+body {
+  padding-top: 50px;
+}
+
+.navbar-scrolled {
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}

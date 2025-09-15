@@ -1,17 +1,17 @@
 const bcrypt = require('bcrypt');
 const Usuarios = require('../../models/usuario');
 
-async function authenticateUser(usuario, senha) {
-    const funcionario = await Usuarios.findOne({ where: { nome: usuario } });
-    if (!funcionario) return null;
+const authenticateUser = async (usuario, senha) => {
+    const usuarioEncontrado = await Usuarios.findOne({ where: { nome: usuario } });
+    if (!usuarioEncontrado) return null;
 
-    const isMatch = await bcrypt.compare(senha, funcionario.senha);
+    const isMatch = await bcrypt.compare(senha, usuarioEncontrado.senha);
     if (!isMatch) return null;
 
-    return funcionario;
+    return usuarioEncontrado;
 }
 
-function logoutUser(req, res) {
+const logoutUser = async (req, res) => {
     req.session.destroy(err => {
         if (err) {
             return res.status(500).json({ message: "Não foi possível deslogar" });

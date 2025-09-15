@@ -1,109 +1,94 @@
 <%- include('../../partials/header.ejs') %>
     <%- include('../../partials/navbar.ejs') %>
 
-        <div class="container">
-            <hr>
-            <h2>Vendas</h2>
-            <a href="/admin/vendas/new" class="btn btn-success">Nova Venda</a>
-            <hr>
-            <table class="table table-bordered">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Funcionario</th>
-                        <th>Cliente</th>
-                        <th>Caixa</th>
-                        <th>Produtos</th>
-                        <th>Data</th>
-                        <th>Ações</th>
-                    </tr>
-                </thead>
-                <tbody id="category-table-body">
-                    <label>
-                        <input type="checkbox" id="toggleExcluir">
-                        Habilitar botão Excluir
-                    </label>
-                    <% vendas.forEach(venda=> { %>
+        <body>
+            <div class="container">
+                <hr>
+                <h2>Vendas</h2>
+                <a href="/admin/vendas/new" class="btn btn-success">Nova Venda</a>
+                <hr>
+                <table class="table table-bordered">
+                    <thead>
                         <tr>
-                            <td>
-                                <%= venda.id_venda %>
-                            </td>
-                            <td>
-                                <% const cliente=clientes.find(c=> c.id_cliente === venda.id_cliente);
-                                    if (cliente) { %>
-                                    <%= cliente.nome %>
-                                        <% } else { %>
-                                            -
-                                            <% } %>
-                            </td>
-                            <td>
-                                <% const funcionario=funcionarios.find(c=> c.id_funcionario === venda.id_funcionario);
-                                    if (funcionario) { %>
-                                    <%= funcionario.nome %>
-                                        <% } else { %>
-                                            -
-                                            <% } %>
-                            </td>
-                            <td>
-                                <% const caixa=caixas.find(c=> c.id_caixa === venda.id_caixa);
-                                    if (caixa) { %>
-                                    <%= caixa.id_caixa %>
-                                        <% } else { %>
-                                            -
-                                            <% } %>
-                            </td>
-                            <td>
-                                <ul>
-                                    <% if (venda.itemvendas && venda.itemvendas.length> 0) { %>
-                                        <% venda.itemvendas.forEach(item=> { %>
-                                            <li>
-                                                <% const produto=produtos.find(p=> p.id_produto === item.id_produto); %>
-                                                    <%= produto ? produto.nome : 'Produto Desconhecido' %>
-                                                        (<%= item.quantidade %>)
-                                            </li>
-                                            <% }) %>
-                                                <% } else { %>
-                                                    <li>Nenhum item</li>
-                                                    <% } %>
-                                </ul>
-                            </td>
-                            <td>
-                                <%= formatDate(venda.data_hora) %>
-                            </td>
-                            <td>
-                                <a href="/admin/vendas/edit/<%= venda.id_venda %>" class="btn btn-warning">Editar</a>
-                                <form action="/admin/vendas/delete/<%= venda.id_venda %>" method="POST"
-                                    style="display: inline;">
-                                    <input type="hidden" name="id_venda" value="<%= venda.id_venda %>">
-                                    <button class="btn btn-danger excluir-btn" style="display: none;">Excluir</button>
-                                </form>
-                            </td>
+                            <th>Cliente</th>
+                            <th>Produtos</th>
+                            <th>Data</th>
+                            <th>Ações</th>
                         </tr>
-                        <% }) %>
-                </tbody>
-            </table>
-        </div>
+                    </thead>
+                    <tbody id="category-table-body">
+                        <label>
+                            <input type="checkbox" id="toggleExcluir">
+                            Habilitar botão Excluir
+                        </label>
+                        <% vendas.forEach(venda=> { %>
+                            <tr>
+                                <td>
+                                    <% const cliente=clientes.find(c=> c.id_cliente === venda.id_cliente);
+                                        if (cliente) { %>
+                                        <%= cliente.nome %>
+                                            <% } else { %>
+                                                -
+                                                <% } %>
+                                </td>
+                                <td>
+                                    <ul>
+                                        <% if (venda.itemvendas && venda.itemvendas.length> 0) { %>
+                                            <% venda.itemvendas.forEach(item=> { %>
+                                                <li>
+                                                    <% const produto=produtos.find(p=> p.id_produto ===
+                                                        item.id_produto); %>
+                                                        <%= produto ? produto.nome : 'Produto Desconhecido' %>
+                                                            (<%= item.quantidade %>)
+                                                </li>
+                                                <% }) %>
+                                                    <% } else { %>
+                                                        <li>Nenhum item</li>
+                                                        <% } %>
+                                    </ul>
+                                </td>
+                                <td>
+                                    <%= formatDate(venda.data_hora) %>
+                                </td>
+                                <td>
+                                    <a href="/admin/vendas/edit/<%= venda.id_venda %>"
+                                        class="btn btn-warning">Editar</a>
+                                    <form action="/admin/vendas/delete/<%= venda.id_venda %>" method="POST"
+                                        style="display: inline;">
+                                        <input type="hidden" name="id_venda" value="<%= venda.id_venda %>">
+                                        <button class="btn btn-danger excluir-btn"
+                                            style="display: none;">Excluir</button>
+                                    </form>
+                                </td>
+                            </tr>
+                            <% }) %>
+                    </tbody>
+                </table>
+            </div>
 
-        <%- include('../../partials/footer.ejs') %>
+            <%- include('../../partials/footer.ejs') %>
 
-            <script>
+                <script>
 
-                document.addEventListener('DOMContentLoaded', function () {
-                    const deleteForms = document.querySelectorAll('form[action^="/admin/caixas/delete/]');
-                    const toggleExcluir = document.getElementById('toggleExcluir');
-                    const tableBody = document.getElementById('category-table-body');
+                    document.addEventListener('DOMContentLoaded', function () {
+                        const deleteForms = document.querySelectorAll('form[action^="/admin/caixas/delete/]');
+                        const toggleExcluir = document.getElementById('toggleExcluir');
+                        const tableBody = document.getElementById('category-table-body');
 
-                    toggleExcluir.addEventListener('change', function () {
-                        tableBody.classList.toggle('delete-enabled', this.checked);
-                    });
+                        toggleExcluir.addEventListener('change', function () {
+                            tableBody.classList.toggle('delete-enabled', this.checked);
+                        });
 
-                    deleteForms.forEach(form => {
-                        form.addEventListener('submit', function (event) {
-                            event.preventDefault();
-                            if (confirm('Você tem certeza que deseja remover este funcionario?')) {
-                                this.submit();
-                            }
+                        deleteForms.forEach(form => {
+                            form.addEventListener('submit', function (event) {
+                                event.preventDefault();
+                                if (confirm('Você tem certeza que deseja remover este funcionario?')) {
+                                    this.submit();
+                                }
+                            });
                         });
                     });
-                });
-            </script>
+                </script>
+        </body>
+
+        </html>

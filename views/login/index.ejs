@@ -7,20 +7,23 @@
                     <div class="card shadow-sm">
                         <div class="card-body">
                             <div class="text-center mb-4">
-                                <button id="showLogin" class="btn btn-outline-primary me-2" style="display: none;">Login</button>
-                                <button id="showRegister" class="btn btn-outline-success" style="display: none;">Criar Conta</button>
+                                <button id="showLogin" class="btn btn-outline-primary me-2"
+                                    style="display: none">Login</button>
+                                <button id="showRegister" class="btn btn-outline-success" style="display: none">Criar
+                                    Conta</button>
                             </div>
 
                             <!-- Login Form -->
                             <form id="loginForm" action="/login" method="POST">
                                 <h3 class="text-center mb-3">Login</h3>
-                                <div class="mb-3">
-                                    <label for="usuario" class="form-label">Usuário</label>
-                                    <input type="text" class="form-control" id="usuario" name="usuario" required>
+                                <div class="mb-3 form-floating">
+                                    <input type="text" class="form-control" id="floatingInput" name="usuario"
+                                        placeholder="Usuário" required>
+                                    <label for="floatingInput" class="form-label">Usuário</label>
                                 </div>
-                                <div class="mb-3">
-                                    <label for="senha" class="form-label">Senha</label>
-                                    <input type="password" class="form-control" id="senha" name="senha" required>
+                                <div class="mb-3 form-floating">
+                                    <input type="password" class="form-control" id="floatingInput" name="senha" placeholder="Senha" required>
+                                    <label for="floatingInput" class="form-label">Senha</label>
                                 </div>
                                 <div class="mb-3 text-end">
                                     <a href="/forgot-password" class="text-decoration-none">Esqueceu a senha?</a>

@@ -1,18 +1,31 @@
 const express = require('express');
 const router = express.Router();
 const asyncHandler = require('../../utils/handlers/async-handler');
-const crypto = require('crypto');
+const { sendEmail, passwordReset } = require('../../services/login/passwordService');
 
 router.get('/forgot-password', (req, res) => {
     res.render('login/forgot-password');
 });
 
-router.get('/reset-password/:token', asyncHandler(async (req, res) => {
-    //TODO
+router.get('/reset-password', asyncHandler(async (req, res) => {
+    const { token } = req.query.token;
+    res.render('login/new-password', { token })
 }));
 
 router.post('/forgot-password', asyncHandler(async (req, res) => {
-    //TODO
+    const { email } = req.body;
+
+    sendEmail(email);
+
+    res.send('Instruções enviadas com sucesso');
+}));
+
+router.post('/reset-password', asyncHandler(async (req, res) => {
+    const { token, novaSenha } = req.body;
+
+    passwordReset(token, novaSenha);
+
+    res.send('Senha atualizada com sucesso');
 }));
 
 module.exports = router;

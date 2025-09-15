@@ -1,5 +1,5 @@
 module.exports = [
-  { label: 'Categorias', href: '/admin/categories' },
+  { label: "Painel Admin", href: '/admin/dashboard' },
   {
     label: 'Produtos',
     dropdown: [
@@ -7,11 +7,16 @@ module.exports = [
       { label: 'Cadastrar Produto', href: '/admin/produtos/new' }
     ]
   },
-  { label: 'Funcionarios', href: '/admin/funcionarios' },
+  { label: 'Vendas', 
+    dropdown: [
+      { label: 'Nova Venda', href: '/admin/vendas/new'},
+      { label: 'Vendas Completas', href: '/admin/vendas'}
+    ]
+   },
   { label: 'Clientes', href: '/admin/clientes' },
-  { label: 'Estoques', href: '/admin/estoques' },
+  { label: 'Estoque', href: '/admin/estoques' },
   { label: 'PDVs', href: '/admin/pdvs' },
   { label: 'Caixas', href: '/admin/caixas' },
-  { label: 'Vendas', href: '/admin/vendas' },
-  { label: 'Movimentações', href: '/admin/movimentacoes'}
+  { label: 'Movimentações', href: '/admin/movimentacoes' },
+  { label: 'Pagamentos', href: '/admin/pagamentos' }
 ];

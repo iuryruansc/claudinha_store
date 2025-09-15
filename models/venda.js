@@ -18,11 +18,11 @@ const Venda = connection.define('venda', {
     },
     id_funcionario: {
         type: Sequelize.INTEGER,
-        allowNull: false,
+        allowNull: true,
     },
     id_caixa: {
         type: Sequelize.INTEGER,
-        allowNull: false,
+        allowNull: true,
     },
     valor_total: {
         type: Sequelize.DECIMAL(10, 2),

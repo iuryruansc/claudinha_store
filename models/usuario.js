@@ -12,9 +12,21 @@ const Usuario = connection.define('usuario', {
         type: Sequelize.STRING,
         allowNull: false
     },
+    email: {
+        type: Sequelize.STRING,
+        allowNull: true,
+        unique: true,
+        validate: {
+            isEmail: true
+        }
+    },
     senha: {
         type: Sequelize.STRING,
         allowNull: false
+    },
+    cargo: {
+        type: Sequelize.STRING,
+        allwowNull: false
     }
 }, {
     tableName: 'usuario',

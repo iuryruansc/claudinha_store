@@ -13,6 +13,7 @@ const syncDatabase = require('./utils/data/data-sync');
 //Utils
 const navLinks = require('./utils/navigation/nav-links');
 const errorHandler = require('./utils/handlers/error-handler');
+const tokenCleanUp = require('./utils/clean-tokens')
 
 //Routers
 const adminRouter = require('./routes/adminRoutes');
@@ -59,7 +60,6 @@ app.use(session({
   saveUninitialized: false,
   cookie: {
     secure: 'auto',
-    maxAge: 1000 * 60 * 60 * 24
   }
 }));
 
@@ -73,14 +73,14 @@ app.use((req, res, next) => {
 });
 
 //Main Routes
-app.get('/', (req, res) => {
-  res.render('login')
-});
 app.use('/admin', adminRouter);
 app.use('/', loginRouter);
 
 //Error Handling middleware
 app.use(errorHandler);
+
+//Cleaning Unused Tokens
+tokenCleanUp();
 
 //Server Listen
 https.createServer(options, app).listen(port, () => {

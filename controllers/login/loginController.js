@@ -2,17 +2,22 @@ const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcrypt');
 const asyncHandler = require('../../utils/handlers/async-handler');
-const Usuarios = require('../../models/usuario');
 const { logoutUser, authenticateUser } = require('../../services/login/loginService');
+
+router.get('/login', (req, res) => {
+    res.render('login/index');
+});
 
 router.post('/login', asyncHandler(async (req, res) => {
     const { usuario, senha } = req.body;
-    const funcionario = await authenticateUser(usuario, senha);
+    const usuarioEncontrado = await authenticateUser(usuario, senha);
 
-    if (funcionario) {
+    if (usuarioEncontrado) {
         req.session.isAuth = true;
-        req.session.userName = funcionario.nome;
-        return res.redirect('/admin/categories');
+        req.session.cargo = usuarioEncontrado.cargo;
+        if (usuarioEncontrado.cargo === 'admin') {
+            res.redirect('admin/dashboard');
+        }
     } else {
         res.status(401).json({ message: 'Usuário ou senha inválidos.' });
     }
