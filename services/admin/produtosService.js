@@ -1,5 +1,7 @@
 const Produto = require('../../models/produto');
 const Category = require('../../models/category');
+const Fornecedor = require('../../models/fornecedor');
+const Marca = require('../../models/marca');
 const { modelValidation } = require('../../utils/data/data-validation');
 
 const findProdutoById = async (id) => {
@@ -9,8 +11,17 @@ const findProdutoById = async (id) => {
 };
 
 const getViewDependencies = async () => {
-    const categorias = await Category.findAll();
-    return categorias;
+    const categoriasPromise = Category.findAll();
+    const fornecedoresPromise = Fornecedor.findAll();
+    const marcasPromise = Marca.findAll();
+
+    const [categorias, fornecedores, marcas] = await Promise.all([
+        categoriasPromise,
+        fornecedoresPromise,
+        marcasPromise
+    ]);
+
+    return { categorias, fornecedores, marcas };
 }
 
 const getProdutosByCategoria = async (id) => {
@@ -22,22 +33,46 @@ const getProdutosByCategoria = async (id) => {
     return { produtos, categoria }
 }
 
+const getProdutosByFornecedor = async (id) => {
+    const produtosPromise = Produto.findAll({ where: { id_fornecedor: id } });
+    const fornecedorPromise = Fornecedor.findByPk(id);
+
+    const [produtos, fornecedor] = await Promise.all([produtosPromise, fornecedorPromise]);
+
+    return { produtos, fornecedor }
+}
+
+const getProdutosByMarca = async (id) => {
+    const produtosPromise = Produto.findAll({ where: { id_marca: id } });
+    const marcaPromise = Marca.findByPk(id);
+
+    const [produtos, marca] = await Promise.all([produtosPromise, marcaPromise]);
+
+    return { produtos, marca }
+}
+
 const getAllProdutos = async () => {
     const produtosPromise = Produto.findAll();
-    const categoriasPromise = getViewDependencies();
+    const dependenciesPromise = getViewDependencies();
 
-    const [produtos, categorias] = await Promise.all([produtosPromise, categoriasPromise]);
+    const [produtos, { categorias, fornecedores, marcas }] = await Promise.all([
+        produtosPromise,
+        dependenciesPromise
+    ]);
 
-    return { produtos, categorias };
+    return { produtos, categorias, fornecedores, marcas };
 };
 
 const getEditData = async (id) => {
     const produtoPromise = findProdutoById(id);
-    const categoriasPromise = getViewDependencies();
+    const dependenciesPromise = getViewDependencies();
 
-    const [produto, categorias] = await Promise.all([produtoPromise, categoriasPromise]);
+    const [produto, { categorias, fornecedores, marcas }] = await Promise.all([
+        produtoPromise,
+        dependenciesPromise
+    ]);
 
-    return { produto, categorias };
+    return { produto, categorias, fornecedores, marcas };
 }
 
 const createProduto = async (clienteData) => {
@@ -65,6 +100,8 @@ module.exports = {
     getViewDependencies,
     getAllProdutos,
     getProdutosByCategoria,
+    getProdutosByFornecedor,
+    getProdutosByMarca,
     getEditData,
     createProduto,
     updateProduto,

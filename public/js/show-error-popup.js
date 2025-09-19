@@ -23,8 +23,6 @@ export function showErrorPopup(message, details = []) {
         '<span aria-hidden="true">&times;</span>' +
         '</button>';
 
-    popup.innerHTML = htmlParts.join('\n');
-
     popupContainer.appendChild(popup);
 
     const closeButton = popup.querySelector('.close');

@@ -20,6 +20,7 @@
 
                             </tbody>
                         </table>
+                        <input type="hidden" name="itens" id="itens" value="" />
                         <button type="button" id="add-item-btn" class="btn btn-outline-primary">
                             <i class="bi bi-plus-circle"></i> Adicionar Produto
                         </button>
@@ -31,7 +32,8 @@
                         <ul class="list-group mb-3" id="resumo-precos"></ul>
                         <div class="card">
                             <div class="card-body">
-                                <h5>Total: R$ <span id="total-geral">0.00</span></h5>
+                                <h5>Total: R$ <span id="valor_total">0.00</span></h5>
+                                <input type="hidden" name="valor_total" id="valor_total_input" value="0.00" />
                             </div>
                         </div>
                     </div>
@@ -62,7 +64,9 @@
                     const addItemBtn = document.getElementById('add-item-btn');
                     const itemsContainer = document.getElementById('itens-venda-container');
                     const resumoPrecos = document.getElementById('resumo-precos');
-                    const totalGeral = document.getElementById('total-geral');
+                    const inputTotal = document.getElementById('valor_total_input');
+                    const spanTotal = document.getElementById('valor_total');
+                    const form = document.querySelector('form[action="/admin/vendas/save"]');
                     let itemIndex = 0;
 
                     barcodeInput.focus();
@@ -91,6 +95,18 @@
 
                     addItemBtn.addEventListener('click', () => {
                         addProductRow(null);
+                    });
+
+                    form.addEventListener('submit', () => {
+                        inputTotal.value = spanTotal.textContent;
+                    });
+
+                    itemsContainer.addEventListener('click', (event) => {
+                        if (event.target.closest('.remove-item-btn')) {
+                            const row = event.target.closest('tr');
+                            if (row) row.remove();
+                            updateResumo();
+                        }
                     });
 
                     function addProductRow(produto) {
@@ -133,14 +149,6 @@
                         updateResumo();
                     }
 
-                    itemsContainer.addEventListener('click', (event) => {
-                        if (event.target.closest('.remove-item-btn')) {
-                            const row = event.target.closest('tr');
-                            if (row) row.remove();
-                            updateResumo();
-                        }
-                    });
-
                     function updateResumo() {
                         resumoPrecos.innerHTML = '';
                         let total = 0;
@@ -161,7 +169,7 @@
                             }
                         });
 
-                        totalGeral.textContent = total.toFixed(2);
+                        spanTotal.textContent = total.toFixed(2);
                     }
 
                     itemsContainer.addEventListener('change', updateResumo);

@@ -2,99 +2,118 @@
     <%- include('../../partials/navbar.ejs') %>
 
         <body>
-            <div class="container">
-                <hr>
-                <h2>
-                    <% if (categoria_nome) { %>
-                        Produtos da Categoria: <%= categoria_nome %>
-                            <% } else { %>
-                                Todos os Produtos
-                                <% } %>
-                </h2>
-                <hr>
-                <table class="table table-bordered">
-                    <thead>
-                        <tr>
-                            <% if (!categoria_nome) { %>
-                                <th>Categoria</th>
-                                <% } %>
-                                    <th>Produto</th>
-                                    <th>Descrição</th>
-                                    <th>Preço</th>
-                                    <th>Código de Barras</th>
-                                    <th>Ações</th>
-                        </tr>
-                    </thead>
-                    <label>
-                        <input type="checkbox" id="toggleExcluir">
-                        Habilitar botão Excluir
-                    </label>
-                    <tbody id="category-table-body">
-                        <% produtos.forEach(produto=> { %>
+            <main class="main-content">
+                <div class="container">
+                    <hr>
+                    <h2>
+                        <% if (categoria_nome) { %>
+                            Produtos da Categoria: <%= categoria_nome %>
+                                <% } else if (fornecedor_nome) { %>
+                                    Produtos do Fornecedor: <%= fornecedor_nome %>
+                                        <% } else if (marca_nome) { %>
+                                            Produtos da Marca: <%= marca_nome %>
+                                                <% } else { %>
+                                                    Todos os Produtos
+                                                    <% } %>
+                    </h2>
+                    <hr>
+                    <table id="table-data" class="table table-bordered">
+                        <thead>
                             <tr>
                                 <% if (!categoria_nome) { %>
-                                    <td>
-                                        <% const cat=categorias.find(c=> c.id_categoria === produto.id_categoria);
-                                            if (cat) { %>
-                                            <%= cat.nome %>
-                                                <% } else { %>
-                                                    -
-                                                    <% } %>
-                                    </td>
+                                    <th>Categoria</th>
                                     <% } %>
-                                        <td>
-                                            <%= produto.nome %>
-                                        </td>
-                                        <td>
-                                            <%= produto.descricao %>
-                                        </td>
-                                        <td>
-                                            <%= produto.preco.toLocaleString('pt-BR', { style: 'currency' ,
-                                                currency: 'BRL' }) %>
-
-                                        </td>
-                                        <td>
-                                            <%= produto.codigo_barras %>
-                                        </td>
-                                        <td>
-                                            <a href="/admin/produtos/edit/<%= produto.id_produto %>?categoria=<%= produto.id_categoria %>"
-                                                class="btn btn-warning">Editar</a>
-                                            <form data-delete-form action="/admin/produtos/delete/<%= produto.id_produto %>"
-                                                method="POST" style="display: inline;">
-                                                <input type="hidden" name="id_produto"
-                                                    value="<%= produto.id_produto %>">
-                                                <button class="btn btn-danger excluir-btn"
-                                                    title="Excluir produto" style="display: none;">Excluir</button>
-                                            </form>
-                                        </td>
+                                        <% if (!fornecedor_nome) { %>
+                                            <th>Fornecedor</th>
+                                            <% } %>
+                                                <% if (!marca_nome) { %>
+                                                    <th>Marca</th>
+                                                    <% } %>
+                                                        <th>Produto</th>
+                                                        <th>Preço</th>
+                                                        <th>Código de Barras</th>
+                                                        <th>Ações
+                                                            <label class="form-check-label ms-2">
+                                                                <input type="checkbox" id="toggleExcluir"
+                                                                    class="form-check-input">
+                                                                <span class="d-inline-block">Habilitar Excluir</span>
+                                                            </label>
+                                                        </th>
                             </tr>
-                            <% }) %>
-                    </tbody>
-                </table>
-            </div>
+                        </thead>
+                        <tbody id="category-table-body">
+                            <% produtos.forEach(produto=> { %>
+                                <tr>
+                                    <% if (!categoria_nome) { %>
+                                        <td>
+                                            <% if (!categoria_nome) { %>
+                                        <td>
+                                            <%= categorias.find(c=> c.id_categoria === produto.id_categoria)?.nome ||
+                                                '-' %>
+                                        </td>
+                                        <% } %>
+                                            <% if (!fornecedor_nome) { %>
+                                                <td>
+                                                    <%= fornecedores.find(f=> f.id_fornecedor ===
+                                                        produto.id_fornecedor)?.nome_fornecedor || '-' %>
+                                                </td>
+                                                <% } %>
+                                                    <% if (!marca_nome) { %>
+                                                        <td>
+                                                            <%= marcas.find(m=> m.id_marca ===
+                                                                produto.id_marca)?.nome_marca || '-' %>
+                                                        </td>
+                                                        <% } %>
+                                                            </td>
+                                                            <% } %>
+                                                                <td>
+                                                                    <%= produto.nome %>
+                                                                </td>
+                                                                <td>
+                                                                    <%= produto.preco.toLocaleString('pt-BR', {
+                                                                        style: 'currency' , currency: 'BRL' }) %>
 
-            <script>
-                document.addEventListener('DOMContentLoaded', function () {
-                    const deleteForms = document.querySelectorAll('[data-delete-form]');
-                    const toggleExcluir = document.getElementById('toggleExcluir');
-                    const tableBody = document.getElementById('category-table-body');
+                                                                </td>
+                                                                <td>
+                                                                    <%= produto.codigo_barras %>
+                                                                </td>
+                                                                <td>
+                                                                    <a href="/admin/produtos/edit/<%= produto.id_produto %>?categoria=<%= produto.id_categoria %>&fornecedor=<%= produto.id_fornecedor %>&marca=<%= produto.id_marca %>"
+   class="btn btn-warning">Editar</a>
+                                                                    <form data-delete-form
+                                                                        action="/admin/produtos/delete/<%= produto.id_produto %>"
+                                                                        method="POST" style="display: inline;">
+                                                                        <input type="hidden" name="id_produto"
+                                                                            value="<%= produto.id_produto %>">
+                                                                        <button class="btn btn-danger excluir-btn"
+                                                                            title="Excluir produto"
+                                                                            style="display: none;">Excluir</button>
+                                                                    </form>
+                                                                </td>
+                                </tr>
+                                <% }) %>
+                        </tbody>
+                    </table>
+                </div>
+            </main>
 
-                    toggleExcluir.addEventListener('change', function () {
-                        tableBody.classList.toggle('delete-enabled', this.checked);
-                    });
+            <div id="error-popup-container"></div>
 
-                    deleteForms.forEach(form => {
-                        form.addEventListener('submit', function (event) {
-                            event.preventDefault();
-                            if (confirm('Você tem certeza que deseja excluir este produto?')) {
-                                this.submit();
-                            }
-                        });
-                    });
-                });
-            </script>
 
             <%- include('../../partials/footer.ejs') %>
+
+                <script type="module">
+                    import { setupRowDelete } from '/js/delete-handler.js'
+
+                    document.addEventListener('DOMContentLoaded', function () {
+                        const deleteForms = document.querySelectorAll('[data-delete-form]');
+                        const toggleExcluir = document.getElementById('toggleExcluir');
+                        const tableBody = document.getElementById('category-table-body');
+
+                        setupRowDelete(deleteForms, toggleExcluir, tableBody);
+                    });
+                </script>
+
         </body>
 
         </html>

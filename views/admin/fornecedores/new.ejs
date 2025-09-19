@@ -7,12 +7,12 @@
                     <hr>
                     <div class="card">
                         <div class="card-header">
-                            <h2>Cadastro de Categoria</h2>
+                            <h2>Cadastro de Fornecedor</h2>
                         </div>
                         <div class="card-body">
-                            <form id="category-form">
-                                <input class="form-control" type="text" name="nome" id="category-name-input"
-                                    placeholder="Defina o nome da categoria" required><br>
+                            <form id="fornecedor-form">
+                                <input class="form-control" type="text" name="nome_fornecedor"
+                                    id="fornecedor-name-input" placeholder="Defina o nome do fornecedor" required><br>
                                 <button class="btn btn-success" id="submit-button" disabled>Cadastrar</button>
                             </form>
                         </div>
@@ -29,9 +29,9 @@
                     import { showErrorPopup } from '/js/show-error-popup.js'
 
                     document.addEventListener('DOMContentLoaded', function () {
-                        const input = document.getElementById('category-name-input');
+                        const input = document.getElementById('fornecedor-name-input');
                         const button = document.getElementById('submit-button');
-                        const form = document.getElementById('category-form');
+                        const form = document.getElementById('fornecedor-form');
 
                         input.addEventListener('input', function () {
                             if (this.value.trim().length > 0) {
@@ -44,17 +44,17 @@
                         form.addEventListener('submit', async function (event) {
                             event.preventDefault();
 
-                            const categoryName = input.value;
+                            const fornecedorName = input.value;
 
                             try {
-                                const response = await fetch('/admin/categories/save', {
+                                const response = await fetch('/admin/fornecedores/save', {
                                     method: 'POST',
                                     headers: { 'Content-Type': 'application/json' },
-                                    body: JSON.stringify({ nome: categoryName }),
+                                    body: JSON.stringify({ nome_fornecedor: fornecedorName }),
                                 });
 
                                 if (response.ok) {
-                                    window.location.href = '/admin/categories';
+                                    window.location.href = '/admin/fornecedores';
                                 } else {
                                     const errorData = await response.json();
                                     showErrorPopup(errorData.error.message, errorData.error.details);

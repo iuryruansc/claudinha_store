@@ -1,41 +1,169 @@
 <%- include('../../partials/header.ejs') %>
     <%- include('../../partials/navbar.ejs') %>
 
-        <div class="container">
-            <hr>
-            <div class="card">
-                <div class="card-header">
-                    <h2>Edição de Produto</h2>
+        <body>
+            <main class="main-content">
+                <div class="container">
+                    <hr>
+                    <div class="card">
+                        <div class="card-header">
+                            <h2>Edição de Produto</h2>
+                        </div>
+                        <div class="card-body">
+                            <form method="POST" action="/admin/produtos/update/<%= produto.id_produto %>">
+                                <input class="form-control" type="text" name="nome"
+                                    placeholder="Defina o nome do produto" value="<%= produto.nome %>"><br>
+                                <input class="form-control" type="text" name="descricao"
+                                    placeholder="Descreva o produto" value="<%= produto.descricao %>"><br>
+                                <input class="form-control" type="text" name="preco"
+                                    placeholder="Defina o preço do produto" value="<%= produto.preco %>"><br>
+                                <input class="form-control" type="text" name="codigo_barras"
+                                    placeholder="Defina o código de barras do produto"
+                                    value="<%= produto.codigo_barras %>"><br>
+                                <select name="id_categoria" class="form-select">
+                                    <% categorias.forEach(categoria=> { %>
+                                        <% if (categoria.id_categoria==produto.id_categoria) { %>
+                                            <option value="<%= categoria.id_categoria %>" selected>
+                                                <%= categoria.nome %>
+                                            </option>
+                                            <% } else { %>
+                                                <option value="<%= categoria.id_categoria %>">
+                                                    <%= categoria.nome %>
+                                                </option>
+                                                <% } %>
+                                                    <% }) %>
+                                </select><br>
+                                <select name="id_fornecedor" class="form-select">
+                                    <% fornecedores.forEach(fornecedor=> { %>
+                                        <% if (fornecedor.id_fornecedor==produto.id_fornecedor) { %>
+                                            <option value="<%= fornecedor.id_fornecedor %>" selected>
+                                                <%= fornecedor.nome_fornecedor %>
+                                            </option>
+                                            <% } else { %>
+                                                <option value="<%= fornecedor.id_fornecedor %>">
+                                                    <%= fornecedor.nome_fornecedor %>
+                                                </option>
+                                                <% } %>
+                                                    <% }) %>
+                                </select><br>
+                                <select name="id_marca" class="form-select">
+                                    <% marcas.forEach(marca=> { %>
+                                        <% if (marca.id_marca==produto.id_marca) { %>
+                                            <option value="<%= marca.id_marca %>" selected>
+                                                <%= marca.nome_marca %>
+                                            </option>
+                                            <% } else { %>
+                                                <option value="<%= marca.id_marca %>">
+                                                    <%= marca.nome_marca %>
+                                                </option>
+                                                <% } %>
+                                                    <% }) %>
+                                </select><br>
+                                <input type="hidden" name="id_produto" value="<%= produto.id_produto %>">
+                                <button class="btn btn-success">Atualizar</button>
+                            </form>
+                        </div>
+                    </div>
                 </div>
-                <div class="card-body">
-                    <form method="POST" action="/admin/produtos/update/<%= produto.id_produto %>">
-                        <input class="form-control" type="text" name="nome" placeholder="Defina o nome do produto"
-                            value="<%= produto.nome %>"><br>
-                        <input class="form-control" type="text" name="descricao" placeholder="Descreva o produto"
-                            value="<%= produto.descricao %>"><br>
-                        <input class="form-control" type="text" name="preco" placeholder="Defina o preço do produto"
-                            value="<%= produto.preco %>"><br>
-                        <input class="form-control" type="text" name="codigo_barras"
-                            placeholder="Defina o código de barras do produto" value="<%= produto.codigo_barras %>"><br>
-                        <select name="id_categoria" class="form-select">
-                            <% categorias.forEach(categoria=> { %>
-                                <% if (categoria.id_categoria==produto.id_categoria) { %>
-                                    <option value="<%= categoria.id_categoria %>" selected>
-                                        <%= categoria.nome %>
-                                    </option>
-                                    <% } else { %>
-                                        <option value="<%= categoria.id_categoria %>">
-                                            <%= categoria.nome %>
-                                        </option>
-                                        <% } %>
-                                            <% }) %>
-                        </select><br>
-                        <input type="hidden" name="id_produto" value="<%= produto.id_produto %>">
-                        <button class="btn btn-success">Atualizar</button>
-                    </form>
-                </div>
-            </div>
-        </div>
+            </main>
+            <%- include('../../partials/footer.ejs') %>
 
-        <%- include('../../partials/footer.ejs') %>
-        
+                <script type="module">
+
+                    import { showErrorPopup } from '/js/show-error-popup.js'
+
+                    document.addEventListener('DOMContentLoaded', function () {
+                        const nameInput = document.querySelector('input[name="nome"]');
+                        const precoInput = document.querySelector('input[name="preco"]');
+                        const descricaoInput = document.querySelector('input[name="descricao"]');
+                        const codeInput = document.querySelector('input[name="codigo_barras"]');
+                        const categoriaSelect = document.querySelector('select[name="id_categoria"]');
+                        const fornecedorSelect = document.querySelector('select[name="id_fornecedor"]');
+                        const marcaSelect = document.querySelector('select[name="id_marca"]');
+                        const form = document.querySelector('form');
+                        const button = form.querySelector('button[type="submit"]');
+
+                        const originalValues = {
+                            nome: nameInput.value,
+                            preco: precoInput.value,
+                            descricao: descricaoInput.value,
+                            codigo_barras: codeInput.value,
+                            id_categoria: categoriaSelect.value,
+                            id_fornecedor: fornecedorSelect.value,
+                            id_marca: marcaSelect.value
+                        };
+
+                        function validateForm() {
+                            const isValid =
+                                nameInput.value.trim() &&
+                                precoInput.value.trim() &&
+                                codeInput.value.trim() &&
+                                fornecedorSelect.value &&
+                                marcaSelect.value;
+
+                            if (isValid) {
+                                button.removeAttribute('disabled');
+                            } else {
+                                button.setAttribute('disabled', 'disabled');
+                            }
+                        }
+
+                        [nameInput, precoInput, codeInput].forEach(input => {
+                            input.addEventListener('input', validateForm);
+                        });
+
+                        [fornecedorSelect, marcaSelect].forEach(select => {
+                            select.addEventListener('change', validateForm);
+                        });
+
+                        form.addEventListener('submit', async function (event) {
+                            event.preventDefault();
+
+                            const updatedValues = {
+                                nome: nameInput.value.trim(),
+                                preco: precoInput.value.trim(),
+                                descricao: descricaoInput.value.trim(),
+                                codigo_barras: codeInput.value.trim(),
+                                id_categoria: categoriaSelect.value,
+                                id_fornecedor: fornecedorSelect.value,
+                                id_marca: marcaSelect.value
+                            };
+
+                            const isUnchanged = Object.keys(updatedValues).every(
+                                key => updatedValues[key] === originalValues[key]
+                            );
+
+                            if (isUnchanged) {
+                                showErrorPopup('Nenhuma alteração foi feita no produto.');
+                                return;
+                            }
+
+                            if (!updatedValues.nome || !updatedValues.preco || !updatedValues.codigo_barras) {
+                                showErrorPopup('Preencha todos os campos obrigatórios.');
+                                return;
+                            }
+
+                            try {
+                                const response = await fetch(form.getAttribute('action'), {
+                                    method: 'POST',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify(updatedValues)
+                                });
+
+                                if (response.ok) {
+                                    window.location.href = '/admin/produtos';
+                                } else {
+                                    const errorData = await response.json();
+                                    showErrorPopup(errorData.error.message, errorData.error.details);
+                                }
+                            } catch (error) {
+                                console.error('Erro de rede:', error);
+                                showErrorPopup('Ocorreu um erro de rede. Tente novamente mais tarde');
+                            }
+                        });
+                    });
+
+                </script>
+        </body>
+
+        </html>

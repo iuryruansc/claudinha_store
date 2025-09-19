@@ -3,12 +3,12 @@ const router = express.Router();
 const asyncHandler = require('../../utils/handlers/async-handler');
 const { numberValidation, stringValidation } = require('../../utils/data/data-validation');
 const { parseIntValue, parseFloatValue } = require('../../utils/data/data-parsers');
-const { getAllProdutos, getViewDependencies, getProdutosByCategoria, getEditData, createProduto, deleteProduto, updateProduto } = require('../../services/admin/produtosService');
+const { getAllProdutos, getViewDependencies, getProdutosByCategoria, getEditData, createProduto, deleteProduto, updateProduto, getProdutosByFornecedor, getProdutosByMarca } = require('../../services/admin/produtosService');
 
 router.get('/produtos/new', asyncHandler(async (req, res) => {
     const categorias = await getViewDependencies();
 
-    res.render('admin/produtos/new', { categorias });
+    res.render('admin/produtos/new', { categorias, fornecedores, marcas });
 }));
 
 router.get('/produtos', asyncHandler(async (req, res) => {
@@ -17,21 +17,66 @@ router.get('/produtos', asyncHandler(async (req, res) => {
     res.render('admin/produtos/index', {
         produtos,
         categorias,
-        categoria_nome: null
+        fornecedores,
+        marcas,
+        categoria_nome: null,
+        fornecedor_nome: null,
+        marca_nome: null
     });
 }));
 
-router.get('/produtos/:id_categoria', asyncHandler(async (req, res) => {
+router.get('/produtos/categoria/:id_categoria', asyncHandler(async (req, res) => {
     const [parsedId] = parseIntValue(req.params.id_categoria);
 
     numberValidation(parsedId);
 
     const { produtos, categoria } = await getProdutosByCategoria(parsedId);
+    const { fornecedores, marcas } = await getViewDependencies();
 
     res.render('admin/produtos/index', {
         produtos,
+        categorias: null,
+        fornecedores,
+        marcas,
         categoria_nome: categoria.nome,
-        categorias: null
+        fornecedor_nome: null,
+        marca_nome: null
+    });
+}));
+
+router.get('/produtos/fornecedor/:id_fornecedor', asyncHandler(async (req, res) => {
+    const [id_fornecedor] = parseIntValue(req.params.id_fornecedor);
+    numberValidation(id_fornecedor);
+
+    const { produtos, fornecedor } = await getProdutosByFornecedor(id_fornecedor);
+    const { categorias, marcas } = await getViewDependencies();
+
+    res.render('admin/produtos/index', {
+        produtos,
+        categorias,
+        fornecedores: null,
+        marcas,
+        categoria_nome: null,
+        fornecedor_nome: fornecedor?.nome_fornecedor || 'Fornecedor desconhecido',
+        marca_nome: null
+    });
+}));
+
+router.get('/produtos/marca/:id_marca', asyncHandler(async (req, res) => {
+    const [id_marca] = parseIntValue(req.params.id_marca);
+    numberValidation(id_marca);
+
+    const { produtos, marca } = await getProdutosByMarca();
+    const { categorias, fornecedores } = await getViewDependencies();
+
+    res.render('admin/produtos/index', {
+        produtos,
+        categorias,
+        fornecedores,
+        marcas: null,
+        categoria_nome: null,
+        fornecedor_nome: null,
+        marca_nome: marca?.nome_marca || 'Marca desconhecida'
     });
 }));
 
@@ -42,26 +87,31 @@ router.get('/produtos/edit/:id_produto', asyncHandler(async (req, res) => {
 
     const { produto, categorias } = await getEditData(parsedId);
 
-    res.render('admin/produtos/edit', { produto, categorias });
+    res.render('admin/produtos/edit', { produto, categorias, fornecedores, marcas });
 }));
 
 router.post('/produtos/save', asyncHandler(async (req, res) => {
-    const { nome, descricao, codigo_barras } = req.body;
-    const [parsedId] = parseIntValue(req.body.id_categoria);
-    const [parsedPreco] = parseFloatValue(req.body.preco);
+    const { nome, codigo_barras } = req.body;
+    const [id_categoria, id_fornecedor, id_marca] = parseIntValue(
+        req.body.id_categoria,
+        req.body.id_fornecedor,
+        req.body.id_marca
+    );
+    const [preco] = parseFloatValue(req.body.preco);
 
-    numberValidation(parsedId, parsedPreco);
-    stringValidation(nome, descricao, codigo_barras);
+    numberValidation(id_categoria, id_fornecedor, id_marca, preco);
+    stringValidation(nome, codigo_barras);
 
     await createProduto({
         nome,
-        descricao,
-        preco: parsedPreco,
+        preco,
         codigo_barras,
-        id_categoria: parsedId,
+        id_categoria,
+        id_fornecedor,
+        id_marca
     });
 
-    res.redirect('/admin/produtos');
+    res.status(200).json({ message: 'Produto criado com sucesso' });
 }));
 
 router.post('/produtos/delete/:id_produto', asyncHandler(async (req, res) => {
@@ -75,22 +125,28 @@ router.post('/produtos/delete/:id_produto', asyncHandler(async (req, res) => {
 }));
 
 router.post('/produtos/update/:id_produto', asyncHandler(async (req, res) => {
-    const [parsedIdProd, parsedIdCat] = parseIntValue(req.params.id_produto, req.params.id_categoria)
-    const { nome, descricao, codigo_barras } = req.body;
-    const [parsedPreco] = parseFloatValue(req.body.preco);
+    const [id_produto] = parseIntValue(req.params.id_produto);
+    const [id_categoria, id_fornecedor, id_marca] = parseIntValue(
+        req.body.id_categoria,
+        req.body.id_fornecedor,
+        req.body.id_marca
+    );
+    const [preco] = parseFloatValue(req.body.preco);
+    const { nome, codigo_barras } = req.body;
 
-    numberValidation(parsedIdProd, parsedIdCat, parsedPreco);
-    stringValidation(nome, descricao, codigo_barras);
+    numberValidation(id_produto, id_categoria, id_fornecedor, id_marca, preco);
+    stringValidation(nome, codigo_barras);
 
-    await updateProduto(parsedIdProd, ({
+    await updateProduto(id_produto, {
         nome,
-        descricao,
-        preco: parsedPreco,
+        preco,
         codigo_barras,
-        id_categoria: parsedIdCat
-    }));
+        id_categoria,
+        id_fornecedor,
+        id_marca
+    });
 
-    res.redirect('/admin/produtos');
+    res.status(200).json({ message: 'Produto atualizado com sucesso' });
 }));
 
 module.exports = router;

@@ -1,8 +1,9 @@
 const express = require('express');
 const router = express.Router();
 const asyncHandler = require('../../utils/handlers/async-handler');
-const { stringValidation, numberValidation } = require('../../utils/data/data-validation');
-const { parseIntValue } = require('../../utils/data/data-parsers');
+const formatDate = require('../../utils/data/date-formatter');
+const { stringValidation, numberValidation, dateValidation } = require('../../utils/data/data-validation');
+const { parseIntValue, parseDateValue } = require('../../utils/data/data-parsers');
 const { getAllLotes, getEditData, getViewDependencies, createLote, updateLote, deleteLote } = require('../../services/admin/lotesService');
 
 router.get('/lotes/new', asyncHandler(async (req, res) => {
@@ -13,7 +14,7 @@ router.get('/lotes/new', asyncHandler(async (req, res) => {
 router.get('/lotes', asyncHandler(async (req, res) => {
     const { lotes, produtos } = await getAllLotes();
 
-    res.render('admin/lotes/index', { lotes, produtos });
+    res.render('admin/lotes/', { lotes, produtos, formatDate });
 }));
 
 router.get('/lotes/edit/:id_lote', asyncHandler(async (req, res) => {
@@ -28,14 +29,16 @@ router.get('/lotes/edit/:id_lote', asyncHandler(async (req, res) => {
 
 router.post('/lotes/save', asyncHandler(async (req, res) => {
     const { localizacao } = req.body;
-    const [parsedId, parsedNumLote, parsedValidade, parsedQuant] = parseIntValue(req.body.id_produto, req.body.numero_lote, req.body.data_validade, req.body.quantidade);
+    const [parsedId, parsedNumLote, parsedQuant] = parseIntValue(req.body.id_produto, req.body.numero_lote, req.body.quantidade);
+    const parsedValidade = parseDateValue(req.body.data_validade);
 
-    numberValidation(parsedId, parsedQuant, parsedNumLote, parsedValidade);
+    numberValidation(parsedId, parsedQuant, parsedNumLote);
     stringValidation(localizacao);
-
+    dateValidation(parsedValidade);
+    
     await createLote({
         id_produto: parsedId,
-        quantidade_atual: parsedQuant,
+        quantidade: parsedQuant,
         localizacao,
         numero_lote: parsedNumLote,
         data_validade: parsedValidade
@@ -56,14 +59,17 @@ router.post('/lotes/delete/:id_lote', asyncHandler(async (req, res) => {
 
 router.post('/lotes/update/:id_lote', asyncHandler(async (req, res) => {
     const [parsedId] = parseIntValue(req.params.id_estoque);
-    const [parsedQuant, parsedNumLote, parsedValidade] = parseIntValue(req.body.quantidade, req.body.numero_lote, req.body.data_validade);
+    const [parsedQuant, parsedNumLote] = parseIntValue(req.body.quantidade, req.body.numero_lote);
     const { localizacao } = req.body;
+    const parsedValidade = parseDateValue(req.body.data_validade);
 
-    numberValidation(parsedId, parsedQuant, parsedNumLote, parsedValidade);
+
+    numberValidation(parsedId, parsedQuant, parsedNumLote);
     stringValidation(localizacao);
+    dateValidation(parsedValidade);
 
     await updateLote(parsedId, ({
-        quantidade_atual: parsedQuant,
+        quantidade: parsedQuant,
         localizacao,
         numero_lote: parsedNumLote,
         data_validade: parsedValidade

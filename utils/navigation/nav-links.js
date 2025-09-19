@@ -3,18 +3,39 @@ module.exports = [
   {
     label: 'Produtos',
     dropdown: [
-      { label: 'Ver Produtos', href: '/admin/produtos' },
-      { label: 'Cadastrar Produto', href: '/admin/produtos/new' }
+      { label: 'Cadastrar Produto', href: '/admin/produtos/new' },
+      { label: 'Ver Produtos', href: '/admin/produtos' }
     ]
   },
-  { label: 'Vendas', 
+  {
+    label: 'Catálogo',
     dropdown: [
-      { label: 'Nova Venda', href: '/admin/vendas/new'},
-      { label: 'Vendas Completas', href: '/admin/vendas'}
+      {
+        label: 'Categorias',
+        dropdown: [
+          { label: 'Nova Categoria', href: '/admin/categories/new' },
+          { label: 'Ver Categorias', href: '/admin/categories' }
+        ]
+      },
+      {
+        label: 'Fornecedores',
+        dropdown: [
+          { label: 'Cadastrar Fornecedor', href: '/admin/fornecedores/new' },
+          { label: 'Ver Fornecedores', href: '/admin/fornecedores' }
+        ]
+      },
+      {
+        label: 'Marcas',
+        dropdown: [
+          { label: 'Cadastrar Marca', href: '/admin/marcas/new' },
+          { label: 'Ver Marcas', href: '/admin/marcas' }
+        ]
+      }
     ]
-   },
+  },
+  { label: 'Vendas', href: '/admin/vendas' },
   { label: 'Clientes', href: '/admin/clientes' },
-  { label: 'Estoque', href: '/admin/estoques' },
+  { label: 'Lotes', href: '/admin/lotes' },
   { label: 'PDVs', href: '/admin/pdvs' },
   { label: 'Caixas', href: '/admin/caixas' },
   { label: 'Movimentações', href: '/admin/movimentacoes' },

@@ -15,13 +15,17 @@ const Produto = connection.define('produto', {
         type: Sequelize.FLOAT,
         allowNull: false
     },
-    descricao: {
-        type: Sequelize.TEXT,
-        allowNull: false
-    },
     id_categoria: {
         type: Sequelize.INTEGER,
-        allowNull: false
+        allowNull: false,
+    },
+    id_fornecedor: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+    },
+    id_marca: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
     },
     codigo_barras: {
         type: Sequelize.STRING,

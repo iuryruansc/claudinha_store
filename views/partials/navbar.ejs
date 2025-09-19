@@ -1,46 +1,76 @@
-<nav class="navbar fixed-top navbar-expand-lg navbar-dark bg-dark">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="/admin/dashboard">🛍️ Claudinha Store</a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown"
-            aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
+<nav id="adminSidebar" class="d-flex flex-column bg-dark text-white vh-100 p-3 position-fixed" style="width: 250px;">
+    <% const iconMap={ 'Painel Admin' : 'bi-speedometer2' , 'Produtos' : 'bi-boxes' , 'Cadastrar Produto'
+        : 'bi-plus-square' , 'Ver Produtos' : 'bi-card-list' , 'Vendas' : 'bi-currency-dollar' , 'Nova Venda'
+        : 'bi-cart-plus' , 'Vendas Completas' :'bi-receipt', 'Catálogo' : 'bi-book' , 'Categorias' : 'bi-tags'
+        , 'Fornecedores' : 'bi-truck' , 'Marcas' : 'bi-award' , 'Clientes' : 'bi-people' , 'Lotes' : 'bi-stack' , 'PDVs'
+        : 'bi-shop' , 'Caixas' : 'bi-safe' , 'Movimentações' : 'bi-arrow-left-right' , 'Pagamentos' : 'bi-credit-card'
+        }; %>
 
-        <div class="collapse navbar-collapse" id="navbarNavDropdown">
-            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                <% navLinks.forEach(link=> { %>
-                    <% if (link.dropdown) { %>
-                        <% const isDropdownActive=link.dropdown && link.dropdown.some(item=>
-                            currentPath.startsWith(item.href));
-                            %>
-                            <li class="nav-item dropdown">
-                                <button class="nav-link dropdown-toggle <%= isDropdownActive ? 'active' : '' %>"
-                                    id="navbarDropdown-<%= link.label %>" type="button" data-bs-toggle="dropdown"
-                                    aria-expanded="false">
-                                    <%= link.label %>
-                                </button>
-                                <ul class="dropdown-menu" aria-labelledby="navbarDropdown-<%= link.label %>">
-                                    <% link.dropdown.forEach(item=> { %>
-                                        <li><a class="dropdown-item <%= currentPath === item.href ? 'active' : '' %>"
-                                                href="<%= item.href %>">
-                                                <%= item.label %>
-                                            </a></li>
-                                        <% }) %>
-                                </ul>
-                            </li>
-                            <% } else { %>
-                                <li class="nav-item">
-                                    <a class="nav-link <%= currentPath === link.href ? 'active' : '' %>"
-                                        href="<%= link.href %>">
-                                        <%= link.label %>
-                                    </a>
-                                </li>
-                                <% } %>
-                                    <% }) %>
-            </ul>
-        </div>
-    </div>
-    <form action="/logout" method="POST" class="d-inline">
-        <button class="btn btn-outline-light btn-sm me-2" type="submit">Logout</button>
-    </form>
+        <% function renderSidebar(items, accordionId='sidebarAccordion' , level=0) { let html='' ; items.forEach((item,
+            idx)=> {
+            const id = `${accordionId}-${idx}`;
+            const headingId = `heading-${id}`;
+            const collapseId = `collapse-${id}`;
+            const childAcc = `accordion-${id}`;
+
+            const isItemActive = item.href && currentPath === item.href;
+            const isChildActive = item.dropdown && item.dropdown.some(sub => {
+            return sub.href
+            ? currentPath.startsWith(sub.href)
+            : sub.dropdown && sub.dropdown.some(subsub => currentPath.startsWith(subsub.href));
+            });
+            const isActive = isItemActive || isChildActive;
+
+            const showClass = isActive ? 'show' : '';
+            const collapsedClass = isActive ? '' : 'collapsed';
+            const iconClass = item.icon || iconMap[item.label] || '';
+            const iconMarkup = iconClass ? `<i class="bi ${iconClass} me-2"></i>` : '';
+
+            if (item.dropdown) {
+            html += `
+            <div class="accordion-item bg-dark border-0">
+                <h2 class="accordion-header" id="${headingId}">
+                    <button class="accordion-button ${collapsedClass} bg-dark text-white" type="button"
+                        data-bs-toggle="collapse" data-bs-target="#${collapseId}" aria-expanded="${isActive}"
+                        aria-controls="${collapseId}">
+                        ${iconMarkup}
+                        <span>${item.label}</span>
+                        <i class="bi bi-chevron-down ms-auto"></i>
+                    </button>
+                </h2>
+                <div id="${collapseId}" class="accordion-collapse collapse ${showClass}"
+                    data-bs-parent="#${accordionId}" aria-labelledby="${headingId}">
+                    <div class="accordion-body ps-${level * 3}">
+                        <div class="accordion accordion-flush bg-dark" id="${childAcc}">
+                            ${renderSidebar(item.dropdown, childAcc, level + 1)}
+                        </div>
+                    </div>
+                </div>
+            </div>`;
+            } else {
+            html += `
+            <a href="${item.href}" class="btn btn-dark text-start w-100 mb-1 ${isItemActive ? 'active' : ''}">
+                ${iconMarkup}
+                ${item.label}
+            </a>`;
+            }
+            });
+
+            return html;
+            }
+            %>
+
+
+            <a href="/admin/dashboard" class="navbar-brand text-white mb-4">
+                🛍️ Claudinha Store
+            </a>
+
+            <div class="accordion accordion-flush sidebar" id="sidebarAccordion">
+                <%- renderSidebar(navLinks) %>
+            </div>
+
+            <form action="/logout" method="POST" class="mt-auto">
+                <button class="btn btn-outline-light w-100">Logout</button>
+            </form>
+
 </nav>

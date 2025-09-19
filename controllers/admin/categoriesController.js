@@ -13,7 +13,7 @@ router.get('/categories/new', (req, res) => {
 router.get('/categories', asyncHandler(async (req, res) => {
     const categories = await getAllCategories();
 
-    res.render('admin/categories/index', { categories })
+    res.render('admin/categories', { categories })
 }));
 
 router.get('/categories/edit/:id_categoria', asyncHandler(async (req, res) => {
@@ -33,7 +33,7 @@ router.post('/categories/save', asyncHandler(async (req, res) => {
 
     await createCategory({ nome });
 
-    res.redirect('/admin/categories');
+    res.status(200).json({ message: 'Categoria criada com sucesso' });
 }));
 
 router.post('/categories/delete/:id_categoria', asyncHandler(async (req, res) => {
@@ -49,7 +49,7 @@ router.post('/categories/delete/:id_categoria', asyncHandler(async (req, res) =>
 
     await deleteCategory(parsedId);
 
-    res.redirect('/admin/categories');
+    res.render('/admin/categories');
 }));
 
 router.post('/categories/update/:id_categoria', asyncHandler(async (req, res) => {
@@ -61,7 +61,7 @@ router.post('/categories/update/:id_categoria', asyncHandler(async (req, res) =>
 
     await updateCategory(parsedId, { nome });
 
-    res.redirect('/admin/categories');
+    res.status(200).json({ message: 'Categoria atualizada com sucesso' });
 }));
 
 module.exports = router;

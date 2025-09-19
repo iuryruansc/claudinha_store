@@ -2,10 +2,28 @@
   display: inline-block !important; 
 }
 
-body {
-  padding-top: 50px;
+.sidebar .collapse {
+  transition: height 0.1s ease;
 }
 
-.navbar-scrolled {
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+.main-content {
+  margin-left: 250px;
+  padding-top: 1rem;
+}
+
+#adminSidebar .accordion-button {
+  box-shadow: none;
+}
+
+#adminSidebar .accordion-body {
+    padding: 0px;
+    margin-left: 15px;
+}
+
+#adminSidebar .accordion-button .bi-chevron-down {
+  transition: transform 0.2s ease;
+}
+
+#adminSidebar .accordion-button:not(.collapsed) .bi-chevron-down {
+  transform: rotate(-180deg);
 }

@@ -1,5 +1,4 @@
 const Category = require('../../models/category');
-const Produto = require('../../models/produto');
 const { modelValidation } = require('../../utils/data/data-validation');
 
 const findCategoryById = async (id) => {
@@ -12,11 +11,6 @@ const getAllCategories = async () => {
     const category = await Category.findAll();
     return category;
 };
-
-const getViewDependencies = async () => {
-    const produtos = await Produto.findAll();
-    return produtos;
-}
 
 const createCategory = async (categoryData) => {
     return await Category.create(categoryData);
@@ -41,7 +35,6 @@ const deleteCategory = async (id) => {
 module.exports = {
     findCategoryById,
     getAllCategories,
-    getViewDependencies,
     createCategory,
     updateCategory,
     deleteCategory

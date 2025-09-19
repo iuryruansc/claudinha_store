@@ -7,7 +7,7 @@
                     <table id="table-data" class="table table-bordered">
                         <thead>
                             <tr>
-                                <th>Categorias</th>
+                                <th>Fornecedores</th>
                                 <th>Ações
                                     <label class="form-check-label ms-2">
                                         <input type="checkbox" id="toggleExcluir" class="form-check-input">
@@ -16,23 +16,22 @@
                                 </th>
                             </tr>
                         </thead>
-                        <tbody id="category-table-body">
-                            <% categories.forEach(category=> { %>
+                        <tbody id="fornecedor-table-body">
+                            <% fornecedores.forEach(fornecedor=> { %>
                                 <tr>
                                     <td>
-                                        <%= category.nome %>
+                                        <%= fornecedor.nome_fornecedor %>
                                     </td>
                                     <td>
-                                        <a href="/admin/categories/edit/<%= category.id_categoria %>"
+                                        <a href="/admin/fornecedores/edit/<%= fornecedor.id_fornecedor %>"
                                             class="btn btn-warning">Editar</a>
-                                        <a href="/admin/produtos/categoria/<%= category.id_categoria %>"
+                                        <a href="/admin/produtos/<%= fornecedor.id_fornecedor %>"
                                             class="btn btn-primary">Ver
                                             Produtos</a>
-                                        <form action="/admin/categories/delete/<%= category.id_categoria %>"
+                                        <form action="/admin/fornecedores/delete/<%= fornecedor.id_fornecedor %>"
                                             style="display: inline;">
-                                            <input type="hidden" name="id_categoria"
-                                                value="<%= category.id_categoria %>">
-
+                                            <input type="hidden" name="id_fornecedor"
+                                                value="<%= fornecedor.id_fornecedor %>">
                                             <button class="btn btn-danger excluir-btn"
                                                 style="display: none;">Excluir</button>
                                         </form>
@@ -49,13 +48,12 @@
             <%- include('../../partials/footer.ejs') %>
 
                 <script type="module">
-
                     import { setupRowDelete } from '/js/delete-handler.js'
 
                     document.addEventListener('DOMContentLoaded', function () {
-                        const deleteForms = document.querySelectorAll('form[action^="/admin/categories/delete"]');
+                        const deleteForms = document.querySelectorAll('form[action^="/admin/fornecedores/delete"]');
                         const toggleExcluir = document.getElementById('toggleExcluir');
-                        const tableBody = document.getElementById('category-table-body');
+                        const tableBody = document.getElementById('fornecedor-table-body');
 
                         setupRowDelete(deleteForms, toggleExcluir, tableBody);
                     });

@@ -7,9 +7,8 @@
                     <div class="card shadow-sm">
                         <div class="card-body">
                             <div class="text-center mb-4">
-                                <button id="showLogin" class="btn btn-outline-primary me-2"
-                                    style="display: none">Login</button>
-                                <button id="showRegister" class="btn btn-outline-success" style="display: none">Criar
+                                <button id="showLogin" class="btn btn-outline-primary me-2">Login</button>
+                                <button id="showRegister" class="btn btn-outline-success">Criar
                                     Conta</button>
                             </div>
 
@@ -17,13 +16,14 @@
                             <form id="loginForm" action="/login" method="POST">
                                 <h3 class="text-center mb-3">Login</h3>
                                 <div class="mb-3 form-floating">
-                                    <input type="text" class="form-control" id="floatingInput" name="usuario"
+                                    <input type="text" class="form-control" id="userInput" name="usuario"
                                         placeholder="Usuário" required>
-                                    <label for="floatingInput" class="form-label">Usuário</label>
+                                    <label for="userInput" class="form-label">Usuário</label>
                                 </div>
                                 <div class="mb-3 form-floating">
-                                    <input type="password" class="form-control" id="floatingInput" name="senha" placeholder="Senha" required>
-                                    <label for="floatingInput" class="form-label">Senha</label>
+                                    <input type="password" class="form-control" id="passwordInput" name="senha"
+                                        placeholder="Senha" required>
+                                    <label for="passwordInput" class="form-label">Senha</label>
                                 </div>
                                 <div class="mb-3 text-end">
                                     <a href="/forgot-password" class="text-decoration-none">Esqueceu a senha?</a>
@@ -36,7 +36,15 @@
                                 <h3 class="text-center mb-3">Criar Conta</h3>
                                 <div class="mb-3">
                                     <label for="usuarioReg" class="form-label">Nome</label>
-                                    <input type="text" class="form-control" id="usuarioReg" name="usuario" required>
+                                    <input type="text" class="form-control" id="usuarioReg" name="nome" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="emailReg" class="form-label">Email</label>
+                                    <input type="text" class="form-control" id="emailReg" name="email" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="cargoReg" class="form-label">Cargo</label>
+                                    <input type="text" class="form-control" id="cargoReg" name="cargo" required>
                                 </div>
                                 <div class="mb-3">
                                     <label for="senhaReg" class="form-label">Senha</label>
@@ -71,6 +79,8 @@
                 registerForm.style.display = 'block';
             });
         </script>
+
+        <%- include('../partials/footer.ejs') %>
     </body>
 
-    <%- include('../partials/footer.ejs') %>
+    </html>

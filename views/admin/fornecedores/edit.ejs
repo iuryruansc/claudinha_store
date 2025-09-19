@@ -7,13 +7,13 @@
                     <hr>
                     <div class="card">
                         <div class="card-header">
-                            <h2>Edição de Categoria</h2>
+                            <h2>Editar Fornecedor</h2>
                         </div>
                         <div class="card-body">
-                            <form id="category-form" action="/admin/categories/update/<%= category.id_categoria %>">
-                                <input class="form-control" type="text" id="category-name-input" name="nome"
-                                    placeholder="Defina o nome da categoria" value="<%= category.nome %>"><br>
-                                <input type="hidden" name="id_categoria" value="<%= category.id_categoria %>">
+                            <form id="fornecedor-form" action="/admin/fornecedores/update/<%= fornecedor.id_fornecedor %>">
+                                <input class="form-control" type="text" id="fornecedor-name-input" name="nome_fornecedor"
+                                    placeholder="Defina o nome da fornecedor" value="<%= fornecedor.nome_fornecedor %>"><br>
+                                <input type="hidden" name="id_fornecedor" value="<%= fornecedor.id_fornecedor %>">
                                 <button class="btn btn-success" id="submit-button">Atualizar</button>
                             </form>
                         </div>
@@ -30,23 +30,23 @@
                     import { showErrorPopup } from '/js/show-error-popup.js'
 
                     document.addEventListener('DOMContentLoaded', function () {
-                        const input = document.getElementById('category-name-input');
+                        const input = document.getElementById('fornecedor-name-input');
                         const button = document.getElementById('submit-button');
-                        const form = document.getElementById('category-form');
+                        const form = document.getElementById('fornecedor-form');
                         const originalName = input.value;
 
                         form.addEventListener('submit', async function (event) {
                             event.preventDefault();
 
-                            const newCategoryName = input.value.trim();
+                            const newFornecedorName = input.value.trim();
 
-                            if (newCategoryName.length === 0) {
-                                showErrorPopup('O nome da categoria não pode ser vazio.');
+                            if (newFornecedorName.length === 0) {
+                                showErrorPopup('O nome do fornecedor não pode ser vazio.');
                                 return;
                             }
 
-                            if (newCategoryName === originalName) {
-                                showErrorPopup('O nome da categoria não foi alterado. Requisição não enviada.');
+                            if (newFornecedorName === originalName) {
+                                showErrorPopup('O nome do fornecedor não foi alterado. Requisição não enviada.');
                                 return;
                             }
 
@@ -56,11 +56,11 @@
                                 const response = await fetch(formAction, {
                                     method: 'POST',
                                     headers: { 'Content-Type': 'application/json' },
-                                    body: JSON.stringify({ nome: newCategoryName }),
+                                    body: JSON.stringify({ nome: newFornecedorName }),
                                 });
 
                                 if (response.ok) {
-                                    window.location.href = '/admin/categories';
+                                    window.location.href = '/admin/fornecedores';
                                 } else {
                                     const errorData = await response.json();
                                     showErrorPopup(errorData.error.message, errorData.error.details);

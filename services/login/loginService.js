@@ -17,7 +17,7 @@ const logoutUser = async (req, res) => {
             return res.status(500).json({ message: "Não foi possível deslogar" });
         }
         res.clearCookie('connect.sid');
-        res.redirect('/login/index');
+        res.redirect('/login?logout=success');
     });
 }
 

@@ -9,7 +9,7 @@ const Pagamento = connection.define('pagamento', {
     },
     id_venda: {
         type: Sequelize.INTEGER,
-        allowNull: false
+        allowNull: false,
     },
     forma_pagamento: {
         type: Sequelize.ENUM('dinheiro', 'cartao_credito', 'cartao_debito', 'pix', 'outro'),

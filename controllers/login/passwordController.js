@@ -17,7 +17,7 @@ router.post('/forgot-password', asyncHandler(async (req, res) => {
 
     sendEmail(email);
 
-    res.send('Instruções enviadas com sucesso');
+    res.render('login/password-sent');
 }));
 
 router.post('/reset-password', asyncHandler(async (req, res) => {

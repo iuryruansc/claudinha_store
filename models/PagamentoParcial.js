@@ -9,7 +9,7 @@ const PagamentoParcial = connection.define('pagamentoparcial', {
     },
     id_venda: {
         type: Sequelize.INTEGER,
-        allowNull: false
+        allowNull: false,
     },
     data_pagamento: {
         type: Sequelize.DATE,

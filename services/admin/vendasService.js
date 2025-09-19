@@ -53,16 +53,12 @@ const createVenda = async (vendaData) => {
     const result = await connection.transaction(async (t) => {
         // Creating main 'Venda'
         const novaVenda = await Venda.create({
-            id_cliente: vendaData.id_cliente,
-            id_funcionario: vendaData.id_funcionario,
-            id_caixa: vendaData.id_caixa,
             valor_total: vendaData.valor_total,
             status: vendaData.status || 'PENDENTE',
         }, { transaction: t });
 
         const idVenda = novaVenda.id_venda;
-        const idFuncionario = novaVenda.id_funcionario;
-
+        
         const produtoIds = vendaData.itens.map(item => item.id_produto);
         const produtos = await Produto.findAll({
             where: { id_produto: produtoIds },

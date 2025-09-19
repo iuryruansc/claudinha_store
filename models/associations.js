@@ -11,8 +11,10 @@ const ParcelaPagamento = require('./parcelaPagamento');
 const Pdv = require('./pdv');
 const Produto = require('./produto');
 const Venda = require('./venda');
-const Usuario = require('./usuario')
-const UserMeta = require('./userMeta')
+const Usuario = require('./usuario');
+const UserMeta = require('./userMeta');
+const Marca = require('./marca');
+const Fornecedor = require('./fornecedor');
 
 // Venda -> ItemVenda
 Venda.hasMany(ItemVenda, { foreignKey: 'id_venda' });
@@ -64,13 +66,21 @@ Lote.belongsTo(Produto, { foreignKey: 'id_produto' });
 Produto.hasMany(ItemVenda, { foreignKey: 'id_produto' });
 ItemVenda.belongsTo(Produto, { foreignKey: 'id_produto' });
 
-// Estoque -> MovimentacaoEstoque
+// Lote -> MovimentacaoEstoque
 Lote.hasMany(MovimentacaoEstoque, { foreignKey: 'id_lote' });
 MovimentacaoEstoque.belongsTo(Lote, { foreignKey: 'id_lote' });
 
 // Usuario -> UserMeta
-Usuario.hasOne(UserMeta, { foreignKey: 'id_usuario'});
-UserMeta.belongsTo(Usuario, {foreignKey: 'id_usuario'});
+Usuario.hasOne(UserMeta, { foreignKey: 'id_usuario' });
+UserMeta.belongsTo(Usuario, { foreignKey: 'id_usuario' });
+
+// Fornecedor -> Produto
+Fornecedor.hasMany(Produto, { foreignKey: 'id_fornecedor' });
+Produto.belongsTo(Fornecedor, { foreignKey: 'id_fornecedor' });
+
+// Marca -> Produto
+Marca.hasMany(Produto, {foreignKey: 'id_marca'});
+Produto.belongsTo(Marca, {foreignKey: 'id_marca'});
 
 module.exports = {
   Caixa,
@@ -85,5 +95,9 @@ module.exports = {
   ParcelaPagamento,
   Pdv,
   Produto,
-  Venda
+  Venda,
+  Usuario,
+  UserMeta,
+  Marca,
+  Fornecedor
 };

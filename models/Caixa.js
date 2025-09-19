@@ -9,11 +9,11 @@ const Caixa = connection.define('caixa', {
     },
     id_pdv: {
         type: Sequelize.INTEGER,
-        allowNull: false
+        allowNull: false,
     },
     id_funcionario: {
         type: Sequelize.INTEGER,
-        allowNull: false
+        allowNull: false,
     },
     data_abertura: {
         type: Sequelize.DATE,

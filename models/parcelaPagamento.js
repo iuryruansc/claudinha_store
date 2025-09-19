@@ -9,7 +9,7 @@ const ParcelaPagamento = connection.define('parcelapagamento', {
     },
     id_pagamento: {
         type: Sequelize.INTEGER,
-        allowNull: false
+        allowNull: false,
     },
     numero_parcela: {
         type: Sequelize.INTEGER,

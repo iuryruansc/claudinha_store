@@ -2,36 +2,118 @@
     <%- include('../../partials/navbar.ejs') %>
 
         <body>
-            <div class="container">
-                <hr>
-                <div class="card">
-                    <div class="card-header">
-                        <h2>Cadastro de Produto</h2>
-                    </div>
-                    <div class="card-body">
-                        <form method="POST" action="/admin/produtos/save">
-                            <input class="form-control" type="text" name="nome"
-                                placeholder="Defina o nome do produto"><br>
-                            <input class="form-control" type="text" name="descricao"
-                                placeholder="Descreva o produto"><br>
-                            <input class="form-control" type="text" name="preco"
-                                placeholder="Defina o preço do produto"><br>
-                            <input class="form-control" type="text" name="codigo_barras"
-                                placeholder="Defina o código de barras do produto"><br>
-                            <select name="id_categoria" class="form-select">
-                                <% categorias.forEach(categoria=> { %>
-                                    <option value="<%= categoria.id_categoria %>">
-                                        <%= categoria.nome %>
-                                    </option>
-                                    <% }) %>
-                            </select><br>
-                            <button class="btn btn-success">Cadastrar</button>
-                        </form>
+            <main class="main-content">
+                <div class="container">
+                    <div class="card">
+                        <div class="card-header">
+                            <h2>Cadastro de Produto</h2>
+                        </div>
+                        <div class="card-body">
+                            <form method="POST" action="/admin/produtos/save" id="category-form">
+                                <input class="form-control" type="text" name="nome"
+                                    placeholder="Defina o nome do produto" id="produto-name-input"><br>
+                                <input class="form-control" type="text" name="preco"
+                                    placeholder="Defina o preço do produto" id="produto-preco-input"><br>
+                                <input class="form-control" type="text" name="codigo_barras"
+                                    placeholder="Defina o código de barras do produto" id="produto-code-input"><br>
+                                <select name="id_categoria" class="form-select">
+                                    <% categorias.forEach(categoria=> { %>
+                                        <option value="<%= categoria.id_categoria %>">
+                                            <%= categoria.nome %>
+                                        </option>
+                                        <% }) %>
+                                </select><br>
+                                <select name="id_fornecedor" class="form-select" id="produto-fornecedor-select">
+                                    <% fornecedores.forEach(fornecedor=> { %>
+                                        <option value="<%= fornecedor.id_fornecedor %>">
+                                            <%= fornecedor.nome_fornecedor %>
+                                        </option>
+                                        <% }) %>
+                                </select><br>
+
+                                <select name="id_marca" class="form-select" id="produto-marca-select">
+                                    <% marcas.forEach(marca=> { %>
+                                        <option value="<%= marca.id_marca %>">
+                                            <%= marca.nome_marca %>
+                                        </option>
+                                        <% }) %>
+                                </select><br>
+                                <button class="btn btn-success" id="submit-button" disabled>Cadastrar</button>
+                            </form>
+                        </div>
                     </div>
                 </div>
-            </div>
+                <div id="error-popup-container"></div>
+            </main>
 
             <%- include('../../partials/footer.ejs') %>
+
+                <script type="module">
+
+                    import { showErrorPopup } from '/js/show-error-popup.js'
+
+                    document.addEventListener('DOMContentLoaded', function () {
+                        const nameInput = document.getElementById('produto-name-input');
+                        const precoInput = document.getElementById('produto-preco-input');
+                        const codeInput = document.getElementById('produto-code-input');
+                        const categoriaSelect = document.querySelector('select[name="id_categoria"]');
+                        const fornecedorSelect = document.getElementById('produto-fornecedor-select');
+                        const marcaSelect = document.getElementById('produto-marca-select');
+
+                        const button = document.getElementById('submit-button');
+                        const form = document.getElementById('category-form');
+
+                        function validateForm() {
+                            const isNameFilled = nameInput.value.trim().length > 0;
+                            const isPrecoFilled = precoInput.value.trim().length > 0;
+                            const isCodeFilled = codeInput.value.trim().length > 0;
+                            const hasFornecedor = fornecedorSelect.value;
+                            const hasMarca = marcaSelect.value;
+
+                            if (isNameFilled && isPrecoFilled && isCodeFilled && hasFornecedor && hasMarca) {
+                                button.removeAttribute('disabled');
+                            } else {
+                                button.setAttribute('disabled', 'disabled');
+                            }
+                        }
+
+                        [nameInput, precoInput, codeInput, fornecedorSelect, marcaSelect].forEach(input => {
+                            input.addEventListener('input', validateForm);
+                            input.addEventListener('change', validateForm);
+                        });
+
+                        form.addEventListener('submit', async function (event) {
+                            event.preventDefault();
+
+                            try {
+                                const response = await fetch('/admin/produtos/save', {
+                                    method: 'POST',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({
+                                        nome: nameInput.value,
+                                        preco: precoInput.value,
+                                        codigo_barras: codeInput.value,
+                                        id_categoria: categoriaSelect.value,
+                                        id_fornecedor: fornecedorSelect.value,
+                                        id_marca: marcaSelect.value
+                                    }),
+
+                                });
+
+                                if (response.ok) {
+                                    window.location.href = '/admin/produtos';
+                                } else {
+                                    const errorData = await response.json();
+                                    showErrorPopup(errorData.error.message, errorData.error.details);
+                                }
+                            } catch (error) {
+                                console.error('Erro de rede:', error);
+                                showErrorPopup('Ocorreu um erro de rede. Tente novamente mais tarde');
+                            }
+                        });
+                    });
+
+                </script>
         </body>
 
         </html>

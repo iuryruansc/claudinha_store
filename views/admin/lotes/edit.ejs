@@ -1,26 +1,38 @@
 <%- include('../../partials/header.ejs') %>
     <%- include('../../partials/navbar.ejs') %>
 
-        <div class="container">
-            <hr>
-            <div class="card">
-                <div class="card-header">
-                    <h2>Edição de Estoque</h2>
-                </div>
-                <div class="card-body">
-                    <form method="POST" action="/admin/estoques/update/<%= estoque.id_estoque %>">
-                        <input class="form-control" type="text" name="quantidade_atual"
-                            placeholder="Insira a quantidade atual de produtos."
-                            value="<%= estoque.quantidade_atual %>"><br>
-                        <input class="form-control" type="text" name="localizacao"
-                            placeholder="Onde está localizado o produto?" value="<%= estoque.localizacao %>"><br>
-                        </select><br>
-                        <input type="hidden" name="id_estoque" value="<%= estoque.id_estoque %>">
-                        <button class="btn btn-success">Atualizar</button>
-                    </form>
+        <body>
+            <div class="container">
+                <hr>
+                <div class="card">
+                    <div class="card-header">
+                        <h2>Edição de Lote</h2>
+                    </div>
+                    <div class="card-body">
+                        <form method="POST" action="/admin/lotes/update/<%= lote.id_lote %>">
+                            <div class="mb-3 form-floating">
+                                <input class="form-control" type="text" name="quantidade" id="floatingQuant"
+                                    placeholder="Insira a quantidade atual de produtos." value="<%= lote.quantidade %>">
+                                <label for="floatingQuant" class="form-label">Quantidade</label>
+                            </div>
+                            <div class="mb-3 form-floating">
+                                <input class="form-control" type="text" name="numero_lote" id="floatingLote"
+                                    placeholder="Qual o número do lote?" value="<%= lote.numero_lote %>">
+                                <label for="floatingLote" class="form-label">Lote</label>
+                            </div>
+                            <div class="mb-3 form-floating">
+                                <input class="form-control" type="text" name="localizacao" id="floatingLocal"
+                                    placeholder="Onde está localizado o produto?" value="<%= lote.localizacao %>">
+                                <label for="floatingLocal" class="form-label">Localização</label>
+                            </div>
+                            <input type="hidden" name="id_lote" value="<%= lote.id_lote %>">
+                            <button class="btn btn-success">Atualizar</button>
+                        </form>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <%- include('../../partials/footer.ejs') %>
-        
+            <%- include('../../partials/footer.ejs') %>
+        </body>
+
+        </html>

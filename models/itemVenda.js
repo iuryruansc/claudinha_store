@@ -10,18 +10,10 @@ const ItemVenda = connection.define('itemvenda', {
     id_venda: {
         type: Sequelize.INTEGER,
         allowNull: false,
-        references: {
-            model: 'venda',
-            key: 'id_venda'
-        }
     },
     id_lote: {
         type: Sequelize.INTEGER,
         allowNull: false,
-        references: {
-            model: 'lote',
-            key: 'id_lote'
-        }
     },
     quantidade: {
         type: Sequelize.INTEGER,

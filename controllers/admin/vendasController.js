@@ -19,12 +19,12 @@ router.get('/vendas', asyncHandler(async (req, res) => {
     res.render('admin/vendas/index', { vendas, caixas, clientes, funcionarios, produtos, formatDate })
 }));
 
-router.get('/vendas/produtos/codigobarras/:codigo', asyncHandler(async (req,res) => {
+router.get('/vendas/produtos/codigobarras/:codigo', asyncHandler(async (req, res) => {
     const codigo_barras = req.params.codigo;
-    const produto = await Produto.findOne( {where: { codigo_barras }})
+    const produto = await Produto.findOne({ where: { codigo_barras } })
     modelValidation(produto);
 
-    res.json (produto);
+    res.json(produto);
 }));
 
 router.get('/vendas/edit/:id_venda', asyncHandler(async (req, res) => {
@@ -39,11 +39,11 @@ router.get('/vendas/edit/:id_venda', asyncHandler(async (req, res) => {
 }));
 
 router.post('/vendas/save', asyncHandler(async (req, res) => {
-    const [parsedIdCliente, parsedIdFun, parsedIdCaixa, parsedValorTotal] = parseIntValue(req.body.id_cliente, req.body.id_funcionario, req.body.id_caixa, req.body.valor_total);
+    const [parsedValorTotal] = parseIntValue(req.body.valor_total);
     const parsedDataHora = req.body.data_hora ? parseDateValue(req.body.data_hora) : undefined;
     const { status } = req.body.status ? req.body : { status: 'PENDENTE' };
 
-    numberValidation(parsedIdCliente, parsedIdFun, parsedIdCaixa, parsedValorTotal);
+    numberValidation(parsedValorTotal);
     dateValidation(parsedDataHora);
     stringValidation(status);
 
@@ -64,9 +64,6 @@ router.post('/vendas/save', asyncHandler(async (req, res) => {
     })
 
     const venda = await createVenda({
-        id_cliente: parsedIdCliente,
-        id_funcionario: parsedIdFun,
-        id_caixa: parsedIdCaixa,
         data_hora: parsedDataHora,
         itens: parsedItens,
         valor_total: parsedValorTotal,

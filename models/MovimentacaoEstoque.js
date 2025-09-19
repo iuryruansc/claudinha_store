@@ -9,15 +9,11 @@ const MovimentacaoEstoque = connection.define('movimentacaoestoque', {
     },
     id_lote: {
         type: Sequelize.INTEGER,
-        allowNull: false
+        allowNull: false,
     },
     id_venda: {
         type: Sequelize.INTEGER,
         allowNull: true,
-        references: {
-            model: 'venda',
-            key: 'id_venda'
-        }
     },
     data_hora: {
         type: Sequelize.DATE,
@@ -33,7 +29,7 @@ const MovimentacaoEstoque = connection.define('movimentacaoestoque', {
     },
     id_funcionario: {
         type: Sequelize.INTEGER,
-        allowNull: false
+        allowNull: false,
     },
     observacao: {
         type: Sequelize.TEXT,

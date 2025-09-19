@@ -9,7 +9,7 @@ const Lote = connection.define('lote', {
     },
     id_produto: {
         type: Sequelize.INTEGER,
-        allowNull: false
+        allowNull: false,
     },
     numero_lote: {
         type: Sequelize.INTEGER,
@@ -20,7 +20,7 @@ const Lote = connection.define('lote', {
         allowNull: false
     },
     data_validade: {
-        type: Sequelize.INTEGER,
+        type: Sequelize.DATE,
         allowNull: false
     },
     localizacao: {

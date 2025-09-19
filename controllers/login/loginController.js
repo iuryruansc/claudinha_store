@@ -5,7 +5,7 @@ const asyncHandler = require('../../utils/handlers/async-handler');
 const { logoutUser, authenticateUser } = require('../../services/login/loginService');
 
 router.get('/login', (req, res) => {
-    res.render('login/index');
+    res.render('login');
 });
 
 router.post('/login', asyncHandler(async (req, res) => {
