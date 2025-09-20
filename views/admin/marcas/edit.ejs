@@ -11,72 +11,29 @@
                         </div>
                         <div class="card-body">
                             <form id="marca-form" action="/admin/marcas/update/<%= marca.id_marca %>">
-                                <input class="form-control" type="text" id="marca-name-input" name="nome_marca"
+                                <input class="form-control" type="text" name="nome_marca"
                                     placeholder="Defina o nome da marca" value="<%= marca.nome_marca %>"><br>
                                 <input type="hidden" name="id_marca" value="<%= marca.id_marca %>">
-                                <button class="btn btn-success" id="submit-button">Atualizar</button>
+                                <button type="submit" class="btn btn-success">Atualizar</button>
                             </form>
                         </div>
                     </div>
                 </div>
-
-                <div id="error-popup-container"></div>
             </main>
+            <div id="error-popup-container"></div>
 
             <%- include('../../partials/footer.ejs') %>
 
                 <script type="module">
 
-                    import { showErrorPopup } from '/js/show-error-popup.js'
+                    import { setupSingleFieldEdit } from '/js/single-field-edit.js'
 
                     document.addEventListener('DOMContentLoaded', function () {
-                        const input = document.getElementById('marca-name-input');
-                        const button = document.getElementById('submit-button');
-                        const form = document.getElementById('marca-form');
-                        const originalName = input.value;
-
-                        form.addEventListener('submit', async function (event) {
-                            event.preventDefault();
-
-                            const newMarcaName = input.value.trim();
-
-                            if (newMarcaName.length === 0) {
-                                showErrorPopup('O nome da marca não pode ser vazio.');
-                                return;
-                            }
-
-                            if (newMarcaName === originalName) {
-                                showErrorPopup('O nome da marca não foi alterado. Requisição não enviada.');
-                                return;
-                            }
-
-                            const formAction = this.getAttribute('action');
-
-                            try {
-                                const response = await fetch(formAction, {
-                                    method: 'POST',
-                                    headers: { 'Content-Type': 'application/json' },
-                                    body: JSON.stringify({ nome: newMarcaName }),
-                                });
-
-                                if (response.ok) {
-                                    window.location.href = '/admin/marcas';
-                                } else {
-                                    const errorData = await response.json();
-                                    showErrorPopup(errorData.error.message, errorData.error.details);
-                                }
-                            } catch (error) {
-                                console.error('Erro de rede:', error);
-                                showErrorPopup('Ocorreu um erro de rede. Tente novamente mais tarde');
-                            }
-                        });
-
-                        input.addEventListener('input', function () {
-                            if (this.value.trim().length > 0) {
-                                button.removeAttribute('disabled');
-                            } else {
-                                button.setAttribute('disabled', 'disabled');
-                            }
+                        setupSingleFieldEdit({
+                            formSelector: '#marca-form',
+                            inputName: 'nome_marca',
+                            redirectUrl: '/admin/marcas',
+                            fieldKey: 'nome_marca'
                         });
                     });
 

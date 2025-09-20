@@ -2,45 +2,77 @@
     <%- include('../../partials/navbar.ejs') %>
 
         <body>
-            <div class="container">
-                <hr>
-                <div class="card">
-                    <div class="card-header">
-                        <h2>Cadastro de Lote</h2>
-                    </div>
-                    <div class="card-body">
-                        <form method="POST" action="/admin/lotes/save">
-                            <div class="mb-3 form-floating">
-                                <input class="form-control" type="text" name="quantidade" id="floatingQuant"
-                                    placeholder="Quantidade de produtos." required>
-                                <label for="floatingQuant" class="form-label">Quantidade de produtos</label>
-                            </div>
-                            <div class="mb-3 form-floating">
-                                <input class="form-control" type="text" name="numero_lote" id="floatingLote"
-                                    placeholder="Qual o número do lote?" required>
-                                <label for="floatingLote" class="form-label">Número do lote</label>
-                            </div>
-                            <div class="mb-3 form-floating">
-                                <input class="form-control" type="text" name="localizacao" id="floatingLocal"
-                                    placeholder="Onde está localizado o estoque?" required>
-                                <label for="floatingLocal" class="form-label">Localização do estoque</label>
-                            </div>
-                            <input class="form-control" type="date" name="data_validade"
-                                placeholder="Data de validade required"><br>
-                            <select name="id_produto" class="form-select" required>
-                                <% produtos.forEach(produto=> { %>
-                                    <option value="<%= produto.id_produto %>">
-                                        <%= produto.nome %>
-                                    </option>
-                                    <% }) %>
-                            </select><br>
-                            <button class="btn btn-success">Cadastrar</button>
-                        </form>
+            <main class="main-content">
+                <div class="container">
+                    <hr>
+                    <div class="card">
+                        <div class="card-header">
+                            <h2>Cadastro de Lote</h2>
+                        </div>
+                        <div class="card-body">
+                            <form id="lote-form" method="POST" action="/admin/lotes/save">
+                                <div class="mb-3 form-floating">
+                                    <input class="form-control" type="text" name="quantidade" id="floatingQuant"
+                                        placeholder="Quantidade de produtos." required>
+                                    <label for="floatingQuant" class="form-label">Quantidade de produtos</label>
+                                </div>
+                                <div class="mb-3 form-floating">
+                                    <input class="form-control" type="text" name="numero_lote" id="floatingLote"
+                                        placeholder="Qual o número do lote?" required>
+                                    <label for="floatingLote" class="form-label">Número do lote</label>
+                                </div>
+                                <div class="mb-3 form-floating">
+                                    <input class="form-control" type="text" name="localizacao" id="floatingLocal"
+                                        placeholder="Onde está localizado o estoque?" required>
+                                    <label for="floatingLocal" class="form-label">Localização do estoque</label>
+                                </div>
+                                <input class="form-control" type="date" name="data_validade"
+                                    placeholder="Data de validade required"><br>
+                                <select name="id_produto" class="form-select" required>
+                                    <option value="">Selecione o produto</option>
+                                    <% produtos.forEach(produto=> { %>
+                                        <option value="<%= produto.id_produto %>">
+                                            <%= produto.nome %>
+                                        </option>
+                                        <% }) %>
+                                </select><br>
+                                <button type="submit" class="btn btn-success" disabled>Cadastrar</button>
+                            </form>
+                        </div>
                     </div>
                 </div>
-            </div>
+                <div id="error-popup-container"></div>
+            </main>
 
             <%- include('../../partials/footer.ejs') %>
+
+                <script type="module">
+                    import { setupMultiFieldNew } from '/js/multi-field-new.js';
+
+                    document.addEventListener('DOMContentLoaded', function () {
+                        setupMultiFieldNew({
+                            formSelector: '#lote-form',
+                            inputFields: [
+                                '#floatingQuant',
+                                '#floatingLote',
+                                '#floatingLocal',
+                                'input[name="data_validade"]'
+                            ],
+                            selectFields: [
+                                'select[name="id_produto"]'
+                            ],
+                            requiredFields: ['quantidade', 'numero_lote', 'localizacao', 'data_validade', 'id_produto'],
+                            redirectUrl: '/admin/lotes',
+                            fieldMap: {
+                                quantidade: '#floatingQuant',
+                                numero_lote: '#floatingLote',
+                                localizacao: '#floatingLocal',
+                                data_validade: 'input[name="data_validade"]',
+                                id_produto: 'select[name="id_produto"]'
+                            }
+                        });
+                    });
+                </script>
         </body>
 
         </html>

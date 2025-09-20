@@ -33,7 +33,6 @@ module.exports = [
       }
     ]
   },
-  { label: 'Vendas', href: '/admin/vendas' },
   { label: 'Clientes', href: '/admin/clientes' },
   { label: 'Lotes', href: '/admin/lotes' },
   { label: 'PDVs', href: '/admin/pdvs' },

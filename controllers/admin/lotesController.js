@@ -4,7 +4,7 @@ const asyncHandler = require('../../utils/handlers/async-handler');
 const formatDate = require('../../utils/data/date-formatter');
 const { stringValidation, numberValidation, dateValidation } = require('../../utils/data/data-validation');
 const { parseIntValue, parseDateValue } = require('../../utils/data/data-parsers');
-const { getAllLotes, getEditData, getViewDependencies, createLote, updateLote, deleteLote } = require('../../services/admin/lotesService');
+const { getAllLotes, getEditData, getViewDependencies, createLote, updateLote, deleteLote, adicionarQuantidadeAoLote } = require('../../services/admin/lotesService');
 
 router.get('/lotes/new', asyncHandler(async (req, res) => {
     const produtos = await getViewDependencies();
@@ -35,7 +35,7 @@ router.post('/lotes/save', asyncHandler(async (req, res) => {
     numberValidation(parsedId, parsedQuant, parsedNumLote);
     stringValidation(localizacao);
     dateValidation(parsedValidade);
-    
+
     await createLote({
         id_produto: parsedId,
         quantidade: parsedQuant,
@@ -58,7 +58,7 @@ router.post('/lotes/delete/:id_lote', asyncHandler(async (req, res) => {
 }));
 
 router.post('/lotes/update/:id_lote', asyncHandler(async (req, res) => {
-    const [parsedId] = parseIntValue(req.params.id_estoque);
+    const [parsedId] = parseIntValue(req.params.id_lote);
     const [parsedQuant, parsedNumLote] = parseIntValue(req.body.quantidade, req.body.numero_lote);
     const { localizacao } = req.body;
     const parsedValidade = parseDateValue(req.body.data_validade);
@@ -77,5 +77,17 @@ router.post('/lotes/update/:id_lote', asyncHandler(async (req, res) => {
 
     res.redirect('/admin/lotes');
 }));
+
+router.post('/lotes/add-quantidade/:id_lote', asyncHandler(async (req, res) => {
+    const [id_lote] = parseIntValue(req.params.id_lote);
+    const [quantidade] = parseIntValue(req.body.quantidade);
+
+    numberValidation(id_lote, quantidade);
+
+    await adicionarQuantidadeAoLote(id_lote, quantidade);
+
+    res.status(200).json({ message: 'Quantidade adicionada com sucesso' });
+}));
+
 
 module.exports = router;

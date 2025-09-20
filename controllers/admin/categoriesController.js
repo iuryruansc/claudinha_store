@@ -49,7 +49,7 @@ router.post('/categories/delete/:id_categoria', asyncHandler(async (req, res) =>
 
     await deleteCategory(parsedId);
 
-    res.render('/admin/categories');
+    res.json({ message: 'Categoria excluída com sucesso' });
 }));
 
 router.post('/categories/update/:id_categoria', asyncHandler(async (req, res) => {

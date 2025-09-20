@@ -10,11 +10,13 @@
                             <h2>Editar Fornecedor</h2>
                         </div>
                         <div class="card-body">
-                            <form id="fornecedor-form" action="/admin/fornecedores/update/<%= fornecedor.id_fornecedor %>">
-                                <input class="form-control" type="text" id="fornecedor-name-input" name="nome_fornecedor"
-                                    placeholder="Defina o nome da fornecedor" value="<%= fornecedor.nome_fornecedor %>"><br>
+                            <form id="fornecedor-form"
+                                action="/admin/fornecedores/update/<%= fornecedor.id_fornecedor %>">
+                                <input class="form-control" type="text"
+                                    name="nome_fornecedor" placeholder="Defina o nome da fornecedor"
+                                    value="<%= fornecedor.nome_fornecedor %>"><br>
                                 <input type="hidden" name="id_fornecedor" value="<%= fornecedor.id_fornecedor %>">
-                                <button class="btn btn-success" id="submit-button">Atualizar</button>
+                                <button type="submit" class="btn btn-success" disabled>Atualizar</button>
                             </form>
                         </div>
                     </div>
@@ -27,56 +29,14 @@
 
                 <script type="module">
 
-                    import { showErrorPopup } from '/js/show-error-popup.js'
+                    import { setupSingleFieldEdit } from '/js/single-field-edit.js'
 
                     document.addEventListener('DOMContentLoaded', function () {
-                        const input = document.getElementById('fornecedor-name-input');
-                        const button = document.getElementById('submit-button');
-                        const form = document.getElementById('fornecedor-form');
-                        const originalName = input.value;
-
-                        form.addEventListener('submit', async function (event) {
-                            event.preventDefault();
-
-                            const newFornecedorName = input.value.trim();
-
-                            if (newFornecedorName.length === 0) {
-                                showErrorPopup('O nome do fornecedor não pode ser vazio.');
-                                return;
-                            }
-
-                            if (newFornecedorName === originalName) {
-                                showErrorPopup('O nome do fornecedor não foi alterado. Requisição não enviada.');
-                                return;
-                            }
-
-                            const formAction = this.getAttribute('action');
-
-                            try {
-                                const response = await fetch(formAction, {
-                                    method: 'POST',
-                                    headers: { 'Content-Type': 'application/json' },
-                                    body: JSON.stringify({ nome: newFornecedorName }),
-                                });
-
-                                if (response.ok) {
-                                    window.location.href = '/admin/fornecedores';
-                                } else {
-                                    const errorData = await response.json();
-                                    showErrorPopup(errorData.error.message, errorData.error.details);
-                                }
-                            } catch (error) {
-                                console.error('Erro de rede:', error);
-                                showErrorPopup('Ocorreu um erro de rede. Tente novamente mais tarde');
-                            }
-                        });
-
-                        input.addEventListener('input', function () {
-                            if (this.value.trim().length > 0) {
-                                button.removeAttribute('disabled');
-                            } else {
-                                button.setAttribute('disabled', 'disabled');
-                            }
+                        setupSingleFieldEdit({
+                            formSelector: '#fornecedor-form',
+                            inputName: 'nome_fornecedor',
+                            redirectUrl: '/admin/fornecedores',
+                            fieldKey: 'nome_fornecedor'
                         });
                     });
 

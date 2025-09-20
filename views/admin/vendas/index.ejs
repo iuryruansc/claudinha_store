@@ -2,69 +2,68 @@
     <%- include('../../partials/navbar.ejs') %>
 
         <body>
-            <div class="container">
-                <hr>
-                <h2>Vendas</h2>
-                <a href="/admin/vendas/new" class="btn btn-success">Nova Venda</a>
-                <hr>
-                <table class="table table-bordered">
-                    <thead>
-                        <tr>
-                            <th>Cliente</th>
-                            <th>Produtos</th>
-                            <th>Data</th>
-                            <th>Ações</th>
-                        </tr>
-                    </thead>
-                    <tbody id="category-table-body">
-                        <label>
-                            <input type="checkbox" id="toggleExcluir">
-                            Habilitar botão Excluir
-                        </label>
-                        <% vendas.forEach(venda=> { %>
+            <main class="main-content">
+                <div class="container">
+                    <table id="table-data" class="table table-bordered">
+                        <thead>
                             <tr>
-                                <td>
-                                    <% const cliente=clientes.find(c=> c.id_cliente === venda.id_cliente);
-                                        if (cliente) { %>
-                                        <%= cliente.nome %>
-                                            <% } else { %>
-                                                -
-                                                <% } %>
-                                </td>
-                                <td>
-                                    <ul>
-                                        <% if (venda.itemvendas && venda.itemvendas.length> 0) { %>
-                                            <% venda.itemvendas.forEach(item=> { %>
-                                                <li>
-                                                    <% const produto=produtos.find(p=> p.id_produto ===
-                                                        item.id_produto); %>
-                                                        <%= produto ? produto.nome : 'Produto Desconhecido' %>
-                                                            (<%= item.quantidade %>)
-                                                </li>
-                                                <% }) %>
-                                                    <% } else { %>
-                                                        <li>Nenhum item</li>
-                                                        <% } %>
-                                    </ul>
-                                </td>
-                                <td>
-                                    <%= formatDate(venda.data_hora) %>
-                                </td>
-                                <td>
-                                    <a href="/admin/vendas/edit/<%= venda.id_venda %>"
-                                        class="btn btn-warning">Editar</a>
-                                    <form action="/admin/vendas/delete/<%= venda.id_venda %>" method="POST"
-                                        style="display: inline;">
-                                        <input type="hidden" name="id_venda" value="<%= venda.id_venda %>">
-                                        <button class="btn btn-danger excluir-btn"
-                                            style="display: none;">Excluir</button>
-                                    </form>
-                                </td>
+                                <th>Cliente</th>
+                                <th>Produtos</th>
+                                <th>Data</th>
+                                <th>Ações
+                                    <label class="form-check-label ms-2">
+                                        <input type="checkbox" id="toggleExcluir" class="form-check-input">
+                                        <span class="d-inline-block">Habilitar Excluir</span>
+                                    </label>
+                                </th>
                             </tr>
-                            <% }) %>
-                    </tbody>
-                </table>
-            </div>
+                        </thead>
+                        <tbody id="category-table-body">
+                            <% vendas.forEach(venda=> { %>
+                                <tr>
+                                    <td>
+                                        <% const cliente=clientes.find(c=> c.id_cliente === venda.id_cliente);
+                                            if (cliente) { %>
+                                            <%= cliente.nome %>
+                                                <% } else { %>
+                                                    -
+                                                    <% } %>
+                                    </td>
+                                    <td>
+                                        <ul>
+                                            <% if (venda.itemvendas && venda.itemvendas.length> 0) { %>
+                                                <% venda.itemvendas.forEach(item=> { %>
+                                                    <li>
+                                                        <% const produto=produtos.find(p=> p.id_produto ===
+                                                            item.id_produto); %>
+                                                            <%= produto ? produto.nome : 'Produto Desconhecido' %>
+                                                                (<%= item.quantidade %>)
+                                                    </li>
+                                                    <% }) %>
+                                                        <% } else { %>
+                                                            <li>Nenhum item</li>
+                                                            <% } %>
+                                        </ul>
+                                    </td>
+                                    <td>
+                                        <%= formatDate(venda.data_hora) %>
+                                    </td>
+                                    <td>
+                                        <a href="/admin/vendas/edit/<%= venda.id_venda %>"
+                                            class="btn btn-warning">Editar</a>
+                                        <form action="/admin/vendas/delete/<%= venda.id_venda %>" method="POST"
+                                            style="display: inline;">
+                                            <input type="hidden" name="id_venda" value="<%= venda.id_venda %>">
+                                            <button class="btn btn-danger excluir-btn"
+                                                style="display: none;">Excluir</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                                <% }) %>
+                        </tbody>
+                    </table>
+                </div>
+            </main>
 
             <%- include('../../partials/footer.ejs') %>
 

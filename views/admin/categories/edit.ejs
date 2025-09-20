@@ -11,10 +11,10 @@
                         </div>
                         <div class="card-body">
                             <form id="category-form" action="/admin/categories/update/<%= category.id_categoria %>">
-                                <input class="form-control" type="text" id="category-name-input" name="nome"
+                                <input class="form-control" type="text" name="nome"
                                     placeholder="Defina o nome da categoria" value="<%= category.nome %>"><br>
                                 <input type="hidden" name="id_categoria" value="<%= category.id_categoria %>">
-                                <button class="btn btn-success" id="submit-button">Atualizar</button>
+                                <button type="submit" class="btn btn-success" disabled>Atualizar</button>
                             </form>
                         </div>
                     </div>
@@ -27,57 +27,15 @@
 
                 <script type="module">
 
-                    import { showErrorPopup } from '/js/show-error-popup.js'
+                    import { setupSingleFieldEdit } from '/js/single-field-edit.js'
 
                     document.addEventListener('DOMContentLoaded', function () {
-                        const input = document.getElementById('category-name-input');
-                        const button = document.getElementById('submit-button');
-                        const form = document.getElementById('category-form');
-                        const originalName = input.value;
-
-                        form.addEventListener('submit', async function (event) {
-                            event.preventDefault();
-
-                            const newCategoryName = input.value.trim();
-
-                            if (newCategoryName.length === 0) {
-                                showErrorPopup('O nome da categoria não pode ser vazio.');
-                                return;
-                            }
-
-                            if (newCategoryName === originalName) {
-                                showErrorPopup('O nome da categoria não foi alterado. Requisição não enviada.');
-                                return;
-                            }
-
-                            const formAction = this.getAttribute('action');
-
-                            try {
-                                const response = await fetch(formAction, {
-                                    method: 'POST',
-                                    headers: { 'Content-Type': 'application/json' },
-                                    body: JSON.stringify({ nome: newCategoryName }),
-                                });
-
-                                if (response.ok) {
-                                    window.location.href = '/admin/categories';
-                                } else {
-                                    const errorData = await response.json();
-                                    showErrorPopup(errorData.error.message, errorData.error.details);
-                                }
-                            } catch (error) {
-                                console.error('Erro de rede:', error);
-                                showErrorPopup('Ocorreu um erro de rede. Tente novamente mais tarde');
-                            }
-                        });
-
-                        input.addEventListener('input', function () {
-                            if (this.value.trim().length > 0) {
-                                button.removeAttribute('disabled');
-                            } else {
-                                button.setAttribute('disabled', 'disabled');
-                            }
-                        });
+                        setupSingleFieldEdit({
+                            formSelector: '#category-form',
+                            inputName: 'nome',
+                            redirectUrl: '/admin/categories',
+                            fieldKey: 'nome'
+                        })
                     });
 
                 </script>

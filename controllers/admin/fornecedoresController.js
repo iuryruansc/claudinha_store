@@ -49,7 +49,7 @@ router.post('/fornecedores/delete/:id_fornecedor', asyncHandler(async (req, res)
 
     await deleteFornecedor(parsedId);
 
-    res.render('/admin/fornecedores');
+    res.json({ message: 'Fornecedor excluído com sucesso'});
 }));
 
 router.post('/fornecedores/update/:id_fornecedor', asyncHandler(async (req, res) => {

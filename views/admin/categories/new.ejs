@@ -10,10 +10,10 @@
                             <h2>Cadastro de Categoria</h2>
                         </div>
                         <div class="card-body">
-                            <form id="category-form">
-                                <input class="form-control" type="text" name="nome" id="category-name-input"
+                            <form id="category-form" action="/admin/categories/save" method="POST">
+                                <input class="form-control" type="text" name="nome"
                                     placeholder="Defina o nome da categoria" required><br>
-                                <button class="btn btn-success" id="submit-button" disabled>Cadastrar</button>
+                                <button type="submit" class="btn btn-success" disabled>Cadastrar</button>
                             </form>
                         </div>
                     </div>
@@ -26,43 +26,14 @@
 
                 <script type="module">
 
-                    import { showErrorPopup } from '/js/show-error-popup.js'
+                    import { setupSingleFieldNew } from '/js/single-field-new.js'
 
                     document.addEventListener('DOMContentLoaded', function () {
-                        const input = document.getElementById('category-name-input');
-                        const button = document.getElementById('submit-button');
-                        const form = document.getElementById('category-form');
-
-                        input.addEventListener('input', function () {
-                            if (this.value.trim().length > 0) {
-                                button.removeAttribute('disabled');
-                            } else {
-                                button.setAttribute('disabled', 'disabled');
-                            }
-                        });
-
-                        form.addEventListener('submit', async function (event) {
-                            event.preventDefault();
-
-                            const categoryName = input.value;
-
-                            try {
-                                const response = await fetch('/admin/categories/save', {
-                                    method: 'POST',
-                                    headers: { 'Content-Type': 'application/json' },
-                                    body: JSON.stringify({ nome: categoryName }),
-                                });
-
-                                if (response.ok) {
-                                    window.location.href = '/admin/categories';
-                                } else {
-                                    const errorData = await response.json();
-                                    showErrorPopup(errorData.error.message, errorData.error.details);
-                                }
-                            } catch (error) {
-                                console.error('Erro de rede:', error);
-                                showErrorPopup('Ocorreu um erro de rede. Tente novamente mais tarde');
-                            }
+                        setupSingleFieldNew({
+                            formSelector: '#category-form',
+                            inputName: 'nome',
+                            redirectUrl: '/admin/categories',
+                            fieldKey: 'nome'
                         });
                     });
 

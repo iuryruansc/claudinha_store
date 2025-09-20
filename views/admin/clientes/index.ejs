@@ -1,80 +1,75 @@
 <%- include('../../partials/header.ejs') %>
     <%- include('../../partials/navbar.ejs') %>
 
-        <div class="container">
-            <hr>
-            <h2>Clientes</h2>
-            <a href="/admin/clientes/new" class="btn btn-success">Cadastrar Cliente</a>
-            <hr>
-            <table class="table table-bordered">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Nome</th>
-                        <th>Email</th>
-                        <th>Telefone</th>
-                        <th>CPF</th>
-                        <th>Ações</th>
-                    </tr>
-                </thead>
-                <tbody id="category-table-body">
-                    <label>
-                        <input type="checkbox" id="toggleExcluir">
-                        Habilitar botão Excluir
-                    </label>
-                    <% clientes.forEach(cliente=> { %>
-                        <tr>
-                            <td>
-                                <%= cliente.id_cliente %>
-                            </td>
-                            <td>
-                                <%= cliente.nome %>
-                            </td>
-                            <td>
-                                <%= cliente.email %>
-                            </td>
-                            <td>
-                                <%= cliente.telefone %>
-                            </td>
-                            <td>
-                                <%= cliente.cpf %>
-                            </td>
-                            <td>
-                                <a href="/admin/clientes/edit/<%= cliente.id_cliente %>"
-                                    class="btn btn-warning">Editar</a>
-                                <form action="/admin/clientes/delete/<%= cliente.id_cliente %>" method="POST"
-                                    style="display: inline;">
-                                    <input type="hidden" name="id_cliente" value="<%= cliente.id_cliente %>">
-                                    <button class="btn btn-danger excluir-btn" style="display: none;">Excluir</button>
-                                </form>
-                            </td>
-                        </tr>
-                        <% }) %>
-                </tbody>
-            </table>
-        </div>
+        <body>
+            <main class="main-content">
+                <div class="container">
+                    <hr>
+                    <a href="/admin/clientes/new" class="btn btn-success">Cadastrar Cliente</a>
+                    <hr>
+                    <table id="table-data" class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Nome</th>
+                                <th>Email</th>
+                                <th>Telefone</th>
+                                <th>CPF</th>
+                                <th>Ações
+                                    <label class="form-check-label ms-2">
+                                        <input type="checkbox" id="toggleExcluir" class="form-check-input">
+                                        <span class="d-inline-block">Habilitar Excluir</span>
+                                    </label>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody id="clientes-table-body">
+                            <% clientes.forEach(cliente=> { %>
+                                <tr>
+                                    <td>
+                                        <%= cliente.nome %>
+                                    </td>
+                                    <td>
+                                        <%= cliente.email %>
+                                    </td>
+                                    <td>
+                                        <%= cliente.telefone %>
+                                    </td>
+                                    <td>
+                                        <%= cliente.cpf %>
+                                    </td>
+                                    <td>
+                                        <a href="/admin/clientes/edit/<%= cliente.id_cliente %>"
+                                            class="btn btn-warning">Editar</a>
+                                        <form id="data-delete-form"
+                                            action="/admin/clientes/delete/<%= cliente.id_cliente %>" method="POST"
+                                            style="display: inline;">
+                                            <input type="hidden" name="id_cliente" value="<%= cliente.id_cliente %>">
+                                            <button class="btn btn-danger excluir-btn"
+                                                style="display: none;">Excluir</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                                <% }) %>
+                        </tbody>
+                    </table>
+                </div>
+            </main>
+            <div id="error-popup-container"></div>
 
-        <%- include('../../partials/footer.ejs') %>
+            <%- include('../../partials/footer.ejs') %>
 
-            <script>
+                <script type="module">
 
-                document.addEventListener('DOMContentLoaded', function () {
-                    const deleteForms = document.querySelectorAll('form[action^="/admin/clientes/delete/]');
-                    const toggleExcluir = document.getElementById('toggleExcluir');
-                    const tableBody = document.getElementById('category-table-body');
+                    import { setupRowDelete } from '/js/delete-handler.js'
 
-                    toggleExcluir.addEventListener('change', function () {
-                        tableBody.classList.toggle('delete-enabled', this.checked);
+                    document.addEventListener('DOMContentLoaded', function () {
+                        const deleteForms = document.querySelectorAll('.data-delete-form');
+                        const toggleExcluir = document.getElementById('toggleExcluir');
+                        const tableBody = document.getElementById('clientes-table-body');
+
+                        setupRowDelete(deleteForms, toggleExcluir, tableBody);
                     });
+                </script>
+        </body>
 
-                    deleteForms.forEach(form => {
-                        form.addEventListener('submit', function (event) {
-                            event.preventDefault();
-                            if (confirm('Você tem certeza que deseja remover este cliente?')) {
-                                this.submit();
-                            }
-                        });
-                    });
-                });
-            </script>
-            
+        </html>

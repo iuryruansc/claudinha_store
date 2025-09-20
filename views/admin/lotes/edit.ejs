@@ -2,37 +2,69 @@
     <%- include('../../partials/navbar.ejs') %>
 
         <body>
-            <div class="container">
-                <hr>
-                <div class="card">
-                    <div class="card-header">
-                        <h2>Edição de Lote</h2>
-                    </div>
-                    <div class="card-body">
-                        <form method="POST" action="/admin/lotes/update/<%= lote.id_lote %>">
-                            <div class="mb-3 form-floating">
-                                <input class="form-control" type="text" name="quantidade" id="floatingQuant"
-                                    placeholder="Insira a quantidade atual de produtos." value="<%= lote.quantidade %>">
-                                <label for="floatingQuant" class="form-label">Quantidade</label>
-                            </div>
-                            <div class="mb-3 form-floating">
-                                <input class="form-control" type="text" name="numero_lote" id="floatingLote"
-                                    placeholder="Qual o número do lote?" value="<%= lote.numero_lote %>">
-                                <label for="floatingLote" class="form-label">Lote</label>
-                            </div>
-                            <div class="mb-3 form-floating">
-                                <input class="form-control" type="text" name="localizacao" id="floatingLocal"
-                                    placeholder="Onde está localizado o produto?" value="<%= lote.localizacao %>">
-                                <label for="floatingLocal" class="form-label">Localização</label>
-                            </div>
-                            <input type="hidden" name="id_lote" value="<%= lote.id_lote %>">
-                            <button class="btn btn-success">Atualizar</button>
-                        </form>
+            <main class="main-content">
+                <div class="container">
+                    <hr>
+                    <div class="card">
+                        <div class="card-header">
+                            <h2>Edição de Lote</h2>
+                        </div>
+                        <div class="card-body">
+                            <form id="lote-form" method="POST" action="/admin/lotes/update/<%= lote.id_lote %>">
+                                <div class="mb-3 form-floating">
+                                    <input class="form-control" type="text" name="quantidade" id="floatingQuant"
+                                        placeholder="Insira a quantidade atual de produtos."
+                                        value="<%= lote.quantidade %>" required>
+                                    <label for="floatingQuant" class="form-label">Quantidade</label>
+                                </div>
+                                <div class="mb-3 form-floating">
+                                    <input class="form-control" type="text" name="numero_lote" id="floatingLote"
+                                        placeholder="Qual o número do lote?" value="<%= lote.numero_lote %>" required>
+                                    <label for="floatingLote" class="form-label">Lote</label>
+                                </div>
+                                <div class="mb-3 form-floating">
+                                    <input class="form-control" type="text" name="localizacao" id="floatingLocal"
+                                        placeholder="Onde está localizado o produto?" value="<%= lote.localizacao %>"
+                                        required>
+                                    <label for="floatingLocal" class="form-label">Localização</label>
+                                </div>
+                                <div class="mb-3 form-floating">
+                                    <input class="form-control" type="date" name="data_validade" id="floatingValidade"
+                                        placeholder="Quando o produto vence?"
+                                        value="<%= lote.data_validade ? lote.data_validade.toISOString().split('T')[0] : '' %>">
+                                    <label for="floatingValidade" class="form-label">Data de Validade</label><br>
+                                    <input type="hidden" name="id_lote" value="<%= lote.id_lote %>">
+                                    <button class="btn btn-success" disabled>Atualizar</button>
+                            </form>
+                        </div>
                     </div>
                 </div>
-            </div>
+            </main>
 
             <%- include('../../partials/footer.ejs') %>
+
+                <script type="module">
+                    import { setupMultiFieldEdit } from '/js/multi-field-edit.js';
+
+                    document.addEventListener('DOMContentLoaded', function () {
+                        setupMultiFieldEdit({
+                            formSelector: '#lote-form',
+                            inputFields: [
+                                '#floatingQuant',
+                                '#floatingLote',
+                                '#floatingLocal'
+                            ],
+                            selectFields: [],
+                            requiredFields: ['quantidade', 'numero_lote', 'localizacao'],
+                            redirectUrl: '/admin/lotes',
+                            fieldMap: {
+                                quantidade: '#floatingQuant',
+                                numero_lote: '#floatingLote',
+                                localizacao: '#floatingLocal',
+                            }
+                        });
+                    });
+                </script>
         </body>
 
         </html>

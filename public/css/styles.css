@@ -27,3 +27,35 @@
 #adminSidebar .accordion-button:not(.collapsed) .bi-chevron-down {
   transform: rotate(-180deg);
 }
+
+.darker-yellow {
+    background-color: #d4a017; /* A rich mustard tone */
+    border-color: #c18f0f;
+}
+
+.darker-yellow:hover {
+    background-color: #b8860b; /* Slightly darker on hover */
+    border-color: #a6780a;
+}
+
+.darker-yellow-text {
+    color: #d4a017;
+}
+
+.darker-purple {
+    background-color: #5a3e8c; /* Deep purple */
+    border-color: #4b3475;
+}
+
+.darker-purple:hover {
+    background-color: #4b3475;
+    border-color: #3e2c63;
+}
+
+.darker-purple-text {
+    color: #5a3e8c;
+}
+
+.softer-blue {
+    background-color: #4a6fa5; /* Steel blue tone */
+}

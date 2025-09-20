@@ -2,78 +2,104 @@
     <%- include('../../partials/navbar.ejs') %>
 
         <body>
-            <div class="container">
-                <hr>
-                <h2>Lotes</h2>
-                <a href="/admin/lotes/new" class="btn btn-success">Cadastrar lote</a>
-                <hr>
-                <table id="table-data" class="table table-bordered">
-                    <thead>
-                        <tr>
-                            <th>Produto</th>
-                            <th>Número do Lote</th>
-                            <th>Quantidade Atual</th>
-                            <th>Localização</th>
-                            <th>Validade</th>
-                            <th>Ações</th>
-                        </tr>
-                    </thead>
-                    <tbody id="category-table-body">
-                        <label>
-                            <input type="checkbox" id="toggleExcluir">
-                            Habilitar botão Excluir
-                        </label>
-                        <% lotes.forEach(lote=> { %>
+            <main class="main-content">
+                <div class="container">
+                    <hr>
+                    <a href="/admin/lotes/new" class="btn btn-success">Cadastrar lote</a>
+                    <hr>
+                    <table id="table-data" class="table table-bordered">
+                        <thead>
                             <tr>
-                                <td>
-                                    <% const produto=produtos.find(p=> p.id_produto === lote.id_produto); %>
-                                        <%= produto ? produto.nome : 'Produto não encontrado' %>
-                                </td>
-                                <td>
-                                    <%= lote.numero_lote %>
-                                </td>
-                                <td>
-                                    <%= lote.quantidade %>
-                                </td>
-                                <td>
-                                    <%= lote.localizacao %>
-                                </td>
-                                <td>
-                                    <%= formatDate(lote.data_validade) %>
-                                </td>
-                                <td>
-                                    <a href="/admin/lotes/edit/<%= lote.id_lote %>?produto=<%= lote.id_produto %>"
-                                        class="btn btn-warning">Editar</a>
-                                    <form class="data-delete-form" action="/admin/lotes/delete/<%= lote.id_lote %>"
-                                        method="POST" style="display: inline;">
-                                        <input type="hidden" name="id_lote" value="<%= lote.id_lote %>">
-                                        <button class="btn btn-danger excluir-btn"
-                                            style="display: none;">Excluir</button>
-                                    </form>
-                                </td>
+                                <th>Produto</th>
+                                <th>Número do Lote</th>
+                                <th>Quantidade Atual</th>
+                                <th>Localização</th>
+                                <th>Validade</th>
+                                <th>Ações
+                                    <label class="form-check-label ms-2">
+                                        <input type="checkbox" id="toggleExcluir" class="form-check-input">
+                                        <span class="d-inline-block">Habilitar Excluir</span>
+                                    </label>
+                                </th>
                             </tr>
-                            <% }) %>
-                    </tbody>
-                </table>
-            </div>
+                        </thead>
+                        <tbody id="lotes-table-body">
+                            <% lotes.forEach(lote=> { %>
+                                <tr>
+                                    <td>
+                                        <% const produto=produtos.find(p=> p.id_produto === lote.id_produto); %>
+                                            <%= produto ? produto.nome : 'Produto não encontrado' %>
+                                    </td>
+                                    <td>
+                                        <%= lote.numero_lote %>
+                                    </td>
+                                    <td>
+                                        <%= lote.quantidade %>
+                                    </td>
+                                    <td>
+                                        <%= lote.localizacao %>
+                                    </td>
+                                    <td>
+                                        <%= formatDate(lote.data_validade) %>
+                                    </td>
+                                    <td>
+                                        <a href="/admin/lotes/edit/<%= lote.id_lote %>?produto=<%= lote.id_produto %>"
+                                            class="btn btn-warning">Editar</a>
+                                        <button class="btn btn-info adicionar-quantidade-btn"
+                                            data-id="<%= lote.id_lote %>">
+                                            +
+                                        </button>
+                                        <form class="data-delete-form" action="/admin/lotes/delete/<%= lote.id_lote %>"
+                                            method="POST" style="display: inline;">
+                                            <input type="hidden" name="id_lote" value="<%= lote.id_lote %>">
+                                            <button type="submit" class="btn btn-danger excluir-btn"
+                                                style="display: none;">Excluir</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                                <% }) %>
+                        </tbody>
+                    </table>
+                </div>
+            </main>
 
             <%- include('../../partials/footer.ejs') %>
 
-                <script>
+                <script type="module">
+                    import { setupRowDelete } from '/js/delete-handler.js'
+
                     document.addEventListener('DOMContentLoaded', function () {
-                        const deleteForms = document.querySelectorAll('[data-delete-form]');
+                        const deleteForms = document.querySelectorAll('.data-delete-form');
                         const toggleExcluir = document.getElementById('toggleExcluir');
-                        const tableBody = document.getElementById('category-table-body');
+                        const tableBody = document.getElementById('lotes-table-body');
 
-                        toggleExcluir.addEventListener('change', function () {
-                            tableBody.classList.toggle('delete-enabled', this.checked);
-                        });
+                        setupRowDelete(deleteForms, toggleExcluir, tableBody);
 
-                        deleteForms.forEach(form => {
-                            form.addEventListener('submit', function (event) {
-                                event.preventDefault();
-                                if (confirm('Você tem certeza que deseja excluir este lote?')) {
-                                    this.submit();
+                        document.querySelectorAll('.adicionar-quantidade-btn').forEach(btn => {
+                            btn.addEventListener('click', async () => {
+                                const loteId = btn.getAttribute('data-id');
+                                const quantidadeStr = prompt('Quantidade a adicionar:');
+                                const quantidade = parseInt(quantidadeStr);
+
+                                if (!isNaN(quantidade) && quantidade > 0) {
+                                    try {
+                                        const response = await fetch(`/admin/lotes/add-quantidade/${loteId}`, {
+                                            method: 'POST',
+                                            headers: { 'Content-Type': 'application/json' },
+                                            body: JSON.stringify({ quantidade })
+                                        });
+
+                                        if (response.ok) {
+                                            window.location.reload();
+                                        } else {
+                                            const error = await response.json();
+                                            alert(error.message || 'Erro ao adicionar quantidade');
+                                        }
+                                    } catch (err) {
+                                        alert('Erro de rede');
+                                    }
+                                } else {
+                                    alert('Digite uma quantidade válida');
                                 }
                             });
                         });

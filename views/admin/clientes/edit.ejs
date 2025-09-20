@@ -1,28 +1,61 @@
 <%- include('../../partials/header.ejs') %>
     <%- include('../../partials/navbar.ejs') %>
 
-        <div class="container">
-            <hr>
-            <div class="card">
-                <div class="card-header">
-                    <h2>Edição de Cliente</h2>
+        <body>
+            <main class="main-content">
+                <div class="container">
+                    <hr>
+                    <div class="card">
+                        <div class="card-header">
+                            <h2>Edição de Cliente</h2>
+                        </div>
+                        <div class="card-body">
+                            <form id="cliente-form" method="POST"
+                                action="/admin/clientes/update/<%= cliente.id_cliente %>">
+                                <input class="form-control" type="text" name="nome" placeholder="Nome do Cliente"
+                                    value="<%= cliente.nome %>" required><br>
+                                <input class="form-control" type="text" name="email" placeholder="Email do Cliente"
+                                    value="<%= cliente.email %>" required><br>
+                                <input class="form-control" type="text" name="telefone"
+                                    placeholder="Telefone do Cliente" value="<%= cliente.telefone %>" required><br>
+                                <input class="form-control" type="text" name="cpf" placeholder="CPF do Cliente"
+                                    value="<%= cliente.cpf %>" required><br>
+                                <input type="hidden" name="id_cliente" value="<%= cliente.id_cliente %>" required>
+                                <button type="submit" class="btn btn-success">Atualizar</button>
+                            </form>
+                        </div>
+                    </div>
                 </div>
-                <div class="card-body">
-                    <form method="POST" action="/admin/clientes/update/<%= cliente.id_cliente %>">
-                        <input class="form-control" type="text" name="nome" placeholder="Nome do Cliente"
-                            value="<%= cliente.nome %>"><br>
-                        <input class="form-control" type="text" name="email" placeholder="Email do Cliente"
-                            value="<%= cliente.email %>"><br>
-                        <input class="form-control" type="text" name="telefone" placeholder="Telefone do Cliente"
-                            value="<%= cliente.telefone %>"><br>
-                        <input class="form-control" type="text" name="cpf" placeholder="CPF do Cliente"
-                            value="<%= cliente.cpf %>"><br>
-                        <input type="hidden" name="id_cliente" value="<%= cliente.id_cliente %>">
-                        <button class="btn btn-success">Atualizar</button>
-                    </form>
-                </div>
-            </div>
-        </div>
+            </main>
+            <div id="error-popup-container"></div>
+            
+            <%- include('../../partials/footer.ejs') %>
 
-        <%- include('../../partials/footer.ejs') %>
-        
+                <script type="module">
+
+                    import { setupMultiFieldEdit } from '/js/multi-field-edit.js';
+
+                    document.addEventListener('DOMContentLoaded', function () {
+                        setupMultiFieldEdit({
+                            formSelector: '#cliente-form',
+                            inputFields: [
+                                'input[name="nome"]',
+                                'input[name="email"]',
+                                'input[name="telefone"]',
+                                'input[name="cpf"]'
+                            ],
+                            selectFields: [],
+                            requiredFields: ['nome', 'email', 'telefone', 'cpf'],
+                            redirectUrl: '/admin/clientes',
+                            fieldMap: {
+                                nome: 'input[name="nome"]',
+                                email: 'input[name="email"]',
+                                telefone: 'input[name="telefone"]',
+                                cpf: 'input[name="cpf"]',
+                            }
+                        });
+                    });
+                </script>
+        </body>
+
+        </html>

@@ -29,7 +29,7 @@ const MovimentacaoEstoque = connection.define('movimentacaoestoque', {
     },
     id_funcionario: {
         type: Sequelize.INTEGER,
-        allowNull: false,
+        allowNull: true,
     },
     observacao: {
         type: Sequelize.TEXT,

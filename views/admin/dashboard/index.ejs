@@ -4,39 +4,33 @@
         <body>
             <main class="main-content">
                 <div class="container">
-                    <h2 class="mb-4">📈 Resumo de Operações</h2>
+                    <h2 class="mb-4">
+                        <i class="bi bi-bar-chart-line"></i> Resumo de Operações
+                    </h2>
                     <div class="row g-4">
-
-                        <!-- ADICIONAR LINK PARA NOVA VENDA -->
-                        <div class="col-md-4">
-                            <div class="card text-white bg-primary h-100 shadow">
-                                <div class="card-body">
-                                    <h5 class="card-title">🛒 Nova Venda</h5>
-                                    <p class="card-text">Crie um checkout para realizar uma nova venda.</p>
-                                    <a href="/admin/vendas/new" class="btn btn-light btn-sm">Iniciar Checkout</a>
-                                </div>
-                            </div>
-                        </div>
-
                         <!-- ADICIONAR LINK PARA O ESTOQUE COMPLETO -->
                         <div class="col-md-4">
-                            <div class="card text-white bg-warning h-100 shadow">
-                                <div class="card-body text-dark">
-                                    <h5 class="card-title">📦 Baixo Estoque</h5>
-                                    <p class="card-text">Alguns produtos estão em baixa quantidade. Verifique o estoque.
-                                    </p>
-                                    <button class="btn btn-light btn-sm">Ver Estoque</button>
+                            <div class="card bg-light h-100 shadow">
+                                <div class="card-body">
+                                    <h5 class="card-title darker-yellow-text">
+                                        <i class="bi bi-exclamation-triangle me-2"></i>Baixo Estoque
+                                    </h5>
+                                    <p class="card-text text-dark">Alguns produtos estão em baixa quantidade. Verifique
+                                        o estoque.</p>
+                                    <button class="btn btn-sm darker-yellow text-white">Ver Estoque</button>
                                 </div>
                             </div>
                         </div>
 
                         <!-- ADICIONAR LINK PARA TODOS OS PAGAMENTOS -->
                         <div class="col-md-4">
-                            <div class="card text-white bg-danger h-100 shadow">
+                            <div class="card bg-light h-100 shadow">
                                 <div class="card-body">
-                                    <h5 class="card-title">💳 Pagamentos Pendentes</h5>
-                                    <p class="card-text">Existe(m) venda(s) com pagamentos pendetes. </p>
-                                    <button class="btn btn-light btn-sm">Ver Pagamentos</button>
+                                    <h5 class="card-title darker-purple-text">
+                                        <i class="bi bi-clock me-2"></i> Pagamentos Pendentes
+                                    </h5>
+                                    <p class="card-text text-dark">Existe(m) venda(s) com pagamentos pendentes.</p>
+                                    <button class="btn btn-sm darker-purple text-white">Ver Pagamentos</button>
                                 </div>
                             </div>
                         </div>
@@ -48,37 +42,42 @@
                     <div class="row">
                         <div class="col-lg-6 mb-4">
                             <div class="card shadow">
-                                <div class="card-header bg-info text-white">
-                                    🕒 Feed de Atividade Recente
+                                <div class="card-header softer-blue text-white">
+                                    <i class="bi bi-activity me-2"></i>Feed de Atividade Recente
                                 </div>
                                 <div class="card-body">
                                     <ul class="list-group list-group-flush">
-                                        <!-- SUBSTITUIR POR EJS DINÂMICO DE VENDAS E MOVIMENTAÇÃO DO ESTOQUE  -->
-                                        <li class="list-group-item">
-                                            <strong>Entrada:</strong> 20 unidades do "Produto C" adicionados <span
-                                                class="text-muted">—
-                                                2 horas atrás</span>
-                                        </li>
-                                        <li class="list-group-item">
-                                            <strong>Saída:</strong> 3 unidades do "Produto C" vendidas <span
-                                                class="text-muted">— 3
-                                                horas atrás</span>
-                                        </li>
-                                        <li class="list-group-item">
-                                            <strong>Saída:</strong> 2 unidades do "Produto B" vendidas <span
-                                                class="text-muted">— 5
-                                                horas atrás</span>
-                                        </li>
-                                        <li class="list-group-item">
-                                            <strong>Saída:</strong> 5 unidades do "Produto A" vendidas <span
-                                                class="text-muted">— 5
-                                                horas atrás</span>
-                                        </li>
-                                        <li class="list-group-item">
-                                            <strong>Nova Venda:</strong> Venda #1022 realizada <span
-                                                class="text-muted">— 5
-                                                horas atrás</span>
-                                        </li>
+                                        <% atividades.forEach(atividade=> { %>
+                                            <li class="list-group-item">
+                                                <i class="bi <%= atividade.tipo === 'entrada' ? 'bi-box-arrow-in-down' :
+                                                    atividade.tipo === 'saida' ? 'bi-box-arrow-up' :
+                                                    atividade.tipo === 'venda' ? 'bi-cart-check' :
+                                                    'bi-info-circle' %> 
+                                                    me-2 text-primary">
+                                                </i>
+
+                                                <% if (atividade.tipo==='entrada' ) { %>
+                                                    <strong>Entrada:</strong>
+                                                    <%= atividade.quantidade %> unidades do "<%= atividade.produto %>"
+                                                            adicionadas
+                                                            <% } else if (atividade.tipo==='saida' ) { %>
+                                                                <strong>Saída:</strong>
+                                                                <%= atividade.quantidade %> unidades do "<%=
+                                                                        atividade.produto %>" removidas
+                                                                        <% } else if (atividade.tipo==='venda' ) { %>
+                                                                            <strong>Nova Venda:</strong> Venda #<%=
+                                                                                atividade.venda_id %> realizada
+                                                                                <% } else { %>
+                                                                                    <strong>Evento:</strong>
+                                                                                    <%= atividade.observacao %>
+                                                                                        <% } %>
+                                                                                            <span class="text-muted">—
+                                                                                                <%= atividade.horas_ago
+                                                                                                    %> horas
+                                                                                                    atrás
+                                                                                            </span>
+                                            </li>
+                                            <% }) %>
                                     </ul>
                                 </div>
                             </div>
@@ -87,7 +86,7 @@
                         <div class="col-lg-6 mb-4">
                             <div class="card shadow">
                                 <div class="card-header bg-success text-white">
-                                    🏷️ Produtos em Promoção
+                                    <i class="bi bi-tag me-2"></i> Produtos em Promoção
                                 </div>
                                 <div class="card-body">
                                     <ul class="list-group list-group-flush">
@@ -135,27 +134,44 @@
                         <div class="col-lg-6 mb-4">
                             <div class="card shadow">
                                 <div class="card-header bg-warning text-dark">
-                                    📦 Visualização Rápida do Estoque
+                                    <i class="bi bi-boxes me-2"></i> Visualização Rápida do Estoque
                                 </div>
                                 <div class="card-body">
-                                    <ul class="list-group list-group-flush">
-                                        <!-- SUBSTITUIR POR EJS DINÂMICO DE PRODUTOS E LOTES -->
-                                        <li class="list-group-item d-flex justify-content-between align-items-center">
-                                            Produto A <span class="badge bg-danger">2 restantes</span>
-                                        </li>
-                                        <li class="list-group-item d-flex justify-content-between align-items-center">
-                                            Produto F <span class="badge bg-danger">5 restantes</span>
-                                        </li>
-                                        <li class="list-group-item d-flex justify-content-between align-items-center">
-                                            Produto D <span class="badge bg-warning text-dark">7 restantes</span>
-                                        </li>
-                                        <li class="list-group-item d-flex justify-content-between align-items-center">
-                                            Produto C <span class="badge bg-warning text-dark">8 restantes</span>
-                                        </li>
-                                        <li class="list-group-item d-flex justify-content-between align-items-center">
-                                            Produto B <span class="badge bg-success">12 restantes</span>
-                                        </li>
+                                    <ul class="list-group list-group-flush animate__animated animate__fadeIn">
+                                        <% lotesBaixoEstoque.slice(0, 5).forEach(lote=> { %>
+                                            <% const produtoNome=lote.produto?.nome || 'Produto desconhecido' ; %>
+                                                <% const qtd=lote.quantidade; %>
+                                                    <% const validade=formatDate(lote.data_validade); %>
+                                                        <% const loteNum=lote.numero_lote; %>
+
+                                                            <% let badgeClass='bg-success' ; %>
+                                                                <% let iconClass='bi-check-circle' ; %>
+                                                                    <% if (qtd <=5) { badgeClass='bg-danger' ;
+                                                                        iconClass='bi-exclamation-triangle' ; } else if
+                                                                        (qtd <=8) { badgeClass='bg-warning text-dark' ;
+                                                                        iconClass='bi-exclamation-circle' ; } %>
+
+                                                                        <li class="list-group-item d-flex justify-content-between align-items-center"
+                                                                            data-bs-toggle="tooltip"
+                                                                            data-bs-placement="top"
+                                                                            title="Lote #<%= loteNum %> — Válido até <%= validade %>">
+                                                                            <div>
+                                                                                <i class="bi <%= iconClass %> me-2"></i>
+                                                                                <%= produtoNome %>
+                                                                            </div>
+                                                                            <span
+                                                                                class="badge <%= badgeClass %> rounded-pill fw-bold">
+                                                                                <%= qtd %> restantes
+                                                                            </span>
+                                                                        </li>
+                                                                        <% }) %>
                                     </ul>
+
+                                    <div class="text-muted small mt-3">
+                                        <i class="bi bi-exclamation-triangle text-danger"></i> Estoque crítico |
+                                        <i class="bi bi-exclamation-circle text-warning"></i> Estoque baixo |
+                                        <i class="bi bi-check-circle text-success"></i> Estoque saudável
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -163,7 +179,7 @@
                         <div class="col-lg-6 mb-4">
                             <div class="card shadow">
                                 <div class="card-header bg-danger text-white">
-                                    💳 Pagamentos Recentes
+                                    <i class="bi bi-credit-card me-2"></i> Pagamentos Recentes
                                 </div>
                                 <div class="card-body">
                                     <ul class="list-group list-group-flush">
@@ -191,6 +207,14 @@
             </main>
 
             <%- include('../../partials/footer.ejs') %>
+
+                <script>
+                    document.addEventListener('DOMContentLoaded', function () {
+                        document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(el => {
+                            new bootstrap.Tooltip(el);
+                        });
+                    });
+                </script>
         </body>
 
         </html>

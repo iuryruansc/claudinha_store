@@ -6,13 +6,13 @@ const { parseIntValue, parseFloatValue } = require('../../utils/data/data-parser
 const { getAllProdutos, getViewDependencies, getProdutosByCategoria, getEditData, createProduto, deleteProduto, updateProduto, getProdutosByFornecedor, getProdutosByMarca } = require('../../services/admin/produtosService');
 
 router.get('/produtos/new', asyncHandler(async (req, res) => {
-    const categorias = await getViewDependencies();
+    const { categorias, fornecedores, marcas } = await getViewDependencies();
 
     res.render('admin/produtos/new', { categorias, fornecedores, marcas });
 }));
 
 router.get('/produtos', asyncHandler(async (req, res) => {
-    const { produtos, categorias } = await getAllProdutos();
+    const { produtos, categorias, fornecedores, marcas } = await getAllProdutos();
 
     res.render('admin/produtos/index', {
         produtos,
@@ -66,7 +66,7 @@ router.get('/produtos/marca/:id_marca', asyncHandler(async (req, res) => {
     const [id_marca] = parseIntValue(req.params.id_marca);
     numberValidation(id_marca);
 
-    const { produtos, marca } = await getProdutosByMarca();
+    const { produtos, marca } = await getProdutosByMarca(id_marca);
     const { categorias, fornecedores } = await getViewDependencies();
 
     res.render('admin/produtos/index', {
@@ -85,7 +85,7 @@ router.get('/produtos/edit/:id_produto', asyncHandler(async (req, res) => {
 
     numberValidation(parsedId);
 
-    const { produto, categorias } = await getEditData(parsedId);
+    const { produto, categorias, fornecedores, marcas } = await getEditData(parsedId);
 
     res.render('admin/produtos/edit', { produto, categorias, fornecedores, marcas });
 }));
@@ -111,7 +111,7 @@ router.post('/produtos/save', asyncHandler(async (req, res) => {
         id_marca
     });
 
-    res.status(200).json({ message: 'Produto criado com sucesso' });
+    res.json({ message: 'Produto criado com sucesso' });
 }));
 
 router.post('/produtos/delete/:id_produto', asyncHandler(async (req, res) => {

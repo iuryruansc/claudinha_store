@@ -28,7 +28,7 @@
                                         <a href="/admin/produtos/categoria/<%= category.id_categoria %>"
                                             class="btn btn-primary">Ver
                                             Produtos</a>
-                                        <form action="/admin/categories/delete/<%= category.id_categoria %>"
+                                        <form id="data-delete-form" action="/admin/categories/delete/<%= category.id_categoria %>"
                                             style="display: inline;">
                                             <input type="hidden" name="id_categoria"
                                                 value="<%= category.id_categoria %>">
@@ -53,7 +53,7 @@
                     import { setupRowDelete } from '/js/delete-handler.js'
 
                     document.addEventListener('DOMContentLoaded', function () {
-                        const deleteForms = document.querySelectorAll('form[action^="/admin/categories/delete"]');
+                        const deleteForms = document.querySelectorAll('#data-delete-form');
                         const toggleExcluir = document.getElementById('toggleExcluir');
                         const tableBody = document.getElementById('category-table-body');
 

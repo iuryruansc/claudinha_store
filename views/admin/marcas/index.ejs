@@ -25,9 +25,9 @@
                                     <td>
                                         <a href="/admin/marcas/edit/<%= marca.id_marca %>"
                                             class="btn btn-warning">Editar</a>
-                                        <a href="/admin/produtos/<%= marca.id_marca %>" class="btn btn-primary">Ver
+                                        <a href="/admin/produtos/marca/<%= marca.id_marca %>" class="btn btn-primary">Ver
                                             Produtos</a>
-                                        <form action="/admin/marcas/delete/<%= marca.id_marca %>"
+                                        <form class="data-delete-form" action="/admin/marcas/delete/<%= marca.id_marca %>"
                                             style="display: inline;">
                                             <input type="hidden" name="id_marca" value="<%= marca.id_marca %>">
                                             <button class="btn btn-danger excluir-btn"
@@ -50,7 +50,7 @@
                     import { setupRowDelete } from '/js/delete-handler.js'
 
                     document.addEventListener('DOMContentLoaded', function () {
-                        const deleteForms = document.querySelectorAll('form[action^="/admin/marcas/delete"]');
+                        const deleteForms = document.querySelectorAll('.data-delete-form');
                         const toggleExcluir = document.getElementById('toggleExcluir');
                         const tableBody = document.getElementById('marca-table-body');
 

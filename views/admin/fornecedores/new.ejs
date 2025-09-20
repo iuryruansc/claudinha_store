@@ -10,10 +10,10 @@
                             <h2>Cadastro de Fornecedor</h2>
                         </div>
                         <div class="card-body">
-                            <form id="fornecedor-form">
+                            <form id="fornecedor-form" action="/admin/fornecedores/save" method="POST">
                                 <input class="form-control" type="text" name="nome_fornecedor"
-                                    id="fornecedor-name-input" placeholder="Defina o nome do fornecedor" required><br>
-                                <button class="btn btn-success" id="submit-button" disabled>Cadastrar</button>
+                                    placeholder="Defina o nome do fornecedor" required><br>
+                                <button type="submit" class="btn btn-success" disabled>Cadastrar</button>
                             </form>
                         </div>
                     </div>
@@ -26,43 +26,14 @@
 
                 <script type="module">
 
-                    import { showErrorPopup } from '/js/show-error-popup.js'
+                    import { setupSingleFieldNew } from '/js/single-field-new.js'
 
                     document.addEventListener('DOMContentLoaded', function () {
-                        const input = document.getElementById('fornecedor-name-input');
-                        const button = document.getElementById('submit-button');
-                        const form = document.getElementById('fornecedor-form');
-
-                        input.addEventListener('input', function () {
-                            if (this.value.trim().length > 0) {
-                                button.removeAttribute('disabled');
-                            } else {
-                                button.setAttribute('disabled', 'disabled');
-                            }
-                        });
-
-                        form.addEventListener('submit', async function (event) {
-                            event.preventDefault();
-
-                            const fornecedorName = input.value;
-
-                            try {
-                                const response = await fetch('/admin/fornecedores/save', {
-                                    method: 'POST',
-                                    headers: { 'Content-Type': 'application/json' },
-                                    body: JSON.stringify({ nome_fornecedor: fornecedorName }),
-                                });
-
-                                if (response.ok) {
-                                    window.location.href = '/admin/fornecedores';
-                                } else {
-                                    const errorData = await response.json();
-                                    showErrorPopup(errorData.error.message, errorData.error.details);
-                                }
-                            } catch (error) {
-                                console.error('Erro de rede:', error);
-                                showErrorPopup('Ocorreu um erro de rede. Tente novamente mais tarde');
-                            }
+                        setupSingleFieldNew({
+                            formSelector: '#fornecedor-form',
+                            inputName: 'nome_fornecedor',
+                            redirectUrl: '/admin/fornecedores',
+                            fieldKey: 'nome_fornecedor'
                         });
                     });
 

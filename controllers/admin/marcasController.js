@@ -4,7 +4,7 @@ const asyncHandler = require('../../utils/handlers/async-handler');
 const Produtos = require('../../models/produto')
 const { stringValidation, checkAssociations, numberValidation } = require('../../utils/data/data-validation');
 const { parseIntValue } = require('../../utils/data/data-parsers');
-const { getAllMarcas, findMarcaById } = require('../../services/admin/marcasService');
+const { getAllMarcas, findMarcaById, createMarca, deleteMarca, updateMarca } = require('../../services/admin/marcasService');
 
 router.get('/marcas/new', (req, res) => {
     res.render('admin/marcas/new', { title: 'Nova Marca' });
@@ -36,8 +36,8 @@ router.post('/marcas/save', asyncHandler(async (req, res) => {
     res.status(200).json({ message: 'Marca criada com sucesso' });
 }));
 
-router.post('/marcas/delete/:id_fornecedor', asyncHandler(async (req, res) => {
-    const [parsedId] = parseIntValue(req.params.id_fornecedor);
+router.post('/marcas/delete/:id_marca', asyncHandler(async (req, res) => {
+    const [parsedId] = parseIntValue(req.params.id_marca);
 
     numberValidation(parsedId);
 
@@ -47,19 +47,19 @@ router.post('/marcas/delete/:id_fornecedor', asyncHandler(async (req, res) => {
         "Não é possível excluir a marca, pois exitem produtos associados a ela."
     );
 
-    await deleteFornecedor(parsedId);
+    await deleteMarca(parsedId);
 
-    res.render('/admin/marcas');
+    res.json({ message: 'Marca excluída com sucesso' });
 }));
 
-router.post('/marcas/update/:id_fornecedor', asyncHandler(async (req, res) => {
+router.post('/marcas/update/:id_marca', asyncHandler(async (req, res) => {
     const { nome_marca } = req.body;
-    const [parsedId] = parseIntValue(req.params.id_fornecedor);
+    const [parsedId] = parseIntValue(req.params.id_marca);
 
     numberValidation(parsedId);
     stringValidation(nome_marca);
 
-    await updateFornecedor(parsedId, { nome_marca });
+    await updateMarca(parsedId, { nome_marca });
 
     res.status(200).json({ message: 'Marca atualizada com sucesso' });
 }));

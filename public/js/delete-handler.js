@@ -8,10 +8,9 @@ export function setupRowDelete(deleteForms, toggleExcluir, tableBody) {
     deleteForms.forEach(form => {
         form.addEventListener('submit', async function (event) {
             event.preventDefault();
-            if (confirm('Você tem certeza que deseja excluir estas?')) {
-                const formAction = this.getAttribute('action');
+            if (confirm('Você tem certeza que deseja excluir essas informações?')) {
                 try {
-                    const response = await fetch(formAction, {
+                    const response = await fetch(this.getAttribute('action'), {
                         method: 'POST'
                     });
 
@@ -20,6 +19,7 @@ export function setupRowDelete(deleteForms, toggleExcluir, tableBody) {
                         if (row) {
                             row.remove();
                         }
+                        window.location.reload();
                     } else {
                         const errorData = await response.json();
                         showErrorPopup(errorData.error.message, errorData.error.details);

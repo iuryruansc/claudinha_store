@@ -1,26 +1,63 @@
 <%- include('../../partials/header.ejs') %>
     <%- include('../../partials/navbar.ejs') %>
 
-        <div class="container">
-            <hr>
-            <div class="card">
-                <div class="card-header">
-                    <h2>Edição de PDV</h2>
+        <body>
+            <main class="main-content">
+                <div class="container">
+                    <hr>
+                    <div class="card">
+                        <div class="card-header">
+                            <h2>Edição de PDV</h2>
+                        </div>
+                        <div class="card-body">
+                            <form id="pdv-form" method="POST" action="/admin/pdvs/update/<%= pdv.id_pdv %>">
+                                <input class="form-control" type="text" name="identificacao"
+                                    placeholder="Identificação do Ponto de Venda" value="<%= pdv.identificacao %>"
+                                    required><br>
+                                <input class="form-control" type="text" name="descricao"
+                                    placeholder="Descreva o Ponto de Venda" value="<%= pdv.descricao %>" required><br>
+                                <select class="form-select" name="status" required>
+                                    <option value="">Selecione o status</option>
+                                    <option value="ativo" <%=pdv.status==='ativo' ? 'selected' : '' %>>Ativo</option>
+                                    <option value="inativo" <%=pdv.status==='inativo' ? 'selected' : '' %>>Inativo
+                                    </option>
+                                </select><br>
+                                <input type="hidden" name="id_pdv" value="<%= pdv.id_pdv %>">
+                                <button type="submit" class="btn btn-success">Atualizar</button>
+                            </form>
+                        </div>
+                    </div>
                 </div>
-                <div class="card-body">
-                    <form method="POST" action="/admin/pdvs/update/<%= pdv.id_pdv %>">
-                        <input class="form-control" type="text" name="identificacao" placeholder="Identificação do Ponto de Venda"
-                            value="<%= pdv.identificacao %>"><br>
-                        <input class="form-control" type="text" name="descricao" placeholder="Descreva o Ponto de Venda"
-                            value="<%= pdv.descricao %>"><br>
-                        <input class="form-control" type="text" name="status" placeholder="Status do PDV(ativo ou inativo)"
-                            value="<%= pdv.status %>"><br>
-                        <input type="hidden" name="id_pdv" value="<%= pdv.id_pdv %>">
-                        <button class="btn btn-success">Atualizar</button>
-                    </form>
-                </div>
-            </div>
-        </div>
+            </main>
+            <div id="error-popup-container"></div>
 
-        <%- include('../../partials/footer.ejs') %>
-        
+            <%- include('../../partials/footer.ejs') %>
+
+                <script type="module">
+
+                    import { setupMultiFieldEdit } from '/js/multi-field-edit.js';
+
+                    document.addEventListener('DOMContentLoaded', function () {
+                        setupMultiFieldEdit({
+                            formSelector: '#pdv-form',
+                            inputFields: [
+                                'input[name="identificacao"]',
+                                'input[name="descricao"]'
+                            ],
+                            selectFields: [
+                                'select[name="status"]'
+                            ],
+                            requiredFields: ['identificacao', 'descricao', 'status'],
+                            redirectUrl: '/admin/pdvs',
+                            fieldMap: {
+                                identificacao: 'input[name="identificacao"]',
+                                descricao: 'input[name="descricao"]',
+                                status: 'select[name="status"]'
+                            }
+                        });
+                    });
+
+                </script>
+        </body>
+
+        </html>
