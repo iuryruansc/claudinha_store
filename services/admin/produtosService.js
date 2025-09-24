@@ -24,6 +24,12 @@ const getViewDependencies = async () => {
     return { categorias, fornecedores, marcas };
 }
 
+const getProdutoByCodigoBarras = async (codigo_barras) => {
+    const produto = await Produto.findOne({ where: { codigo_barras } });
+    modelValidation(produto);
+    return produto;
+}
+
 const getProdutosByCategoria = async (id) => {
     const produtosPromise = Produto.findAll({ where: { id_categoria: id } });
     const categoriaPromise = Category.findByPk(id);
@@ -98,6 +104,7 @@ const deleteProduto = async (id) => {
 module.exports = {
     findProdutoById,
     getViewDependencies,
+    getProdutoByCodigoBarras,
     getAllProdutos,
     getProdutosByCategoria,
     getProdutosByFornecedor,

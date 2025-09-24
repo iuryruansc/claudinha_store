@@ -7,35 +7,113 @@
                     <h2 class="mb-4">
                         <i class="bi bi-bar-chart-line"></i> Resumo de Operações
                     </h2>
-                    <div class="row g-4">
-                        <!-- ADICIONAR LINK PARA O ESTOQUE COMPLETO -->
-                        <div class="col-md-4">
-                            <div class="card bg-light h-100 shadow">
-                                <div class="card-body">
-                                    <h5 class="card-title darker-yellow-text">
-                                        <i class="bi bi-exclamation-triangle me-2"></i>Baixo Estoque
-                                    </h5>
-                                    <p class="card-text text-dark">Alguns produtos estão em baixa quantidade. Verifique
-                                        o estoque.</p>
-                                    <button class="btn btn-sm darker-yellow text-white">Ver Estoque</button>
-                                </div>
-                            </div>
+                    <% if (erro==='caixa' ) { %>
+                        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                            <strong>⚠️ Atenção:</strong> Você precisa abrir um caixa antes de acessar Vendas.
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"
+                                aria-label="Fechar"></button>
                         </div>
+                        <% } %>
 
-                        <!-- ADICIONAR LINK PARA TODOS OS PAGAMENTOS -->
-                        <div class="col-md-4">
-                            <div class="card bg-light h-100 shadow">
-                                <div class="card-body">
-                                    <h5 class="card-title darker-purple-text">
-                                        <i class="bi bi-clock me-2"></i> Pagamentos Pendentes
-                                    </h5>
-                                    <p class="card-text text-dark">Existe(m) venda(s) com pagamentos pendentes.</p>
-                                    <button class="btn btn-sm darker-purple text-white">Ver Pagamentos</button>
+                            <div class="row g-4">
+                                <!-- NOVO CAIXA -->
+                                <div class="col-md-4">
+                                    <div class="card bg-light h-100 shadow">
+                                        <div class="card-body">
+
+                                            <% if (!caixa) { %>
+                                                <!-- Sem caixa ativo: formulário de abertura -->
+                                                <h5 class="card-title btn-checkout-text">
+                                                    <i class="bi-cash-stack me-2"></i>Abrir Caixa
+                                                </h5>
+                                                <p class="card-text">Selecione o PDV e informe o saldo inicial.</p>
+                                                <form action="/admin/caixa/abrir" method="POST"
+                                                    class="d-flex flex-column gap-2">
+                                                    <select name="id_pdv" class="form-select form-select-sm" required>
+                                                        <option value="" disabled selected>Escolha o PDV</option>
+                                                        <% pdvs.forEach(pdv=> { %>
+                                                            <option value="<%= pdv.id_pdv %>">
+                                                                <%= pdv.descricao %>
+                                                            </option>
+                                                            <% }) %>
+                                                    </select>
+                                                    <input type="number" step="0.01" name="saldo_inicial"
+                                                        class="form-control form-control-sm" placeholder="Saldo inicial"
+                                                        required />
+                                                    <button type="submit" class="btn btn-checkout text-white btn-sm">
+                                                        Abrir Caixa
+                                                    </button>
+                                                </form>
+
+                                                <% } else { %>
+                                                    <!-- Caixa ativo: formulário de fechamento -->
+                                                    <h5 class="card-title darker-red-text">
+                                                        <i class="bi-lock-fill me-2"></i>Fechar Caixa
+                                                    </h5>
+                                                    <p class="card-text">
+                                                        Caixa aberto em <%= formatDate(caixa.data_abertura ||
+                                                            caixa.createdAt) %>
+                                                            (Saldo inicial: R$ <%=
+                                                                parseFloat(caixa.saldo_inicial).toFixed(2) %>)
+                                                    </p>
+                                                    <form action="/admin/caixa/fechar" method="POST"
+                                                        class="d-flex flex-column gap-2">
+                                                        <input type="number" step="0.01" name="saldo_final"
+                                                            class="form-control form-control-sm"
+                                                            placeholder="Saldo final" required />
+                                                        <button type="submit" class="btn btn-danger btn-sm">
+                                                            Fechar Caixa
+                                                        </button>
+                                                    </form>
+                                                    <% } %>
+
+                                        </div>
+                                    </div>
                                 </div>
-                            </div>
-                        </div>
 
-                    </div>
+                                <!-- NOVO LOTE -->
+                                <div class="col-md-4">
+                                    <div class="card bg-light h-100 shadow">
+                                        <div class="card-body">
+
+                                            <h5 class="card-title btn-checkout-text">
+                                                <i class="bi bi-box-arrow-in-down me-2"></i>Entrada de Produto
+                                            </h5>
+                                            <p class="card-text">
+                                                Escaneie ou digite o código de barras para iniciar a entrada
+                                            </p>
+
+                                            <form id="formIniciarEntrada">
+                                                <div class="mb-3">
+                                                    <input type="text" name="codigo_barras" id="cardCodigoBarra"
+                                                        class="form-control form-control-sm"
+                                                        placeholder="Código de Barras" autocomplete="off" required>
+                                                </div>
+
+                                                <button type="button" id="btnIniciarEntrada"
+                                                    class="btn btn-checkout text-white btn-sm w-100">
+                                                    Iniciar Entrada
+                                                </button>
+                                            </form>
+
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- ADICIONAR LINK PARA TODOS OS PAGAMENTOS -->
+                                <div class="col-md-4">
+                                    <div class="card bg-light h-100 shadow">
+                                        <div class="card-body">
+                                            <h5 class="card-title darker-purple-text">
+                                                <i class="bi bi-clock me-2"></i> Pagamentos Pendentes
+                                            </h5>
+                                            <p class="card-text">Existe(m) venda(s) com pagamentos pendentes.</p>
+                                            <button class="btn btn-sm darker-purple text-white">Ver Pagamentos</button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
                 </div>
 
                 <div class="container mt-5">
@@ -205,16 +283,81 @@
                         </div>
 
             </main>
+            <%- include('../../partials/entradaProdutoModal.ejs') %>
 
-            <%- include('../../partials/footer.ejs') %>
+                <%- include('../../partials/footer.ejs') %>
 
-                <script>
-                    document.addEventListener('DOMContentLoaded', function () {
-                        document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(el => {
-                            new bootstrap.Tooltip(el);
+                    <script type="module">
+                        import { setupMultiFieldNew } from '/js/multi-field-new.js';
+
+                        document.addEventListener('DOMContentLoaded', function () {
+                            const btnIniciar = document.getElementById('btnIniciarEntrada');
+                            const inputBarcode = document.getElementById('cardCodigoBarra');
+                            const bootstrapModal = new bootstrap.Modal(
+                                document.getElementById('entradaProdutoModal')
+                            );
+
+                            btnIniciar.addEventListener('click', async () => {
+                                const codigo = inputBarcode.value.trim();
+                                if (!codigo) {
+                                    return alert('Informe um código de barras');
+                                }
+
+                                try {
+                                    const res = await fetch(
+                                        `/admin/dashboard/entrada/iniciar?codigo_barras=${encodeURIComponent(codigo)}`
+                                    );
+                                    if (!res.ok) {
+                                        const err = await res.json();
+                                        throw new Error(err.error || 'Produto não encontrado');
+                                    }
+
+                                    const { id_produto, nome } = await res.json();
+
+                                    document.getElementById('modalProdutoId').value = id_produto;
+                                    document.getElementById('modalProdutoNome').value = nome;
+
+                                    inputBarcode.value = '';
+                                    bootstrapModal.show();
+
+                                } catch (error) {
+                                    alert(error.message);
+                                }
+                            });
+
+                            setupMultiFieldNew({
+                                formSelector: '#formEntradaProduto',
+                                inputFields: [
+                                    '#numeroLote',
+                                    '#quantidade',
+                                    '#dataValidade',
+                                    '#localizacao'
+                                ],
+                                selectFields: [],
+                                requiredFields: [
+                                    'id_produto',
+                                    'numero_lote',
+                                    'quantidade',
+                                    'data_validade',
+                                    'localizacao'
+                                ],
+                                fieldMap: {
+                                    id_produto: '#modalProdutoId',
+                                    numero_lote: '#numeroLote',
+                                    quantidade: '#quantidade',
+                                    data_validade: '#dataValidade',
+                                    localizacao: '#localizacao'
+                                },
+                                errorMessages: {
+                                    network: 'Erro de rede ao criar lote.'
+                                },
+                            })
+
+                            document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(el => {
+                                new bootstrap.Tooltip(el);
+                            });
                         });
-                    });
-                </script>
+                    </script>
         </body>
 
         </html>

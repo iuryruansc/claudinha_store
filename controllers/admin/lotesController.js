@@ -44,7 +44,7 @@ router.post('/lotes/save', asyncHandler(async (req, res) => {
         data_validade: parsedValidade
     });
 
-    res.redirect('/admin/lotes');
+    res.redirect('/admin/dashboard');
 }));
 
 router.post('/lotes/delete/:id_lote', asyncHandler(async (req, res) => {

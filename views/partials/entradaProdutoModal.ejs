@@ -1,0 +1,61 @@
+<div class="modal fade" id="entradaProdutoModal" tabindex="-1" aria-labelledby="entradaProdutoModalLabel"
+  aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+
+      <div class="modal-header">
+        <h5 class="modal-title" id="entradaProdutoModalLabel">
+          Nova Entrada de Produto
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+      </div>
+
+      <div class="modal-body">
+        <form id="formEntradaProduto" class="row g-3" method="POST" action="/admin/lotes/save">
+
+          <!-- Produto Selecionado (readonly) -->
+          <div class="form-floating mb-3">
+            <input type="text" class="form-control" id="modalProdutoNome" placeholder="Produto Selecionado" readonly>
+            <label for="modalProdutoNome">Produto Selecionado</label>
+            <input type="hidden" id="modalProdutoId">
+          </div>
+
+          <!-- Número do Lote -->
+          <div class="form-floating mb-3">
+            <input type="text" class="form-control" id="numeroLote" placeholder="Número do Lote" required>
+            <label for="numeroLote">Número do Lote</label>
+          </div>
+
+          <!-- Quantidade -->
+          <div class="form-floating mb-3">
+            <input type="number" class="form-control" id="quantidade" placeholder="Quantidade" min="1" required>
+            <label for="quantidade">Quantidade</label>
+          </div>
+
+          <!-- Data de Validade -->
+          <div class="form-floating mb-3">
+            <input type="date" class="form-control" id="dataValidade" placeholder="Data de Validade" required>
+            <label for="dataValidade">Data de Validade</label>
+          </div>
+
+          <!-- Localização -->
+          <div class="form-floating mb-3">
+            <input type="text" class="form-control" id="localizacao" placeholder="Localização" required>
+            <label for="localizacao">Localização</label>
+          </div>
+
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+              Cancelar
+            </button>
+            <button type="submit" id="btnSalvarEntradaModal" class="btn btn-primary">
+              Salvar Entrada
+            </button>
+          </div>
+
+        </form>
+      </div>
+
+    </div>
+  </div>
+</div>

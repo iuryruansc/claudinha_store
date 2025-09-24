@@ -1,101 +1,137 @@
 <%- include('../../partials/header.ejs') %>
     <%- include('../../partials/navbar.ejs') %>
 
-        <div class="container">
-            <hr>
-            <h2>Caixa</h2>
-            <a href="/admin/caixas/new" class="btn btn-success">Cadastrar Caixa</a>
-            <hr>
-            <table class="table table-bordered">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Funcionario</th>
-                        <th>Ponto de Venda</th>
-                        <th>Saldo Inicial</th>
-                        <th>Saldo Final</th>
-                        <th>Status</th>
-                        <th>Abertura</th>
-                        <th>Fechamento</th>
-                        <th>Ações</th>
-                    </tr>
-                </thead>
-                <tbody id="category-table-body">
-                    <label>
-                        <input type="checkbox" id="toggleExcluir">
-                        Habilitar botão Excluir
-                    </label>
-                    <% caixas.forEach(caixa=> { %>
-                        <tr>
-                            <td>
-                                <%= caixa.id_caixa %>
-                            </td>
-                            <td>
-                                <% const funcionario=funcionarios.find(c=> c.id_funcionario === caixa.id_funcionario);
-                                    if (funcionario) { %>
-                                    <%= funcionario.nome %>
-                                        <% } else { %>
-                                            -
-                                            <% } %>
-                            </td>
-                            <td>
-                                <% const pdv=pdvs.find(c=> c.id_pdv === caixa.id_pdv);
-                                    if (pdv) { %>
-                                    <%= pdv.identificacao %>
-                                        <% } else { %>
-                                            -
-                                            <% } %>
-                            </td>
-                            <td>
-                                <%= caixa.saldo_inicial %>
-                            </td>
-                            <td>
-                                <%= caixa.saldo_final %>
-                            </td>
-                            <td>
-                                <%= caixa.status %>
-                            </td>
-                            <td>
-                                <%= formatDate(caixa.data_abertura) %>
-                            </td>
-                            <td>
-                                <%= caixa.data_fechamento %>
-                            </td>
-                            <td>
-                                <a href="/admin/caixas/edit/<%= caixa.id_caixa %>" class="btn btn-warning">Editar</a>
-                                <form action="/admin/caixas/delete/<%= caixa.id_caixa %>" method="POST"
-                                    style="display: inline;">
-                                    <input type="hidden" name="id_caixa" value="<%= caixa.id_caixa %>">
-                                    <button class="btn btn-danger excluir-btn" style="display: none;">Excluir</button>
-                                </form>
-                            </td>
-                        </tr>
-                        <% }) %>
-                </tbody>
-            </table>
-        </div>
+        <body>
+            <main class="main-content">
+                <div class="container">
+                    <div id="error-popup-container"></div>
+                    <div class="d-flex justify-content-between align-items-center my-4">
+                        <h2 class="mb-0 h4">
+                            <i class="bi bi-cash-stack me-2"></i>
+                            Gerenciar Caixas
+                        </h2>
+                    </div>
+                    <div class="card shadow-sm">
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table id="table-data" class="table table-striped table-hover align-middle">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>Funcionário</th>
+                                            <th>Ponto de Venda</th>
+                                            <th>Abertura</th>
+                                            <th>Fechamento</th>
+                                            <th>Saldo Inicial</th>
+                                            <th>Saldo Final</th>
+                                            <th>Status</th>
+                                            <th class="text-center">
+                                                <div class="d-flex align-items-center justify-content-center">
+                                                    <span>Ações</span>
+                                                    <div class="form-check form-switch ms-3">
+                                                        <input aria-checked="false" class="form-check-input"
+                                                            type="checkbox" role="switch" id="toggleExcluir"
+                                                            title="Habilitar exclusão">
+                                                    </div>
+                                                </div>
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="caixa-table-body">
+                                        <% caixas.forEach(caixa=> { %>
+                                            <tr>
+                                                <td>
+                                                    <% const funcionario=funcionarios.find(c=> c.id_funcionario ===
+                                                        caixa.id_funcionario); %>
+                                                        <% if (funcionario) { %>
+                                                            <%= funcionario.nome %>
+                                                                <% } else { %>
+                                                                    <span>Admin</span>
+                                                                    <% } %>
+                                                </td>
+                                                <td>
+                                                    <% const pdv=pdvs.find(c=> c.id_pdv === caixa.id_pdv); %>
+                                                        <% if (pdv) { %>
+                                                            <%= pdv.identificacao %>
+                                                                <% } else { %>
+                                                                    <span class="text-muted fst-italic">-</span>
+                                                                    <% } %>
+                                                </td>
+                                                <td>
+                                                    <%= formatDate(caixa.data_abertura) %>
+                                                </td>
+                                                <td>
+                                                    <% if (caixa.data_fechamento) { %>
+                                                        <%= formatDate(caixa.data_fechamento) %>
+                                                            <% } else { %>
+                                                                <span class="text-muted fst-italic">Aberto</span>
+                                                                <% } %>
+                                                </td>
+                                                <td>
+                                                    <%= parseFloat(caixa.saldo_inicial) .toLocaleString('pt-BR', {
+                                                        style: 'currency' , currency: 'BRL' }) %>
+                                                </td>
+                                                </td>
+                                                <td>
+                                                    <% if (caixa.saldo_final !==null) { %>
+                                                        <%= parseFloat(caixa.saldo_final) .toLocaleString('pt-BR', {
+                                                            style: 'currency' , currency: 'BRL' }) %>
+                                                            <% } else { %>
+                                                                <span class="text-muted fst-italic">Aberto</span>
+                                                                <% } %>
+                                                </td>
+                                                <td>
+                                                    <% if (caixa.status==='aberto' ) { %>
+                                                        <span class="badge bg-success">Aberto</span>
+                                                        <% } else if (caixa.status==='fechado' ) { %>
+                                                            <span class="badge bg-danger">Fechado</span>
+                                                            <% } else { %>
+                                                                <span class="badge bg-secondary">Desconhecido</span>
+                                                                <% } %>
+                                                </td>
+                                                <td class="text-center">
+                                                    <fieldset class="btn-group">
+                                                        <a href="/admin/caixas/edit/<%= caixa.id_caixa %>"
+                                                            class="btn btn-sm btn-outline-primary" title="Editar caixa">
+                                                            <i class="bi bi-pencil-square"></i>
+                                                        </a>
+                                                        <form data-delete-form
+                                                            action="/admin/caixas/delete/<%= caixa.id_caixa %>"
+                                                            method="POST" class="d-inline">
+                                                            <input type="hidden" name="id_caixa"
+                                                                value="<%= caixa.id_caixa %>">
+                                                            <button class="btn btn-sm btn-outline-danger excluir-btn"
+                                                                title="Excluir produto" style="display: none;">
+                                                                <i class="bi bi-trash"></i>
+                                                            </button>
+                                                        </form>
+                                                    </fieldset>
+                                                </td>
+                                            </tr>
+                                            <% }) %>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
 
-        <%- include('../../partials/footer.ejs') %>
+            <%- include('../../partials/footer.ejs') %>
 
-            <script>
+                <script type="module">
+                    import { setupRowDelete } from '/js/delete-handler.js';
 
-                document.addEventListener('DOMContentLoaded', function () {
-                    const deleteForms = document.querySelectorAll('form[action^="/admin/caixas/delete/]');
-                    const toggleExcluir = document.getElementById('toggleExcluir');
-                    const tableBody = document.getElementById('category-table-body');
+                    document.addEventListener('DOMContentLoaded', function () {
+                        const deleteForms = document.querySelectorAll('[data-delete-form]');
+                        const toggleExcluir = document.getElementById('toggleExcluir');
+                        const tableBody = document.getElementById('caixa-table-body');
 
-                    toggleExcluir.addEventListener('change', function () {
-                        tableBody.classList.toggle('delete-enabled', this.checked);
+                        const tooltipTriggerList = document.querySelectorAll('[title]');
+                        const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
+
+                        setupRowDelete(deleteForms, toggleExcluir, tableBody);
                     });
+                </script>
+        </body>
 
-                    deleteForms.forEach(form => {
-                        form.addEventListener('submit', function (event) {
-                            event.preventDefault();
-                            if (confirm('Você tem certeza que deseja remover este funcionario?')) {
-                                this.submit();
-                            }
-                        });
-                    });
-                });
-            </script>
-            
+        </html>

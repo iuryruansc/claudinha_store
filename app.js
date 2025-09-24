@@ -57,10 +57,11 @@ app.use(helmet({
 
 app.use(session({
   secret: process.env.SESSION_SECRET,
-  resave: false,
-  saveUninitialized: false,
+  resave: true,
+  saveUninitialized: true,
   cookie: {
     secure: 'auto',
+    maxAge: 1000 * 60 * 60 *10
   }
 }));
 

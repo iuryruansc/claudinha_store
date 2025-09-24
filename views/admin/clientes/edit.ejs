@@ -1,61 +1,88 @@
 <%- include('../../partials/header.ejs') %>
-    <%- include('../../partials/navbar.ejs') %>
+<%- include('../../partials/navbar.ejs') %>
 
-        <body>
-            <main class="main-content">
-                <div class="container">
-                    <hr>
-                    <div class="card">
-                        <div class="card-header">
-                            <h2>Edição de Cliente</h2>
-                        </div>
-                        <div class="card-body">
-                            <form id="cliente-form" method="POST"
-                                action="/admin/clientes/update/<%= cliente.id_cliente %>">
-                                <input class="form-control" type="text" name="nome" placeholder="Nome do Cliente"
-                                    value="<%= cliente.nome %>" required><br>
-                                <input class="form-control" type="text" name="email" placeholder="Email do Cliente"
-                                    value="<%= cliente.email %>" required><br>
-                                <input class="form-control" type="text" name="telefone"
-                                    placeholder="Telefone do Cliente" value="<%= cliente.telefone %>" required><br>
-                                <input class="form-control" type="text" name="cpf" placeholder="CPF do Cliente"
-                                    value="<%= cliente.cpf %>" required><br>
-                                <input type="hidden" name="id_cliente" value="<%= cliente.id_cliente %>" required>
-                                <button type="submit" class="btn btn-success">Atualizar</button>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-            </main>
+<body>
+    <main class="main-content">
+        <div class="container">
             <div id="error-popup-container"></div>
-            
-            <%- include('../../partials/footer.ejs') %>
+            <div class="d-flex justify-content-between align-items-center my-4">
+                <h2 class="mb-0 h4">
+                    <i class="bi bi-person-gear me-2"></i>
+                    Editar Cliente
+                </h2>
+                <a href="/admin/clientes" class="btn btn-secondary">
+                    <i class="bi bi-arrow-left me-2"></i>Voltar
+                </a>
+            </div>
+            <hr>
 
-                <script type="module">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <form id="cliente-form" method="POST" action="/admin/clientes/update/<%= cliente.id_cliente %>">
+                        <div class="form-floating mb-3">
+                            <input id="cliente-nome-input" class="form-control" type="text" name="nome"
+                                placeholder="Nome do Cliente" value="<%= cliente.nome %>" required>
+                            <label for="cliente-nome-input">Nome do Cliente</label>
+                        </div>
 
-                    import { setupMultiFieldEdit } from '/js/multi-field-edit.js';
+                        <div class="form-floating mb-3">
+                            <input id="cliente-email-input" class="form-control" type="text" name="email"
+                                placeholder="Email do Cliente" value="<%= cliente.email %>" required>
+                            <label for="cliente-email-input">Email</label>
+                        </div>
 
-                    document.addEventListener('DOMContentLoaded', function () {
-                        setupMultiFieldEdit({
-                            formSelector: '#cliente-form',
-                            inputFields: [
-                                'input[name="nome"]',
-                                'input[name="email"]',
-                                'input[name="telefone"]',
-                                'input[name="cpf"]'
-                            ],
-                            selectFields: [],
-                            requiredFields: ['nome', 'email', 'telefone', 'cpf'],
-                            redirectUrl: '/admin/clientes',
-                            fieldMap: {
-                                nome: 'input[name="nome"]',
-                                email: 'input[name="email"]',
-                                telefone: 'input[name="telefone"]',
-                                cpf: 'input[name="cpf"]',
-                            }
-                        });
-                    });
-                </script>
-        </body>
+                        <div class="form-floating mb-3">
+                            <input id="cliente-telefone-input" class="form-control" type="text" name="telefone"
+                                placeholder="Telefone do Cliente" value="<%= cliente.telefone %>" required>
+                            <label for="cliente-telefone-input">Telefone</label>
+                        </div>
 
-        </html>
+                        <div class="form-floating mb-3">
+                            <input id="cliente-cpf-input" class="form-control" type="text" name="cpf"
+                                placeholder="CPF do Cliente" value="<%= cliente.cpf %>" required>
+                            <label for="cliente-cpf-input">CPF</label>
+                        </div>
+
+                        <input type="hidden" name="id_cliente" value="<%= cliente.id_cliente %>" required>
+
+                        <div class="d-flex justify-content-between mt-4">
+                            
+                            <button type="submit" class="btn btn-success">
+                                <i class="bi bi-check-circle me-2"></i>Atualizar
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <%- include('../../partials/footer.ejs') %>
+
+    <script type="module">
+        import { setupMultiFieldEdit } from '/js/multi-field-edit.js';
+
+        document.addEventListener('DOMContentLoaded', function () {
+            setupMultiFieldEdit({
+                formSelector: '#cliente-form',
+                inputFields: [
+                    '#cliente-nome-input',
+                    '#cliente-email-input',
+                    '#cliente-telefone-input',
+                    '#cliente-cpf-input'
+                ],
+                selectFields: [],
+                requiredFields: ['nome', 'email', 'telefone', 'cpf'],
+                redirectUrl: '/admin/clientes',
+                fieldMap: {
+                    nome: '#cliente-nome-input',
+                    email: '#cliente-email-input',
+                    telefone: '#cliente-telefone-input',
+                    cpf: '#cliente-cpf-input'
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>

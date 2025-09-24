@@ -1,43 +1,52 @@
 <%- include('../../partials/header.ejs') %>
-    <%- include('../../partials/navbar.ejs') %>
+<%- include('../../partials/navbar.ejs') %>
 
-        <body>
-            <main class="main-content">
-                <div class="container">
-                    <hr>
-                    <div class="card">
-                        <div class="card-header">
-                            <h2>Editar Marca</h2>
-                        </div>
-                        <div class="card-body">
-                            <form id="marca-form" action="/admin/marcas/update/<%= marca.id_marca %>">
-                                <input class="form-control" type="text" name="nome_marca"
-                                    placeholder="Defina o nome da marca" value="<%= marca.nome_marca %>"><br>
-                                <input type="hidden" name="id_marca" value="<%= marca.id_marca %>">
-                                <button type="submit" class="btn btn-success">Atualizar</button>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-            </main>
+<body>
+    <main class="main-content">
+        <div class="container">
             <div id="error-popup-container"></div>
+            <div class="d-flex justify-content-between align-items-center my-4">
+                <h2 class="mb-0 h4">
+                    <i class="bi bi-tags-fill me-2"></i>
+                    Editar Marca
+                </h2>
+                <a href="/admin/marcas" class="btn btn-secondary">
+                    <i class="bi bi-arrow-left me-2"></i>Voltar
+                </a>
+            </div>
 
-            <%- include('../../partials/footer.ejs') %>
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <form id="marca-form" method="POST" action="/admin/marcas/update/<%= marca.id_marca %>">
+                        <div class="mb-3">
+                            <label for="marcaName" class="form-label">Nome da Marca</label>
+                            <input class="form-control" type="text" id="marcaName" name="nome_marca"
+                                placeholder="Defina o nome da marca" value="<%= marca.nome_marca %>" required>
+                        </div>
+                        <input type="hidden" name="id_marca" value="<%= marca.id_marca %>">
+                        <button type="submit" class="btn btn-success" disabled>
+                            <i class="bi bi-arrow-clockwise me-2"></i>Salvar Alterações
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
 
-                <script type="module">
+    </main>
 
-                    import { setupSingleFieldEdit } from '/js/single-field-edit.js'
+    <%- include('../../partials/footer.ejs') %>
 
-                    document.addEventListener('DOMContentLoaded', function () {
-                        setupSingleFieldEdit({
-                            formSelector: '#marca-form',
-                            inputName: 'nome_marca',
-                            redirectUrl: '/admin/marcas',
-                            fieldKey: 'nome_marca'
-                        });
-                    });
+    <script type="module">
+        import { setupSingleFieldEdit } from '/js/single-field-edit.js';
 
-                </script>
-        </body>
-
-        </html>
+        document.addEventListener('DOMContentLoaded', function () {
+            setupSingleFieldEdit({
+                formSelector: '#marca-form',
+                inputName: 'nome_marca',
+                redirectUrl: '/admin/marcas',
+                fieldKey: 'nome_marca'
+            });
+        });
+    </script>
+</body>
+</html>

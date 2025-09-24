@@ -3,7 +3,7 @@ const fs = require('fs');
 const path = require('path');
 const router = express.Router();
 const controllersPath = path.join(__dirname, '../controllers/admin');
-const isAuth = require('../utils/handlers/auth-handler');
+const { isAuth } = require('../utils/handlers/auth-handler');
 
 router.use(isAuth);
 

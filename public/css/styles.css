@@ -59,3 +59,21 @@
 .softer-blue {
     background-color: #4a6fa5; /* Steel blue tone */
 }
+
+.softer-blue-text {
+    color: #4a6fa5;
+}
+
+.btn-checkout {
+  background-color: #5a9bd8;
+  color: white;
+}
+
+.btn-checkout-text {
+  color: #5a9bd8;
+}
+
+.btn-checkout:hover {
+  background-color: #3a7fc1;
+  color: white;
+}

@@ -13,7 +13,7 @@ const Caixa = connection.define('caixa', {
     },
     id_funcionario: {
         type: Sequelize.INTEGER,
-        allowNull: false,
+        allowNull: true,
     },
     data_abertura: {
         type: Sequelize.DATE,
@@ -23,7 +23,6 @@ const Caixa = connection.define('caixa', {
     data_fechamento: {
         type: Sequelize.DATE,
         allowNull: true,
-        defaultValue: null
     },
     saldo_inicial: {
         type: Sequelize.DECIMAL(10, 2),

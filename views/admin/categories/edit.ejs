@@ -1,44 +1,51 @@
 <%- include('../../partials/header.ejs') %>
-    <%- include('../../partials/navbar.ejs') %>
+<%- include('../../partials/navbar.ejs') %>
 
-        <body>
-            <main class="main-content">
-                <div class="container">
-                    <hr>
-                    <div class="card">
-                        <div class="card-header">
-                            <h2>Edição de Categoria</h2>
+<body>
+    <main class="main-content">
+        <div class="container">
+            <div id="error-popup-container"></div>
+            <div class="d-flex justify-content-between align-items-center my-4">
+                <h2 class="mb-0 h4">
+                    <i class="bi bi-tag-fill me-2"></i>
+                    Edição de Categoria
+                </h2>
+                <a href="/admin/categories" class="btn btn-secondary">
+                    <i class="bi bi-arrow-left me-2"></i>Voltar
+                </a>
+            </div>
+
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <form id="category-form" method="POST" action="/admin/categories/update/<%= category.id_categoria %>">
+                        <div class="mb-3">
+                            <label for="categoryName" class="form-label">Nome da Categoria</label>
+                            <input class="form-control" type="text" id="categoryName" name="nome"
+                                placeholder="Defina o nome da categoria" value="<%= category.nome %>" required>
                         </div>
-                        <div class="card-body">
-                            <form id="category-form" action="/admin/categories/update/<%= category.id_categoria %>">
-                                <input class="form-control" type="text" name="nome"
-                                    placeholder="Defina o nome da categoria" value="<%= category.nome %>"><br>
-                                <input type="hidden" name="id_categoria" value="<%= category.id_categoria %>">
-                                <button type="submit" class="btn btn-success" disabled>Atualizar</button>
-                            </form>
-                        </div>
-                    </div>
+                        <input type="hidden" name="id_categoria" value="<%= category.id_categoria %>">
+                        <button type="submit" class="btn btn-success" disabled>
+                            <i class="bi bi-arrow-clockwise me-2"></i>Salvar Alterações
+                        </button>
+                    </form>
                 </div>
+            </div>
+        </div>
+    </main>
 
-                <div id="error-popup-container"></div>
-            </main>
+    <%- include('../../partials/footer.ejs') %>
 
-            <%- include('../../partials/footer.ejs') %>
+    <script type="module">
+        import { setupSingleFieldEdit } from '/js/single-field-edit.js';
 
-                <script type="module">
-
-                    import { setupSingleFieldEdit } from '/js/single-field-edit.js'
-
-                    document.addEventListener('DOMContentLoaded', function () {
-                        setupSingleFieldEdit({
-                            formSelector: '#category-form',
-                            inputName: 'nome',
-                            redirectUrl: '/admin/categories',
-                            fieldKey: 'nome'
-                        })
-                    });
-
-                </script>
-        </body>
-
-        </html>
+        document.addEventListener('DOMContentLoaded', function () {
+            setupSingleFieldEdit({
+                formSelector: '#category-form',
+                inputName: 'nome',
+                redirectUrl: '/admin/categories',
+                fieldKey: 'nome'
+            });
+        });
+    </script>
+</body>
+</html>

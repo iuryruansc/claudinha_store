@@ -1,4 +1,5 @@
 const Sequelize = require('sequelize');
+const bcrypt = require('bcrypt')
 const connection = require('../database/database');
 
 const Funcionario = connection.define('funcionario', {
@@ -22,7 +23,21 @@ const Funcionario = connection.define('funcionario', {
     }
 }, {
     tableName: 'funcionario',
-    timestamps: true
+    timestamps: true,
+    hooks: {
+        beforeCreate: async (funcionario) => {
+            if(funcionario.cpf) {
+                const salt = await bcrypt.genSalt(10);
+                funcionario.cpf = await bcrypt.hash(funcionario.cpf, salt);
+            }
+        }, 
+        beforeUpdate: async (funcionario) => {
+            if (funcionario.changed('cpf')) {
+                const salt = await bcrypt.genSalt(10);
+                funcionario.cpf = await bcrypt.hash(funcionario.cpf, salt);
+            }
+        }
+    }
 });
 
 module.exports = Funcionario;

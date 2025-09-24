@@ -6,4 +6,11 @@ const isAuth = (req, res, next) => {
     }
 };
 
-module.exports = isAuth;
+const requireCaixa = (req, res, next) => {
+  if (!req.session.caixaId) {    
+    return res.redirect('/admin/dashboard?erro=caixa');
+  }
+  next();
+};
+
+module.exports = { isAuth, requireCaixa };

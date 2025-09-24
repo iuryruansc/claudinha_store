@@ -33,8 +33,14 @@ module.exports = [
       }
     ]
   },
+  {
+    label: 'Vendas',
+    dropdown: [
+      { label: 'Nova Venda', href: '/admin/vendas/new' },
+      { label: 'Acessar Vendas', href: '/admin/vendas' }
+    ]
+  },
   { label: 'Clientes', href: '/admin/clientes' },
-  { label: 'Lotes', href: '/admin/lotes' },
   { label: 'PDVs', href: '/admin/pdvs' },
   { label: 'Caixas', href: '/admin/caixas' },
   { label: 'Movimentações', href: '/admin/movimentacoes' },

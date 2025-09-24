@@ -1,125 +1,128 @@
 <%- include('../../partials/header.ejs') %>
     <%- include('../../partials/navbar.ejs') %>
 
-        <div class="container mt-4">
+        <body>
+            <main class="main-content">
+                <div class="container mt-4">
 
-            <form method="POST" action="/admin/vendas/save">
-                <div class="row">
-                    <!-- 🧾 Left Column: Sale Items -->
-                    <div class="col-md-7 border rounded p-3 bg-light">
-                        <h4>Itens da Venda</h4>
-                        <table class="table">
-                            <thead>
-                                <tr>
-                                    <th>Produto</th>
-                                    <th>Quantidade</th>
-                                    <th></th>
-                                </tr>
-                            </thead>
-                            <tbody id="itens-venda-container">
+                    <form method="POST" action="/admin/vendas/save">
+                        <div class="row">
+                            <!-- 🧾 Left Column: Sale Items -->
+                            <div class="col-md-7 border rounded p-3 bg-light">
+                                <h4>Itens da Venda</h4>
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>Produto</th>
+                                            <th>Quantidade</th>
+                                            <th></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="itens-venda-container">
 
-                            </tbody>
-                        </table>
-                        <input type="hidden" name="itens" id="itens" value="" />
-                        <button type="button" id="add-item-btn" class="btn btn-outline-primary">
-                            <i class="bi bi-plus-circle"></i> Adicionar Produto
-                        </button>
-                    </div>
+                                    </tbody>
+                                </table>
+                                <input type="hidden" name="itens" id="itens" value="" />
+                                <button type="button" id="add-item-btn" class="btn btn-outline-primary">
+                                    <i class="bi bi-plus-circle"></i> Adicionar Produto
+                                </button>
+                            </div>
 
-                    <!-- 💰 Right Column: Price Summary -->
-                    <div class="col-md-5 border rounded p-3 bg-light">
-                        <h4>Resumo de Preços</h4>
-                        <ul class="list-group mb-3" id="resumo-precos"></ul>
-                        <div class="card">
-                            <div class="card-body">
-                                <h5>Total: R$ <span id="valor_total">0.00</span></h5>
-                                <input type="hidden" name="valor_total" id="valor_total_input" value="0.00" />
+                            <!-- 💰 Right Column: Price Summary -->
+                            <div class="col-md-5 border rounded p-3 bg-light">
+                                <h4>Resumo de Preços</h4>
+                                <ul class="list-group mb-3" id="resumo-precos"></ul>
+                                <div class="card">
+                                    <div class="card-body">
+                                        <h5>Total: R$ <span id="valor_total">0.00</span></h5>
+                                        <input type="hidden" name="valor_total" id="valor_total_input" value="0.00" />
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                    </div>
+
+                        <div class="mt-4">
+                            <input type="text" id="codigo-input" class="form-control" autocomplete="off"
+                                placeholder="Leia o código de barras aqui...">
+                        </div><br>
+
+                        <button class="btn btn-success">
+                            <i class="bi bi-check-circle"></i> Cadastrar Venda
+                        </button>
                 </div>
+                </form>
+                </div>
+            </main>
 
-                <div class="mt-4">
-                    <input type="text" id="codigo-input" class="form-control" autocomplete="off"
-                        placeholder="Leia o código de barras aqui...">
-                </div><br>
+            <%- include('../../partials/footer.ejs') %>
 
-                <button class="btn btn-success">
-                    <i class="bi bi-check-circle"></i> Cadastrar Venda
-                </button>
-        </div>
-        </form>
-        </div>
+                <script>
+                    const produtos = <%- JSON.stringify(produtos) %>;
+                </script>
 
-        <%- include('../../partials/footer.ejs') %>
+                <script>
 
-            <script>
-                const produtos = <%- JSON.stringify(produtos) %>;
-            </script>
+                    document.addEventListener('DOMContentLoaded', () => {
+                        const barcodeInput = document.getElementById('codigo-input');
+                        const addItemBtn = document.getElementById('add-item-btn');
+                        const itemsContainer = document.getElementById('itens-venda-container');
+                        const resumoPrecos = document.getElementById('resumo-precos');
+                        const inputTotal = document.getElementById('valor_total_input');
+                        const spanTotal = document.getElementById('valor_total');
+                        const form = document.querySelector('form[action="/admin/vendas/save"]');
+                        let itemIndex = 0;
 
-            <script>
+                        barcodeInput.focus();
 
-                document.addEventListener('DOMContentLoaded', () => {
-                    const barcodeInput = document.getElementById('codigo-input');
-                    const addItemBtn = document.getElementById('add-item-btn');
-                    const itemsContainer = document.getElementById('itens-venda-container');
-                    const resumoPrecos = document.getElementById('resumo-precos');
-                    const inputTotal = document.getElementById('valor_total_input');
-                    const spanTotal = document.getElementById('valor_total');
-                    const form = document.querySelector('form[action="/admin/vendas/save"]');
-                    let itemIndex = 0;
-
-                    barcodeInput.focus();
-
-                    barcodeInput.addEventListener('keypress', function (e) {
-                        if (e.key === 'Enter') {
-                            e.preventDefault();
-                            const codigo = this.value.trim();
-                            if (codigo) {
-                                fetch(`/admin/vendas/produtos/codigobarras/${codigo}`)
-                                    .then(res => res.json())
-                                    .then(produto => {
-                                        if (produto && produto.id_produto) {
-                                            addProductRow(produto);
-                                        } else {
-                                            alert('Produto não encontrado!');
-                                        }
-                                    })
-                                    .catch(err => {
-                                        console.error('Erro ao buscar produto:', err);
-                                    });
-                                this.value = '';
+                        barcodeInput.addEventListener('keypress', function (e) {
+                            if (e.key === 'Enter') {
+                                e.preventDefault();
+                                const codigo = this.value.trim();
+                                if (codigo) {
+                                    fetch(`/admin/vendas/produtos/codigobarras/${codigo}`)
+                                        .then(res => res.json())
+                                        .then(produto => {
+                                            if (produto && produto.id_produto) {
+                                                addProductRow(produto);
+                                            } else {
+                                                alert('Produto não encontrado!');
+                                            }
+                                        })
+                                        .catch(err => {
+                                            console.error('Erro ao buscar produto:', err);
+                                        });
+                                    this.value = '';
+                                }
                             }
-                        }
-                    });
-
-                    addItemBtn.addEventListener('click', () => {
-                        addProductRow(null);
-                    });
-
-                    form.addEventListener('submit', () => {
-                        inputTotal.value = spanTotal.textContent;
-                    });
-
-                    itemsContainer.addEventListener('click', (event) => {
-                        if (event.target.closest('.remove-item-btn')) {
-                            const row = event.target.closest('tr');
-                            if (row) row.remove();
-                            updateResumo();
-                        }
-                    });
-
-                    function addProductRow(produto) {
-                        const row = document.createElement('tr');
-                        row.classList.add('item-row');
-
-                        let selectHTML = '';
-                        produtos.forEach(p => {
-                            selectHTML += `<option value="${p.id_produto}" data-preco="${p.preco}">${p.nome}</option>`;
                         });
 
+                        addItemBtn.addEventListener('click', () => {
+                            addProductRow(null);
+                        });
 
-                        row.innerHTML = `
+                        form.addEventListener('submit', () => {
+                            inputTotal.value = spanTotal.textContent;
+                        });
+
+                        itemsContainer.addEventListener('click', (event) => {
+                            if (event.target.closest('.remove-item-btn')) {
+                                const row = event.target.closest('tr');
+                                if (row) row.remove();
+                                updateResumo();
+                            }
+                        });
+
+                        function addProductRow(produto) {
+                            const row = document.createElement('tr');
+                            row.classList.add('item-row');
+
+                            let selectHTML = '';
+                            produtos.forEach(p => {
+                                selectHTML += `<option value="${p.id_produto}" data-preco="${p.preco}">${p.nome}</option>`;
+                            });
+
+
+                            row.innerHTML = `
         <td>
           <select name="itens[${itemIndex}][id_produto]" class="form-select produto-select">
             ${selectHTML}
@@ -135,45 +138,48 @@
         </td>
       `;
 
-                        itemsContainer.appendChild(row);
+                            itemsContainer.appendChild(row);
 
-                        if (produto) {
-                            const select = row.querySelector('.produto-select');
-                            const option = [...select.options].find(opt => opt.value == produto.id_produto);
-                            if (option) {
-                                option.selected = true;
+                            if (produto) {
+                                const select = row.querySelector('.produto-select');
+                                const option = [...select.options].find(opt => opt.value == produto.id_produto);
+                                if (option) {
+                                    option.selected = true;
+                                }
                             }
+
+                            itemIndex++;
+                            updateResumo();
                         }
 
-                        itemIndex++;
-                        updateResumo();
-                    }
+                        function updateResumo() {
+                            resumoPrecos.innerHTML = '';
+                            let total = 0;
 
-                    function updateResumo() {
-                        resumoPrecos.innerHTML = '';
-                        let total = 0;
+                            document.querySelectorAll('.item-row').forEach(row => {
+                                const select = row.querySelector('.produto-select');
+                                const input = row.querySelector('.quantidade-input');
+                                const preco = parseFloat(select.selectedOptions[0].dataset.preco || 0);
+                                const quantidade = parseInt(input.value || 0);
+                                const subtotal = preco * quantidade;
 
-                        document.querySelectorAll('.item-row').forEach(row => {
-                            const select = row.querySelector('.produto-select');
-                            const input = row.querySelector('.quantidade-input');
-                            const preco = parseFloat(select.selectedOptions[0].dataset.preco || 0);
-                            const quantidade = parseInt(input.value || 0);
-                            const subtotal = preco * quantidade;
+                                if (quantidade > 0) {
+                                    const li = document.createElement('li');
+                                    li.className = 'list-group-item d-flex justify-content-between align-items-center';
+                                    li.innerHTML = `${select.selectedOptions[0].text} x ${quantidade} <span>R$ ${subtotal.toFixed(2)}</span>`;
+                                    resumoPrecos.appendChild(li);
+                                    total += subtotal;
+                                }
+                            });
 
-                            if (quantidade > 0) {
-                                const li = document.createElement('li');
-                                li.className = 'list-group-item d-flex justify-content-between align-items-center';
-                                li.innerHTML = `${select.selectedOptions[0].text} x ${quantidade} <span>R$ ${subtotal.toFixed(2)}</span>`;
-                                resumoPrecos.appendChild(li);
-                                total += subtotal;
-                            }
-                        });
+                            spanTotal.textContent = total.toFixed(2);
+                        }
 
-                        spanTotal.textContent = total.toFixed(2);
-                    }
+                        itemsContainer.addEventListener('change', updateResumo);
+                        itemsContainer.addEventListener('input', updateResumo);
+                    });
 
-                    itemsContainer.addEventListener('change', updateResumo);
-                    itemsContainer.addEventListener('input', updateResumo);
-                });
+                </script>
+        </body>
 
-            </script>
+        </html>

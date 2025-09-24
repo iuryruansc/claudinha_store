@@ -12,6 +12,15 @@ const getAllPdvs = async () => {
     return pdv;
 };
 
+const getPdvsAtivos = async () => {
+    const pdvs = await Pdv.findAll({
+        where: {
+            status: 'ativo'
+        }
+    });
+    return pdvs;
+}
+
 const createPdv = async (clienteData) => {
     return await Pdv.create(clienteData);
 };
@@ -35,6 +44,7 @@ const deletePdv = async (id) => {
 module.exports = {
     findPdvById,
     getAllPdvs,
+    getPdvsAtivos,
     createPdv,
     updatePdv,
     deletePdv
