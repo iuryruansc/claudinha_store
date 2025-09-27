@@ -1,0 +1,78 @@
+<div class="modal fade" id="promocaoModal" tabindex="-1" aria-labelledby="descontoModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+
+      <div class="modal-header">
+        <h5 class="modal-title" id="descontoModalLabel">Novo Desconto</h5>
+      </div>
+
+      <div class="modal-body">
+        <form id="formDesconto" class="row g-3" method="POST" action="/admin/descontos/save">
+
+          <!-- Produto Selecionado -->
+          <div class="form-floating mb-3">
+            <input type="text" class="form-control" id="modalDescProdutoNome" placeholder="Produto Selecionado"
+              data-field="produtoNome" readonly disabled>
+            <label for="modalDescProdutoNome">Produto</label>
+          </div>
+          <input data-field="produtoId" type="hidden" id="modalDescProdutoId" name="id_produto">
+
+          <div class="form-floating mb-3">
+            <input type="number" step="0.01" class="form-control" id="produtoPreco" name="preco_produto"
+              data-field="produtoValor" placeholder="Valor do Produto" readonly disabled>
+            <label for="produtoPreco">Valor do Produto</label>
+          </div>
+
+          <!-- Tipo de Desconto -->
+          <div class="form-floating mb-3">
+            <select class="form-select" id="modalDescTipo" name="tipo" required>
+              <option value="">Selecione...</option>
+              <option value="porcentagem">Porcentagem</option>
+              <option value="valor_fixo">Valor Fixo</option>
+            </select>
+            <label for="modalDescTipo">Tipo</label>
+          </div>
+
+          <!-- Valor -->
+          <div class="form-floating mb-3">
+            <input type="number" class="form-control" id="modalDescValor" name="valor" placeholder="Valor" min="0"
+              step="0.01" required>
+            <label for="modalDescValor">Valor</label>
+          </div>
+
+          <!-- Data de Início -->
+          <div class="form-floating mb-3">
+            <input type="datetime-local" class="form-control" id="modalDescInicio" name="data_inicio" placeholder="Data de Início"
+              required>
+            <label for="modalDescInicio">Data de Início</label>
+          </div>
+
+          <!-- Data de Término -->
+          <div class="form-floating mb-3">
+            <input type="datetime-local" class="form-control" id="modalDescFim" name="data_fim" placeholder="Data de Término"
+              required>
+            <label for="modalDescFim">Data de Término</label>
+          </div>
+
+          <!-- Observação -->
+          <div class="form-floating mb-3">
+            <textarea class="form-control" placeholder="Observação" id="modalDescObservacao" name="observacao"
+              style="height: 100px"></textarea>
+            <label for="modalDescObservacao">Observação</label>
+          </div>
+
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+              Cancelar
+            </button>
+            <button type="submit" id="btnSubmitDesconto" class="btn btn-primary">
+              Salvar
+            </button>
+          </div>
+
+        </form>
+      </div>
+
+    </div>
+  </div>
+</div>

@@ -2,6 +2,7 @@ require('dotenv').config();
 
 //Imports
 const express = require('express');
+const path = require('path');
 const app = express();
 const session = require('express-session');
 const https = require('https')
@@ -10,14 +11,18 @@ const helmet = require('helmet');
 const connection = require('./database/database');
 const syncDatabase = require('./utils/data/data-sync');
 
+
 //Utils
 const navLinks = require('./utils/navigation/nav-links');
 const errorHandler = require('./utils/handlers/error-handler');
-const tokenCleanUp = require('./utils/clean-tokens')
+const sendSuccess = require('./utils/handlers/success-handler');
+const tokenCleanUp = require('./utils/clean-tokens');
+const promoCleanUp = require('./utils/clean-promos');
 
 //Routers
 const adminRouter = require('./routes/adminRoutes');
 const loginRouter = require('./routes/loginRoutes');
+const startPromoCleanup = require('./utils/clean-promos');
 
 //Configuration
 const port = process.env.PORT || 3000;
@@ -61,18 +66,37 @@ app.use(session({
   saveUninitialized: true,
   cookie: {
     secure: 'auto',
-    maxAge: 1000 * 60 * 60 *10
+    maxAge: 1000 * 60 * 60 * 10
   }
 }));
 
+app.use(
+  '/vendor/bootstrap',
+  express.static(path.join(__dirname, 'node_modules', 'bootstrap', 'dist'))
+);
+
 app.use(express.static('public'));
 app.use(express.urlencoded({ extended: true }));
+
+const errorMessages = {
+  caixa: 'Atenção: Você precisa abrir um caixa antes de gerar uma venda.',
+};
+
+app.use((req, res, next) => {
+  const code = req.query.erro;
+  res.locals.erro = errorMessages[code] || '';
+  next();
+});
+
 app.use(express.json());
 
 app.use((req, res, next) => {
   res.locals.navLinks = navLinks;
   next();
 });
+
+//Success Handling middleware
+app.use(sendSuccess);
 
 //Main Routes
 app.use('/admin', adminRouter);
@@ -83,6 +107,9 @@ app.use(errorHandler);
 
 //Cleaning Unused Tokens
 tokenCleanUp();
+
+//Cleaning Promos
+startPromoCleanup();
 
 //Server Listen
 https.createServer(options, app).listen(port, () => {

@@ -1,0 +1,31 @@
+<script type="module">
+    import { showErrorPopup } from '/js/show-error-popup.js';
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const code = "<%= erro || '' %>";
+        const messages = {
+            caixa: 'Atenção: Você precisa abrir um caixa antes de gerar uma venda.',
+        };
+        const msg = messages[code];
+        if (msg) {
+            showErrorPopup(msg);
+            window.history.replaceState({}, document.title, window.location.pathname);
+        }
+
+        const logoutForm = document.querySelector('#logoutForm');
+        if (logoutForm) {
+            logoutForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const res = await fetch('/logout', { method: 'POST' });
+                const ct = res.headers.get('content-type') || '';
+
+                if (res.status === 403 && ct.includes('application/json')) {
+                    const data = await res.json();
+                    showErrorPopup(data.error.message, data.error.details);
+                } else {
+                    window.location.href = res.url;
+                }
+            });
+        }
+    });
+</script>

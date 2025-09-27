@@ -5,19 +5,29 @@ const MovimentacaoEstoque = require('../../models/movimentacaoEstoque');
 
 const getAllMovs = async () => {
     const movsPromise = MovimentacaoEstoque.findAll({
-        include: [{ model: Lote }]
+        include: [
+            {
+                model: Lote,
+                as: 'lote',
+                include: [
+                    {
+                        model: Produto,
+                        as: 'produto'  
+                    }
+                ]
+            }
+        ],
+        order: [['data_hora', 'DESC']]
     });
 
     const funcionariosPromise = Funcionario.findAll();
-    const produtosPromise = Produto.findAll();
 
     const [movs, funcionarios, produtos] = await Promise.all([
         movsPromise,
         funcionariosPromise,
-        produtosPromise
     ]);
 
-    return { movs, funcionarios, produtos };
+    return { movs, funcionarios };
 };
 
 const getRecentActivity = async () => {

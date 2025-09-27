@@ -4,7 +4,7 @@ const asyncHandler = require('../../utils/handlers/async-handler');
 const formatDate = require('../../utils/data/date-formatter');
 const { stringValidation, numberValidation, dateValidation } = require('../../utils/data/data-validation');
 const { parseIntValue, parseDateValue } = require('../../utils/data/data-parsers');
-const { getAllLotes, getEditData, getViewDependencies, createLote, updateLote, deleteLote, adicionarQuantidadeAoLote } = require('../../services/admin/lotesService');
+const { getAllLotes, getEditData, getViewDependencies, updateLote, deleteLote, adicionarQuantidadeAoLote, createLoteWithMovimentacao } = require('../../services/admin/lotesService');
 
 router.get('/lotes/new', asyncHandler(async (req, res) => {
     const produtos = await getViewDependencies();
@@ -29,22 +29,26 @@ router.get('/lotes/edit/:id_lote', asyncHandler(async (req, res) => {
 
 router.post('/lotes/save', asyncHandler(async (req, res) => {
     const { localizacao } = req.body;
-    const [parsedId, parsedNumLote, parsedQuant] = parseIntValue(req.body.id_produto, req.body.numero_lote, req.body.quantidade);
+    const [parsedId, parsedNumLote, parsedQuant, parsedPreco] = parseIntValue(req.body.id_produto, req.body.numero_lote, req.body.quantidade, req.body.preco_produto);
     const parsedValidade = parseDateValue(req.body.data_validade);
+    const isAdmin = req.session.cargo === 'admin';
 
-    numberValidation(parsedId, parsedQuant, parsedNumLote);
+    const id_funcionario = isAdmin ? 1 : req.session.userId;
+
+    numberValidation(parsedId, parsedQuant, parsedNumLote, parsedPreco);
     stringValidation(localizacao);
     dateValidation(parsedValidade);
 
-    await createLote({
+    await createLoteWithMovimentacao({
         id_produto: parsedId,
-        quantidade: parsedQuant,
-        localizacao,
+        preco_produto: parsedPreco,
         numero_lote: parsedNumLote,
-        data_validade: parsedValidade
-    });
+        quantidade: parsedQuant,
+        data_validade: parsedValidade,
+        localizacao
+    }, id_funcionario);
 
-    res.redirect('/admin/dashboard');
+    res.sendSuccess('Produto adicionado ao estoque.');
 }));
 
 router.post('/lotes/delete/:id_lote', asyncHandler(async (req, res) => {

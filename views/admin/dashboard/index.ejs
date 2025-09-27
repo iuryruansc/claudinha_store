@@ -2,122 +2,127 @@
     <%- include('../../partials/navbar.ejs') %>
 
         <body>
-            <main class="main-content">
+            <main id="appMain" class="main-content">
                 <div class="container">
                     <h2 class="mb-4">
                         <i class="bi bi-bar-chart-line"></i> Resumo de Operações
                     </h2>
-                    <% if (erro==='caixa' ) { %>
-                        <div class="alert alert-warning alert-dismissible fade show" role="alert">
-                            <strong>⚠️ Atenção:</strong> Você precisa abrir um caixa antes de acessar Vendas.
-                            <button type="button" class="btn-close" data-bs-dismiss="alert"
-                                aria-label="Fechar"></button>
-                        </div>
-                        <% } %>
+                    <div id="error-popup-container"></div>
+                    <div class="row g-4">
+                        <!-- NOVO CAIXA -->
+                        <div class="col-md-4">
+                            <div class="card bg-light h-100 shadow">
+                                <div class="card-body">
 
-                            <div class="row g-4">
-                                <!-- NOVO CAIXA -->
-                                <div class="col-md-4">
-                                    <div class="card bg-light h-100 shadow">
-                                        <div class="card-body">
+                                    <% if (!caixa) { %>
+                                        <!-- Sem caixa ativo: formulário de abertura -->
+                                        <h5 class="card-title btn-checkout-text">
+                                            <i class="bi-cash-stack me-2"></i>Abrir Caixa
+                                        </h5>
+                                        <p class="card-text">Selecione o PDV e informe o saldo inicial.</p>
+                                        <form action="/admin/caixa/abrir" method="POST"
+                                            class="d-flex flex-column gap-2">
+                                            <select name="id_pdv" class="form-select form-select-sm" required>
+                                                <option value="" disabled selected>Escolha o PDV</option>
+                                                <% pdvs.forEach(pdv=> { %>
+                                                    <option value="<%= pdv.id_pdv %>">
+                                                        <%= pdv.descricao %>
+                                                    </option>
+                                                    <% }) %>
+                                            </select>
+                                            <input type="number" step="0.01" name="saldo_inicial"
+                                                class="form-control form-control-sm" placeholder="Saldo inicial"
+                                                required />
+                                            <button type="submit" class="btn btn-checkout text-white btn-sm">
+                                                Abrir Caixa
+                                            </button>
+                                        </form>
 
-                                            <% if (!caixa) { %>
-                                                <!-- Sem caixa ativo: formulário de abertura -->
-                                                <h5 class="card-title btn-checkout-text">
-                                                    <i class="bi-cash-stack me-2"></i>Abrir Caixa
-                                                </h5>
-                                                <p class="card-text">Selecione o PDV e informe o saldo inicial.</p>
-                                                <form action="/admin/caixa/abrir" method="POST"
-                                                    class="d-flex flex-column gap-2">
-                                                    <select name="id_pdv" class="form-select form-select-sm" required>
-                                                        <option value="" disabled selected>Escolha o PDV</option>
-                                                        <% pdvs.forEach(pdv=> { %>
-                                                            <option value="<%= pdv.id_pdv %>">
-                                                                <%= pdv.descricao %>
-                                                            </option>
-                                                            <% }) %>
-                                                    </select>
-                                                    <input type="number" step="0.01" name="saldo_inicial"
-                                                        class="form-control form-control-sm" placeholder="Saldo inicial"
-                                                        required />
-                                                    <button type="submit" class="btn btn-checkout text-white btn-sm">
-                                                        Abrir Caixa
-                                                    </button>
-                                                </form>
-
-                                                <% } else { %>
-                                                    <!-- Caixa ativo: formulário de fechamento -->
-                                                    <h5 class="card-title darker-red-text">
-                                                        <i class="bi-lock-fill me-2"></i>Fechar Caixa
-                                                    </h5>
-                                                    <p class="card-text">
-                                                        Caixa aberto em <%= formatDate(caixa.data_abertura ||
-                                                            caixa.createdAt) %>
-                                                            (Saldo inicial: R$ <%=
-                                                                parseFloat(caixa.saldo_inicial).toFixed(2) %>)
-                                                    </p>
-                                                    <form action="/admin/caixa/fechar" method="POST"
-                                                        class="d-flex flex-column gap-2">
-                                                        <input type="number" step="0.01" name="saldo_final"
-                                                            class="form-control form-control-sm"
-                                                            placeholder="Saldo final" required />
-                                                        <button type="submit" class="btn btn-danger btn-sm">
-                                                            Fechar Caixa
-                                                        </button>
-                                                    </form>
-                                                    <% } %>
-
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- NOVO LOTE -->
-                                <div class="col-md-4">
-                                    <div class="card bg-light h-100 shadow">
-                                        <div class="card-body">
-
-                                            <h5 class="card-title btn-checkout-text">
-                                                <i class="bi bi-box-arrow-in-down me-2"></i>Entrada de Produto
+                                        <% } else { %>
+                                            <!-- Caixa ativo: formulário de fechamento -->
+                                            <h5 class="card-title darker-red-text">
+                                                <i class="bi-lock-fill me-2"></i>Fechar Caixa
                                             </h5>
                                             <p class="card-text">
-                                                Escaneie ou digite o código de barras para iniciar a entrada
+                                                Caixa aberto em <%= formatDate(caixa.data_abertura || caixa.createdAt)
+                                                    %>
+                                                    (Saldo inicial: R$ <%= parseFloat(caixa.saldo_inicial).toFixed(2) %>
+                                                        )
                                             </p>
-
-                                            <form id="formIniciarEntrada">
-                                                <div class="mb-3">
-                                                    <input type="text" name="codigo_barras" id="cardCodigoBarra"
-                                                        class="form-control form-control-sm"
-                                                        placeholder="Código de Barras" autocomplete="off" required>
-                                                </div>
-
-                                                <button type="button" id="btnIniciarEntrada"
-                                                    class="btn btn-checkout text-white btn-sm w-100">
-                                                    Iniciar Entrada
+                                            <form action="/admin/caixa/fechar" method="POST"
+                                                class="d-flex flex-column gap-2">
+                                                <input type="number" step="0.01" name="saldo_final"
+                                                    class="form-control form-control-sm" placeholder="Saldo final"
+                                                    required />
+                                                <button type="submit" class="btn btn-danger btn-sm">
+                                                    Fechar Caixa
                                                 </button>
                                             </form>
+                                            <% } %>
 
-                                        </div>
-                                    </div>
                                 </div>
-
-                                <!-- ADICIONAR LINK PARA TODOS OS PAGAMENTOS -->
-                                <div class="col-md-4">
-                                    <div class="card bg-light h-100 shadow">
-                                        <div class="card-body">
-                                            <h5 class="card-title darker-purple-text">
-                                                <i class="bi bi-clock me-2"></i> Pagamentos Pendentes
-                                            </h5>
-                                            <p class="card-text">Existe(m) venda(s) com pagamentos pendentes.</p>
-                                            <button class="btn btn-sm darker-purple text-white">Ver Pagamentos</button>
-                                        </div>
-                                    </div>
-                                </div>
-
                             </div>
+                        </div>
+
+                        <!-- NOVO LOTE -->
+                        <div class="col-md-4">
+                            <div class="card bg-light h-100 shadow">
+                                <div class="card-body">
+
+                                    <h5 class="card-title btn-checkout-text">
+                                        <i class="bi bi-box-arrow-in-down me-2"></i>Entrada de Produto
+                                    </h5>
+                                    <p class="card-text">
+                                        Escaneie ou digite o código de barras para iniciar a entrada.
+                                    </p>
+
+                                    <form id="formIniciarEntrada">
+                                        <div class="mb-3">
+                                            <input type="text" name="codigo_barras" id="cardCodigoBarra"
+                                                class="form-control form-control-sm" placeholder="Código de Barras"
+                                                autocomplete="off" required>
+                                        </div>
+
+                                        <button type="button" id="btnIniciarEntrada"
+                                            class="btn btn-checkout text-white btn-sm w-100">
+                                            Iniciar Entrada
+                                        </button>
+                                    </form>
+
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- NOVA PROMOÇÃO -->
+                        <div class="col-md-4">
+                            <div class="card bg-light h-100 shadow">
+                                <div class="card-body">
+                                    <h5 class="card-title text-success">
+                                        <i class="bi bi-tag-fill me-2"></i>Cadastrar Promoção
+                                    </h5>
+                                    <p class="card-text">
+                                        Escaneie ou digite o código de barras do produto.
+                                    </p>
+                                    <form id="formIniciarPromocao">
+                                        <div class="mb-3">
+                                            <input type="text" name="codigo_barras_promo" id="promocaoCodigoBarra"
+                                                class="form-control form-control-sm" placeholder="Código de Barras"
+                                                autocomplete="off" required />
+                                        </div>
+                                        <button type="button" id="btnIniciarPromocao"
+                                            class="btn bg-success text-white btn-sm w-100">
+                                            Cadastrar Promoção
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="container mt-5">
                     <div class="row">
+                        <!-- ACTIVITY FEED-->
                         <div class="col-lg-6 mb-4">
                             <div class="card shadow">
                                 <div class="card-header softer-blue text-white">
@@ -161,54 +166,57 @@
                             </div>
                         </div>
 
+                        <!-- PROMOÇÕES -->
                         <div class="col-lg-6 mb-4">
                             <div class="card shadow">
                                 <div class="card-header bg-success text-white">
                                     <i class="bi bi-tag me-2"></i> Produtos em Promoção
                                 </div>
-                                <div class="card-body">
-                                    <ul class="list-group list-group-flush">
-                                        <!-- Example static items; replace with dynamic EJS later -->
-                                        <li class="list-group-item d-flex justify-content-between align-items-center">
-                                            Produto D
-                                            <span>
-                                                <del class="text-muted">R$25.00</del>
-                                                <span class="badge bg-light text-success ms-2">R$18.00</span>
-                                            </span>
-                                        </li>
-                                        <li class="list-group-item d-flex justify-content-between align-items-center">
-                                            Produto A
-                                            <span>
-                                                <del class="text-muted">R$60.00</del>
-                                                <span class="badge bg-light text-success ms-2">R$45.00</span>
-                                            </span>
-                                        </li>
-                                        <li class="list-group-item d-flex justify-content-between align-items-center">
-                                            Produto C
-                                            <span>
-                                                <del class="text-muted">R$40.00</del>
-                                                <span class="badge bg-light text-success ms-2">R$32.00</span>
-                                            </span>
-                                        </li>
-                                        <li class="list-group-item d-flex justify-content-between align-items-center">
-                                            Produto F
-                                            <span>
-                                                <del class="text-muted">R$10.00</del>
-                                                <span class="badge bg-light text-success ms-2">R$7.50</span>
-                                            </span>
-                                        </li>
-                                        <li class="list-group-item d-flex justify-content-between align-items-center">
-                                            Produto G
-                                            <span>
-                                                <del class="text-muted">R$15.00</del>
-                                                <span class="badge bg-light text-success ms-2">R$11.00</span>
-                                            </span>
-                                        </li>
-                                    </ul>
+                                <div class="row g-4">
+                                    <% if (promoList.length) { %>
+                                        <% promoList.forEach((promo, idx)=> { %>
+                                            <div
+                                                class="col-12 col-sm-6 col-lg-4 mb-4 <%= idx % 2 === 0 ? 'promo-odd' : 'promo-even' %>">
+                                                <div
+                                                    class="promo-card position-relative overflow-hidden h-100 d-flex flex-column shadow-sm">
+                                                    <div class="ribbon bg-danger text-white">
+                                                        -<%= Math.round(((promo.precoOriginal - promo.precoPromocional)
+                                                            / promo.precoOriginal) * 100) %>%
+                                                    </div>
+
+                                                    <div class="card-body d-flex flex-column">
+                                                        <h5 class="card-title mb-2">
+                                                            <%= promo.nome %>
+                                                        </h5>
+
+                                                        <div class="mb-3">
+                                                            <span class="text-muted text-decoration-line-through me-2">
+                                                                R$<%= promo.precoOriginal %>
+                                                            </span>
+                                                            <span class="h5 text-success mb-0">
+                                                                R$<%= promo.precoPromocional %>
+                                                            </span>
+                                                        </div>
+
+                                                        <div class="progress mb-1">
+                                                            <div class="progress-bar promo-bar" role="progressbar"
+                                                                data-inicio="<%= promo.dataInicio %>"
+                                                                data-fim="<%= promo.dataFim %>"></div>
+                                                        </div>
+                                                        <div class="promo-remaining text-end small"></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <% }) %>
+                                                <% } else { %>
+                                                    <p class="text-center">Nenhuma promoção ativa no momento.</p>
+                                                    <% } %>
                                 </div>
+
                             </div>
                         </div>
 
+                        <!-- SNAPSHOT ESTOQUE -->
                         <div class="col-lg-6 mb-4">
                             <div class="card shadow">
                                 <div class="card-header bg-warning text-dark">
@@ -254,6 +262,7 @@
                             </div>
                         </div>
 
+                        <!-- PAGAMENTOS -->
                         <div class="col-lg-6 mb-4">
                             <div class="card shadow">
                                 <div class="card-header bg-danger text-white">
@@ -281,83 +290,125 @@
                                 </div>
                             </div>
                         </div>
-
+                    </div>
             </main>
-            <%- include('../../partials/entradaProdutoModal.ejs') %>
 
-                <%- include('../../partials/footer.ejs') %>
 
-                    <script type="module">
-                        import { setupMultiFieldNew } from '/js/multi-field-new.js';
+            <%- include('../../partials/footer.ejs') %>
 
-                        document.addEventListener('DOMContentLoaded', function () {
-                            const btnIniciar = document.getElementById('btnIniciarEntrada');
-                            const inputBarcode = document.getElementById('cardCodigoBarra');
-                            const bootstrapModal = new bootstrap.Modal(
-                                document.getElementById('entradaProdutoModal')
-                            );
+                <%- include('../../partials/entrada-produto-modal.ejs') %>
+                    <%- include('../../partials/promocao-modal.ejs') %>
 
-                            btnIniciar.addEventListener('click', async () => {
-                                const codigo = inputBarcode.value.trim();
-                                if (!codigo) {
-                                    return alert('Informe um código de barras');
-                                }
+                        <script type="module">
+                            import { setupMultiFieldNew } from '/js/multi-field-new.js';
+                            import { showErrorPopup } from '/js/show-error-popup.js';
+                            import { initEntradaProduto } from "/js//entrada-produto.js";
 
-                                try {
-                                    const res = await fetch(
-                                        `/admin/dashboard/entrada/iniciar?codigo_barras=${encodeURIComponent(codigo)}`
-                                    );
-                                    if (!res.ok) {
-                                        const err = await res.json();
-                                        throw new Error(err.error || 'Produto não encontrado');
+                            document.addEventListener('DOMContentLoaded', function () {
+                                const entradaModal = document.getElementById('entradaProdutoModal');
+                                const entradaForm = document.getElementById('formEntradaProduto');
+                                const promocaoModal = document.getElementById('promocaoModal');
+                                const promocaoForm = document.getElementById('formDesconto');
+
+                                // Entrada de Produto
+                                initEntradaProduto({
+                                    btnSelector: "#btnIniciarEntrada",
+                                    inputSelector: "#cardCodigoBarra",
+                                    modalSelector: "#entradaProdutoModal",
+                                    endpoint: "/admin/dashboard/entrada/iniciar",
+                                    onError: showErrorPopup
+                                });
+
+                                setupMultiFieldNew({
+                                    formSelector: '#formEntradaProduto',
+                                    inputFields: [
+                                        '#modalProdutoId',
+                                        '#numeroLote',
+                                        '#produtoPreco',
+                                        '#quantidade',
+                                        '#dataValidade',
+                                        '#localizacao'
+                                    ],
+                                    selectFields: [],
+                                    requiredFields: [
+                                        'id_produto',
+                                        'numero_lote',
+                                        'preco_produto',
+                                        'quantidade',
+                                        'data_validade',
+                                        'localizacao'
+                                    ],
+                                    redirectUrl: '/admin/dashboard',
+                                    fieldMap: {
+                                        id_produto: '#modalProdutoId',
+                                        preco_produto: '#produtoPreco',
+                                        numero_lote: '#numeroLote',
+                                        quantidade: '#quantidade',
+                                        data_validade: '#dataValidade',
+                                        localizacao: '#localizacao'
+                                    },
+                                    errorMessages: {
+                                        network: 'Erro de rede ao criar lote.'
+                                    },
+                                })
+
+                                entradaModal.addEventListener('hidden.bs.modal', () => {
+                                    entradaForm.reset();
+                                });
+
+                                // Entrada de Promoção
+                                initEntradaProduto({
+                                    btnSelector: '#btnIniciarPromocao',
+                                    inputSelector: '#promocaoCodigoBarra',
+                                    modalSelector: '#promocaoModal',
+                                    endpoint: '/admin/dashboard/entrada/iniciar',
+                                    onError: showErrorPopup
+                                });
+
+                                setupMultiFieldNew({
+                                    formSelector: '#formDesconto',
+                                    inputFields: [
+                                        '#modalDescProdutoId',
+                                        '#modalDescValor',
+                                        '#modalDescInicio',
+                                        '#modalDescFim',
+                                        '#modalDescObservacao'
+                                    ],
+                                    selectFields: [
+                                        '#modalDescTipo'
+                                    ],
+                                    requiredFields: [
+                                        'id_produto',
+                                        'tipo',
+                                        'valor',
+                                        'data_inicio',
+                                        'data_fim'
+                                    ],
+
+                                    redirectUrl: '/admin/dashboard',
+                                    fieldMap: {
+                                        id_produto: '#modalDescProdutoId',
+                                        tipo: '#modalDescTipo',
+                                        valor: '#modalDescValor',
+                                        data_inicio: '#modalDescInicio',
+                                        data_fim: '#modalDescFim',
+                                        observacao: '#modalDescObservacao'
+                                    },
+                                    errorMessages: {
+                                        network: 'Erro de rede ao criar desconto.'
                                     }
+                                });
 
-                                    const { id_produto, nome } = await res.json();
+                                promocaoModal.addEventListener('hidden.bs.modal', () => {
+                                    promocaoForm.reset();
+                                })
 
-                                    document.getElementById('modalProdutoId').value = id_produto;
-                                    document.getElementById('modalProdutoNome').value = nome;
+                                document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(el => {
+                                    new bootstrap.Tooltip(el);
+                                });
 
-                                    inputBarcode.value = '';
-                                    bootstrapModal.show();
-
-                                } catch (error) {
-                                    alert(error.message);
-                                }
                             });
-
-                            setupMultiFieldNew({
-                                formSelector: '#formEntradaProduto',
-                                inputFields: [
-                                    '#numeroLote',
-                                    '#quantidade',
-                                    '#dataValidade',
-                                    '#localizacao'
-                                ],
-                                selectFields: [],
-                                requiredFields: [
-                                    'id_produto',
-                                    'numero_lote',
-                                    'quantidade',
-                                    'data_validade',
-                                    'localizacao'
-                                ],
-                                fieldMap: {
-                                    id_produto: '#modalProdutoId',
-                                    numero_lote: '#numeroLote',
-                                    quantidade: '#quantidade',
-                                    data_validade: '#dataValidade',
-                                    localizacao: '#localizacao'
-                                },
-                                errorMessages: {
-                                    network: 'Erro de rede ao criar lote.'
-                                },
-                            })
-
-                            document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(el => {
-                                new bootstrap.Tooltip(el);
-                            });
-                        });
-                    </script>
+                        </script>
         </body>
 
         </html>

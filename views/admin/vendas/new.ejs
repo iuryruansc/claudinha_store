@@ -3,183 +3,510 @@
 
         <body>
             <main class="main-content">
-                <div class="container mt-4">
-
-                    <form method="POST" action="/admin/vendas/save">
-                        <div class="row">
-                            <!-- 🧾 Left Column: Sale Items -->
-                            <div class="col-md-7 border rounded p-3 bg-light">
-                                <h4>Itens da Venda</h4>
-                                <table class="table">
-                                    <thead>
-                                        <tr>
-                                            <th>Produto</th>
-                                            <th>Quantidade</th>
-                                            <th></th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="itens-venda-container">
-
-                                    </tbody>
-                                </table>
-                                <input type="hidden" name="itens" id="itens" value="" />
-                                <button type="button" id="add-item-btn" class="btn btn-outline-primary">
-                                    <i class="bi bi-plus-circle"></i> Adicionar Produto
-                                </button>
-                            </div>
-
-                            <!-- 💰 Right Column: Price Summary -->
-                            <div class="col-md-5 border rounded p-3 bg-light">
-                                <h4>Resumo de Preços</h4>
-                                <ul class="list-group mb-3" id="resumo-precos"></ul>
-                                <div class="card">
+                <div class="container mb-2">
+                    <form id="venda-form" method="POST" action="/admin/vendas/save">
+                        <div class="row g-3">
+                            <!-- 🧾 Itens da Venda -->
+                            <div class="col-12 col-lg-7">
+                                <div class="card shadow-sm">
+                                    <div class="card-header bg-light border-bottom">
+                                        <h4 class="fs-5 mb-0 fw-semibold">🧾 Itens da Venda</h4>
+                                    </div>
                                     <div class="card-body">
-                                        <h5>Total: R$ <span id="valor_total">0.00</span></h5>
-                                        <input type="hidden" name="valor_total" id="valor_total_input" value="0.00" />
+
+                                        <div id="itens-venda-placeholder" class="text-center text-muted py-4">
+                                            <p class="mb-1"><i class="bi bi-cart-x" style="font-size: 2rem;"></i></p>
+                                            <p class="mb-0">Nenhum produto adicionado.</p>
+                                            <small>Use o leitor de código de barras ou adicione manualmente.</small>
+                                        </div>
+
+                                        <div id="tabela-itens-wrapper" class="table-responsive" style="display: none;">
+                                            <table class="table table-sm table-striped table-hover align-middle mb-3">
+                                                <thead class="table-light">
+                                                    <tr>
+                                                        <th>Produto</th>
+                                                        <th style="width: 120px;">Quantidade</th>
+                                                        <th style="width: 130px;">Preço Un.</th>
+                                                        <th style="width: 50px;" class="text-end">Ação</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody id="itens-venda-container">
+                                                </tbody>
+                                            </table>
+                                        </div>
+
+                                        <button type="button" id="add-item-btn"
+                                            class="btn btn-outline-secondary btn-sm">
+                                            <i class="bi bi-plus-circle"></i> Adicionar Produto Manualmente
+                                        </button>
                                     </div>
                                 </div>
                             </div>
-                        </div>
 
-                        <div class="mt-4">
-                            <input type="text" id="codigo-input" class="form-control" autocomplete="off"
-                                placeholder="Leia o código de barras aqui...">
-                        </div><br>
+                            <!-- 💰 Resumo de Preços -->
+                            <div class="col-12 col-lg-5 d-flex flex-column gap-4">
+                                <div class="card shadow-sm">
 
-                        <button class="btn btn-success">
-                            <i class="bi bi-check-circle"></i> Cadastrar Venda
-                        </button>
-                </div>
-                </form>
+                                    <div class="card-header bg-light border-bottom">
+                                        <h4 class="fs-5 mb-0 fw-semibold">💰 Resumo de Preços</h4>
+                                    </div>
+
+                                    <div class="card-body">
+                                        <div id="lista-itens-resumo" class="mb-3">
+                                        </div>
+
+                                        <ul class="list-group list-group-flush mb-3">
+                                            <li class="list-group-item d-flex justify-content-between px-0">
+                                                <span>Sub-total</span>
+                                                <strong id="resumo-subtotal-valor">R$ 0,00</strong>
+                                            </li>
+                                            <li id="resumo-desconto-linha"
+                                                class="list-group-item d-flex justify-content-between text-danger px-0 d-none">
+                                                <span>Desconto</span>
+                                                <strong id="resumo-desconto-valor">- R$ 0,00</strong>
+                                            </li>
+                                        </ul>
+
+                                        <div id="global-discount-row">
+                                            <label class="form-label small text-muted">Aplicar desconto na venda</label>
+                                            <div class="input-group input-group-sm">
+                                                <select id="global-discount-type" class="form-select"
+                                                    style="max-width: 80px;">
+                                                    <option value="none" selected>Sem</option>
+                                                    <option value="porcentagem">%</option>
+                                                    <option value="valor_fixo">R$</option>
+                                                </select>
+                                                <input id="global-discount-value" type="number" class="form-control"
+                                                    placeholder="0" min="0" step="0.01" />
+                                            </div>
+                                        </div>
+
+                                    </div>
+
+                                    <div class="card-footer bg-white">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <h5 class="fs-6 text-secondary mb-0">Total a Pagar</h5>
+                                            <h4 class="fs-3 mb-0 text-success fw-bold">R$
+                                                <span id="valor_total">0.00</span>
+                                            </h4>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Cadastro de Produto via Código -->
+                            <div class="row mb-4">
+                                <div class="col-12">
+                                    <label for="codigo-input" class="form-label fw-semibold">Leitor de Código de
+                                        Barras</label>
+                                    <div class="input-group input-group-lg">
+                                        <span class="input-group-text" id="barcode-addon"><i
+                                                class="bi bi-upc-scan"></i></span>
+                                        <input type="text" id="codigo-input" class="form-control"
+                                            placeholder="Passe o leitor ou digite o código e pressione Enter"
+                                            autocomplete="off" aria-label="Código de Barras"
+                                            aria-describedby="barcode-addon" />
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Informações de Pagamento -->
+                            <div class="card mb-4">
+                                <div class="card-header">
+                                    <h4 class="fs-5 mb-2">Informações de Pagamento</h4>
+                                </div>
+                                <div class="card-body">
+                                    <div id="pagamentos-container">
+                                    </div>
+                                    <button type="button" id="add-pagamento-btn"
+                                        class="btn btn-outline-info btn-sm w-auto mb-3">
+                                        <i class="bi bi-currency-dollar"></i> Adicionar Pagamento
+                                    </button>
+                                </div>
+
+                                <div class="card-footer bg-white border-top pt-3"></div>
+
+                                <div class="card-footer bg-transparent">
+                                    <div class="d-flex justify-content-between mb-2">
+                                        <h5 class="fs-6 text-secondary">Total Pago</h5>
+                                        <h4 class="fs-5">R$ <span id="total-pago">0.00</span></h4>
+                                    </div>
+                                    <div class="d-flex justify-content-between mb-2" id="restante-row">
+                                        <h5 class="fs-6 text-secondary">Valor Restante</h5>
+                                        <h4 class="fs-5">R$ <span id="valor-restante">0.00</span></h4>
+                                    </div>
+                                    <div class="d-flex justify-content-between text-success d-none" id="troco-row">
+                                        <h5 class="fs-6 text-secondary">Troco</h5>
+                                        <h4 class="fs-5">R$ <span id="troco">0.00</span></h4>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Botão de Gerar Venda -->
+                            <div class="d-grid mt-4">
+                                <button type="submit" id="finalizar-venda-btn" class="btn btn-success btn-lg">
+                                </button>
+                            </div>
+                    </form>
                 </div>
             </main>
 
-            <%- include('../../partials/footer.ejs') %>
+            <%- include('../../partials/venda-modal.ejs') %>
+                <%- include('../../partials/footer.ejs') %>
 
-                <script>
-                    const produtos = <%- JSON.stringify(produtos) %>;
-                </script>
+                    <script>
+                        const produtos = <%- JSON.stringify(produtos) %>;
+                        const formasPagamento = <%- JSON.stringify(formasPagamento) %>;
+                    </script>
 
-                <script>
+                    <script>
+                        function showAlert(message, type = 'warning') {
+                            const container = document.querySelector('.container')
+                            const alertDiv = document.createElement('div')
+                            alertDiv.className = `alert alert-${type} alert-dismissible fade show`
+                            alertDiv.innerHTML = `
+      ${message}
+      <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `
+                            container.prepend(alertDiv)
+                            setTimeout(() => alertDiv.remove(), 5000)
+                        }
+                    </script>
 
-                    document.addEventListener('DOMContentLoaded', () => {
-                        const barcodeInput = document.getElementById('codigo-input');
-                        const addItemBtn = document.getElementById('add-item-btn');
-                        const itemsContainer = document.getElementById('itens-venda-container');
-                        const resumoPrecos = document.getElementById('resumo-precos');
-                        const inputTotal = document.getElementById('valor_total_input');
-                        const spanTotal = document.getElementById('valor_total');
-                        const form = document.querySelector('form[action="/admin/vendas/save"]');
-                        let itemIndex = 0;
+                    <script>
+                        document.addEventListener('DOMContentLoaded', () => {
+                            // MÓDULO DE ESTADO E SELETORES GLOBAIS
+                            const AppState = {
+                                itemIndex: 0,
+                                pagamentoIndex: 0,
+                                elementos: {
+                                    form: document.getElementById('venda-form'),
+                                    barcodeInput: document.getElementById('codigo-input'),
+                                    addItemBtn: document.getElementById('add-item-btn'),
+                                    itemsContainer: document.getElementById('itens-venda-container'),
+                                    pagamentosContainer: document.getElementById('pagamentos-container'),
+                                    addPagamentoBtn: document.getElementById('add-pagamento-btn'),
+                                    globalDiscountType: document.getElementById('global-discount-type'),
+                                    globalDiscountValue: document.getElementById('global-discount-value'),
+                                    // Seletores para atualização da UI
+                                    spanTotal: document.getElementById('valor_total'),
+                                    spanTotalPago: document.getElementById('total-pago'),
+                                    spanTroco: document.getElementById('troco'),
+                                    spanValorRestante: document.getElementById('valor-restante'),
+                                    restanteRow: document.getElementById('restante-row'),
+                                    trocoRow: document.getElementById('troco-row'),
+                                    finalizarBtn: document.getElementById('finalizar-venda-btn'),
+                                    // Modal de confirmação
+                                    finalizarVendaModal: new bootstrap.Modal(document.getElementById('finalizarVendaModal')),
+                                    btnConfirmarEnvio: document.getElementById('confirmar-envio-btn'),
+                                }
+                            };
 
-                        barcodeInput.focus();
+                            // MÓDULO DE ITENS DA VENDA
+                            const VendaItemsManager = {
+                                init() {
+                                    AppState.elementos.addItemBtn.addEventListener('click', () => this.addProductRow(null));
+                                    AppState.elementos.itemsContainer.addEventListener('click', (e) => this.handleItemActions(e));
+                                    AppState.elementos.itemsContainer.addEventListener('change', (e) => this.handleItemChange(e));
+                                    AppState.elementos.itemsContainer.addEventListener('input', () => UIManager.updateAll());
+                                    AppState.elementos.barcodeInput.addEventListener('keydown', (e) => this.handleBarcodeScan(e));
+                                },
 
-                        barcodeInput.addEventListener('keypress', function (e) {
-                            if (e.key === 'Enter') {
-                                e.preventDefault();
-                                const codigo = this.value.trim();
-                                if (codigo) {
-                                    fetch(`/admin/vendas/produtos/codigobarras/${codigo}`)
-                                        .then(res => res.json())
-                                        .then(produto => {
-                                            if (produto && produto.id_produto) {
-                                                addProductRow(produto);
-                                            } else {
-                                                alert('Produto não encontrado!');
-                                            }
-                                        })
-                                        .catch(err => {
-                                            console.error('Erro ao buscar produto:', err);
+                                addProductRow(produto, lote) {
+                                    const row = document.createElement('tr');
+                                    row.classList.add('item-row');
+                                    let options = produtos.map(p => `<option value="${p.id_produto}">${p.nome}</option>`).join('');
+
+                                    row.innerHTML = `
+                <td><select name="itens[${AppState.itemIndex}][id_produto]" class="form-select produto-select"><option value="">Selecione...</option>${options}</select></td>
+                <td><input type="number" name="itens[${AppState.itemIndex}][quantidade]" class="form-control quantidade-input" value="1" min="1"></td>
+                <td class="price-cell">R$ 0,00</td>
+                <td class="text-end"><i class="bi bi-trash icon-action remove-item-btn" title="Remover Item" style="cursor: pointer;"></i></td>
+                <input type="hidden" name="itens[${AppState.itemIndex}][id_lote]" class="lote-id"><input type="hidden" name="itens[${AppState.itemIndex}][preco]" class="preco-item">
+            `;
+                                    AppState.elementos.itemsContainer.appendChild(row);
+
+                                    if (produto && lote) {
+                                        const sel = row.querySelector('.produto-select');
+                                        sel.value = produto.id_produto;
+                                        this.fetchAndFillLote(row, produto.id_produto, lote);
+                                    }
+                                    AppState.itemIndex++;
+                                    UIManager.updateAll();
+                                },
+
+                                fetchAndFillLote(row, id_produto, preFetchedLote = null) {
+                                    const fillData = (data) => {
+                                        const priceCell = row.querySelector('.price-cell');
+                                        const loteInput = row.querySelector('.lote-id');
+                                        const precoInput = row.querySelector('.preco-item');
+                                        const precoFinal = parseFloat(data.preco_final ?? data.preco_produto ?? 0);
+
+                                        priceCell.textContent = `R$ ${UIManager.formatCurrency(precoFinal)}`;
+                                        loteInput.value = data.id_lote || '';
+                                        precoInput.value = precoFinal.toFixed(2);
+                                        UIManager.updateAll();
+                                    };
+
+                                    if (preFetchedLote) {
+                                        fillData(preFetchedLote);
+                                        return;
+                                    }
+
+                                    fetch(`/admin/vendas/produtos/${id_produto}/lote`)
+                                        .then(res => res.ok ? res.json() : Promise.reject('Nenhum lote'))
+                                        .then(fillData)
+                                        .catch(() => {
+                                            const priceCell = row.querySelector('.price-cell');
+                                            priceCell.textContent = '—';
+                                            row.querySelector('.lote-id').value = '';
+                                            row.querySelector('.preco-item').value = 0;
+                                            UIManager.updateAll();
                                         });
-                                    this.value = '';
+                                },
+
+                                handleBarcodeScan(e) {
+                                    if (e.key !== 'Enter') return;
+                                    e.preventDefault();
+                                    const codigo = AppState.elementos.barcodeInput.value.trim();
+                                    if (!codigo) return;
+
+                                    fetch(`/admin/vendas/produtos/codigobarras/${encodeURIComponent(codigo)}`)
+                                        .then(res => res.ok ? res.json() : Promise.reject('Produto não encontrado'))
+                                        .then(({ produto, lote }) => {
+                                            if (!lote) {
+                                                showAlert('Este produto não possui lote disponível!', 'warning');
+                                                return;
+                                            }
+                                            this.addProductRow(produto, lote);
+                                        })
+                                        .catch(err => showAlert(err.toString(), 'danger'))
+                                        .finally(() => {
+                                            AppState.elementos.barcodeInput.value = '';
+                                            AppState.elementos.barcodeInput.focus();
+                                        });
+                                },
+
+                                handleItemActions(e) {
+                                    if (e.target.closest('.remove-item-btn')) {
+                                        e.target.closest('tr').remove();
+                                        UIManager.updateAll();
+                                    }
+                                },
+
+                                handleItemChange(e) {
+                                    const sel = e.target.closest('.produto-select');
+                                    if (!sel) return;
+                                    const row = sel.closest('tr');
+                                    const id = sel.value;
+                                    if (id && !isNaN(id)) {
+                                        this.fetchAndFillLote(row, id);
+                                    } else {
+                                        row.querySelector('.price-cell').textContent = '—';
+                                        row.querySelector('.lote-id').value = '';
+                                        row.querySelector('.preco-item').value = 0;
+                                        UIManager.updateAll();
+                                    }
                                 }
-                            }
-                        });
+                            };
 
-                        addItemBtn.addEventListener('click', () => {
-                            addProductRow(null);
-                        });
+                            // MÓDULO DE PAGAMENTOS
+                            const PagamentoManager = {
+                                init() {
+                                    AppState.elementos.addPagamentoBtn.addEventListener('click', () => this.addPagamentoRow());
+                                    AppState.elementos.pagamentosContainer.addEventListener('input', (e) => this.handlePagamentoInput(e));
+                                    AppState.elementos.pagamentosContainer.addEventListener('click', (e) => this.handlePagamentoActions(e));
+                                    AppState.elementos.pagamentosContainer.addEventListener('change', (e) => this.handlePagamentoChange(e));
+                                },
 
-                        form.addEventListener('submit', () => {
-                            inputTotal.value = spanTotal.textContent;
-                        });
+                                addPagamentoRow() {
+                                    const div = document.createElement('div');
+                                    div.className = 'row g-3 mb-2 align-items-center pagamento-row';
+                                    let options = formasPagamento.map(fp => `<option value="${fp.id_forma_pagamento}">${fp.nome}</option>`).join('');
 
-                        itemsContainer.addEventListener('click', (event) => {
-                            if (event.target.closest('.remove-item-btn')) {
-                                const row = event.target.closest('tr');
-                                if (row) row.remove();
-                                updateResumo();
-                            }
-                        });
+                                    div.innerHTML = `
+                <div class="col-md-4"><select name="pagamentos[${AppState.pagamentoIndex}][id_forma_pagamento]" class="form-select forma-pagamento-select">${options}</select></div>
+                <div class="col-md-3"><div class="input-group"><span class="input-group-text">R$</span><input type="number" name="pagamentos[${AppState.pagamentoIndex}][valor]" class="form-control valor-pago-input" placeholder="0.00" step="0.01" min="0.01"></div></div>
+                <div class="col-md-3 parcelas-div" style="display: none;"><div class="input-group"><input type="number" name="pagamentos[${AppState.pagamentoIndex}][parcelas]" class="form-control" placeholder="Parcelas" min="1" value="1"><span class="input-group-text">x</span></div></div>
+                <div class="col-md-1"><button type="button" class="btn btn-sm btn-outline-danger remove-pagamento-btn"><i class="bi bi-x-circle"></i></button></div>
+            `;
 
-                        function addProductRow(produto) {
-                            const row = document.createElement('tr');
-                            row.classList.add('item-row');
+                                    const valorInput = div.querySelector('.valor-pago-input');
+                                    const pagamentosExistentes = AppState.elementos.pagamentosContainer.querySelectorAll('.pagamento-row').length;
+                                    if (pagamentosExistentes === 0) {
+                                        const [_, restante] = UIManager.getCalculatedTotals();
+                                        if (restante > 0) valorInput.value = restante.toFixed(2);
+                                    }
 
-                            let selectHTML = '';
-                            produtos.forEach(p => {
-                                selectHTML += `<option value="${p.id_produto}" data-preco="${p.preco}">${p.nome}</option>`;
-                            });
+                                    AppState.elementos.pagamentosContainer.appendChild(div);
+                                    UIManager.updateAll();
+                                    AppState.pagamentoIndex++;
+                                },
 
+                                handlePagamentoInput(e) {
+                                    if (e.target.classList.contains('valor-pago-input')) {
+                                        UIManager.updateAll();
+                                    }
+                                },
 
-                            row.innerHTML = `
-        <td>
-          <select name="itens[${itemIndex}][id_produto]" class="form-select produto-select">
-            ${selectHTML}
-          </select>
-        </td>
-        <td>
-          <input type="number" name="itens[${itemIndex}][quantidade]" class="form-control quantidade-input" value="1" min="1">
-        </td>
-        <td>
-          <button type="button" class="btn btn-danger remove-item-btn">
-            <i class="bi bi-trash"></i>
-          </button>
-        </td>
-      `;
+                                handlePagamentoActions(e) {
+                                    if (e.target.closest('.remove-pagamento-btn')) {
+                                        e.target.closest('.pagamento-row').remove();
+                                        UIManager.updateAll();
+                                    }
+                                },
 
-                            itemsContainer.appendChild(row);
-
-                            if (produto) {
-                                const select = row.querySelector('.produto-select');
-                                const option = [...select.options].find(opt => opt.value == produto.id_produto);
-                                if (option) {
-                                    option.selected = true;
+                                handlePagamentoChange(e) {
+                                    if (e.target.classList.contains('forma-pagamento-select')) {
+                                        const selectedText = e.target.options[e.target.selectedIndex].text;
+                                        const parcelasDiv = e.target.closest('.pagamento-row').querySelector('.parcelas-div');
+                                        parcelasDiv.style.display = selectedText.toLowerCase().includes('crédito') ? 'block' : 'none';
+                                    }
                                 }
+                            };
+
+                            // MÓDULO DE UI (ATUALIZAÇÕES E FORMATAÇÃO)
+                            const UIManager = {
+                                init() {
+                                    AppState.elementos.globalDiscountType.addEventListener('change', () => this.updateAll());
+                                    AppState.elementos.globalDiscountValue.addEventListener('input', () => this.updateAll());
+                                    AppState.elementos.form.addEventListener('submit', (e) => this.handleFormSubmit(e));
+                                    AppState.elementos.btnConfirmarEnvio.addEventListener('click', () => this.confirmarEnvio());
+                                },
+
+                                formatCurrency(value) {
+                                    return value.toFixed(2).replace('.', ',');
+                                },
+
+                                getCalculatedTotals() {
+                                    let subtotal = 0;
+                                    document.querySelectorAll('.item-row').forEach(row => {
+                                        const qtd = parseInt(row.querySelector('.quantidade-input').value) || 0;
+                                        const preco = parseFloat(row.querySelector('.preco-item').value) || 0;
+                                        subtotal += preco * qtd;
+                                    });
+
+                                    const discountType = AppState.elementos.globalDiscountType.value;
+                                    const discountValue = parseFloat(AppState.elementos.globalDiscountValue.value) || 0;
+                                    let discountAmount = 0;
+                                    if (discountType === 'porcentagem' && discountValue > 0) {
+                                        discountAmount = subtotal * (discountValue / 100);
+                                    } else if (discountType === 'valor_fixo' && discountValue > 0) {
+                                        discountAmount = discountValue;
+                                    }
+
+                                    const totalVenda = Math.max(0, subtotal - discountAmount);
+
+                                    let totalPago = 0;
+                                    document.querySelectorAll('.valor-pago-input').forEach(input => {
+                                        totalPago += parseFloat(input.value) || 0;
+                                    });
+
+                                    const restante = totalVenda - totalPago;
+
+                                    return [totalVenda, restante, totalPago, subtotal, discountAmount];
+                                },
+
+                                updateAll() {
+                                    const [totalVenda, restante, totalPago, subtotal, discountAmount] = this.getCalculatedTotals();
+
+                                    // Atualiza Resumo de Preços
+                                    document.getElementById('resumo-subtotal-valor').textContent = `R$ ${this.formatCurrency(subtotal)}`;
+                                    const descontoLinhaEl = document.getElementById('resumo-desconto-linha');
+                                    if (discountAmount > 0) {
+                                        document.getElementById('resumo-desconto-valor').textContent = `- R$ ${this.formatCurrency(discountAmount)}`;
+                                        descontoLinhaEl.classList.remove('d-none');
+                                    } else {
+                                        descontoLinhaEl.classList.add('d-none');
+                                    }
+                                    AppState.elementos.spanTotal.textContent = this.formatCurrency(totalVenda);
+
+                                    // Atualiza Resumo de Pagamentos
+                                    AppState.elementos.spanTotalPago.textContent = this.formatCurrency(totalPago);
+                                    if (totalVenda <= 0) {
+                                        AppState.elementos.restanteRow.classList.add('d-none');
+                                        AppState.elementos.trocoRow.classList.add('d-none');
+                                    } else if (restante > 0.005) {
+                                        AppState.elementos.spanValorRestante.textContent = this.formatCurrency(restante);
+                                        AppState.elementos.restanteRow.classList.remove('d-none');
+                                        AppState.elementos.trocoRow.classList.add('d-none');
+                                    } else {
+                                        const troco = Math.abs(restante);
+                                        AppState.elementos.spanTroco.textContent = this.formatCurrency(troco);
+                                        AppState.elementos.trocoRow.classList.remove('d-none');
+                                        AppState.elementos.restanteRow.classList.add('d-none');
+                                    }
+
+                                    // Atualiza Botão Finalizar
+                                    if (totalVenda <= 0) {
+                                        AppState.elementos.finalizarBtn.disabled = true;
+                                        AppState.elementos.finalizarBtn.innerHTML = '<i class="bi bi-cart-x"></i> Adicione produtos para iniciar';
+                                    } else if (restante > 0.005) {
+                                        AppState.elementos.finalizarBtn.disabled = false;
+                                        AppState.elementos.finalizarBtn.className = 'btn btn-warning btn-lg';
+                                        AppState.elementos.finalizarBtn.innerHTML = `<i class="bi bi-exclamation-triangle"></i> Finalizar com Pendência de R$ ${this.formatCurrency(restante)}`;
+                                    } else {
+                                        AppState.elementos.finalizarBtn.disabled = false;
+                                        AppState.elementos.finalizarBtn.className = 'btn btn-success btn-lg';
+                                        AppState.elementos.finalizarBtn.innerHTML = '<i class="bi bi-check-circle-fill"></i> Finalizar Venda';
+                                    }
+
+                                    // Atualiza visibilidade da tabela de itens
+                                    const itemsContainer = AppState.elementos.itemsContainer;
+                                    const placeholder = document.getElementById('itens-venda-placeholder');
+                                    const tableWrapper = document.getElementById('tabela-itens-wrapper');
+                                    if (itemsContainer.children.length > 0) {
+                                        placeholder.style.display = 'none';
+                                        tableWrapper.style.display = 'block';
+                                    } else {
+                                        placeholder.style.display = 'block';
+                                        tableWrapper.style.display = 'none';
+                                    }
+                                },
+
+                                handleFormSubmit(event) {
+                                    event.preventDefault();
+                                    const [totalVenda, restante, totalPago] = this.getCalculatedTotals();
+
+                                    document.getElementById('modal-total-venda').textContent = `R$ ${this.formatCurrency(totalVenda)}`;
+                                    document.getElementById('modal-total-pago').textContent = `R$ ${this.formatCurrency(totalPago)}`;
+
+                                    const resumoFinalLabel = document.getElementById('modal-resumo-final-label');
+                                    const resumoFinalValor = document.getElementById('modal-resumo-final-valor');
+
+                                    if (restante > 0.005) {
+                                        resumoFinalLabel.textContent = 'Valor Restante:';
+                                        resumoFinalValor.textContent = `R$ ${this.formatCurrency(restante)}`;
+                                        resumoFinalValor.className = 'badge rounded-pill fs-6 bg-warning text-dark';
+                                    } else {
+                                        const troco = Math.abs(restante);
+                                        resumoFinalLabel.textContent = 'Troco:';
+                                        resumoFinalValor.textContent = `R$ ${this.formatCurrency(troco)}`;
+                                        resumoFinalValor.className = 'badge rounded-pill fs-6 bg-success';
+                                    }
+                                    AppState.elementos.finalizarVendaModal.show();
+                                },
+
+                                confirmarEnvio() {
+                                    AppState.elementos.finalizarVendaModal.hide();
+                                    AppState.elementos.form.submit();
+                                }
+                            };
+
+                            // INICIALIZAÇÃO
+                            function init() {
+                                AppState.elementos.barcodeInput.focus();
+                                VendaItemsManager.init();
+                                PagamentoManager.init();
+                                UIManager.init();
+
+                                PagamentoManager.addPagamentoRow();
+                                UIManager.updateAll();
                             }
 
-                            itemIndex++;
-                            updateResumo();
-                        }
-
-                        function updateResumo() {
-                            resumoPrecos.innerHTML = '';
-                            let total = 0;
-
-                            document.querySelectorAll('.item-row').forEach(row => {
-                                const select = row.querySelector('.produto-select');
-                                const input = row.querySelector('.quantidade-input');
-                                const preco = parseFloat(select.selectedOptions[0].dataset.preco || 0);
-                                const quantidade = parseInt(input.value || 0);
-                                const subtotal = preco * quantidade;
-
-                                if (quantidade > 0) {
-                                    const li = document.createElement('li');
-                                    li.className = 'list-group-item d-flex justify-content-between align-items-center';
-                                    li.innerHTML = `${select.selectedOptions[0].text} x ${quantidade} <span>R$ ${subtotal.toFixed(2)}</span>`;
-                                    resumoPrecos.appendChild(li);
-                                    total += subtotal;
-                                }
-                            });
-
-                            spanTotal.textContent = total.toFixed(2);
-                        }
-
-                        itemsContainer.addEventListener('change', updateResumo);
-                        itemsContainer.addEventListener('input', updateResumo);
-                    });
-
-                </script>
+                            init();
+                        });
+                    </script>
         </body>
 
         </html>

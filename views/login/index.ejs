@@ -7,8 +7,8 @@
                     <div class="card shadow-sm">
                         <div class="card-body">
                             <div class="text-center mb-4">
-                                <button id="showLogin" class="btn btn-outline-primary me-2" style="display: none;">Login</button>
-                                <button id="showRegister" class="btn btn-outline-success" style="display: none;">Criar
+                                <button id="showLogin" class="btn btn-outline-primary me-2">Login</button>
+                                <button id="showRegister" class="btn btn-outline-success">Criar
                                     Conta</button>
                             </div>
 
@@ -16,9 +16,15 @@
                             <form id="loginForm" action="/login" method="POST">
                                 <h3 class="text-center mb-3">Login</h3>
                                 <div class="mb-3 form-floating">
-                                    <input type="text" class="form-control" id="userInput" name="usuario"
-                                        placeholder="Usuário" required>
-                                    <label for="userInput" class="form-label">Usuário</label>
+                                    <select class="form-control" id="userSelect" name="nome" required>
+                                        <option value="" disabled selected>Selecione seu usuário</option>
+                                        <% usuarios.forEach(user=> { %>
+                                            <option value="<%= user.nome %>">
+                                                <%= user.nome %>
+                                            </option>
+                                            <% }) %>
+                                    </select>
+                                    <label for="userSelect">Usuário</label>
                                 </div>
                                 <div class="mb-3 form-floating">
                                     <input type="password" class="form-control" id="passwordInput" name="senha"
@@ -35,16 +41,18 @@
                             <form id="registerForm" action="/register" method="POST" style="display: none;">
                                 <h3 class="text-center mb-3">Criar Conta</h3>
                                 <div class="mb-3">
-                                    <label for="usuarioReg" class="form-label">Nome</label>
-                                    <input type="text" class="form-control" id="usuarioReg" name="nome" required>
+                                    <label for="funcionarioReg" class="form-label">Funcionário</label>
+                                    <select class="form-control" id="funcionarioReg" name="nome" required>
+                                        <% funcionarios.forEach(f=> { %>
+                                            <option value="<%= f.nome%>">
+                                                <%= f.nome %>
+                                            </option>
+                                            <% }) %>
+                                    </select>
                                 </div>
                                 <div class="mb-3">
                                     <label for="emailReg" class="form-label">Email</label>
                                     <input type="text" class="form-control" id="emailReg" name="email" required>
-                                </div>
-                                <div class="mb-3">
-                                    <label for="cargoReg" class="form-label">Cargo</label>
-                                    <input type="text" class="form-control" id="cargoReg" name="cargo" required>
                                 </div>
                                 <div class="mb-3">
                                     <label for="senhaReg" class="form-label">Senha</label>

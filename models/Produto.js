@@ -11,7 +11,7 @@ const Produto = connection.define('produto', {
         type: Sequelize.STRING,
         allowNull: false
     },
-    preco: {
+    preco_compra: {
         type: Sequelize.FLOAT,
         allowNull: false
     },

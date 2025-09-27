@@ -16,8 +16,8 @@
 }
 
 #adminSidebar .accordion-body {
-    padding: 0px;
-    margin-left: 15px;
+  padding: 0px;
+  margin-left: 15px;
 }
 
 #adminSidebar .accordion-button .bi-chevron-down {
@@ -29,51 +29,203 @@
 }
 
 .darker-yellow {
-    background-color: #d4a017; /* A rich mustard tone */
-    border-color: #c18f0f;
+  background-color: #d4a017; /* A rich mustard tone */
+  border-color: #c18f0f;
 }
 
 .darker-yellow:hover {
-    background-color: #b8860b; /* Slightly darker on hover */
-    border-color: #a6780a;
+  background-color: #b8860b; /* Slightly darker on hover */
+  border-color: #a6780a;
 }
 
 .darker-yellow-text {
-    color: #d4a017;
+  color: #d4a017;
 }
 
 .darker-purple {
-    background-color: #5a3e8c; /* Deep purple */
-    border-color: #4b3475;
+  background-color: #5a3e8c; /* Deep purple */
+  border-color: #4b3475;
 }
 
 .darker-purple:hover {
-    background-color: #4b3475;
-    border-color: #3e2c63;
+  background-color: #4b3475;
+  border-color: #3e2c63;
 }
 
 .darker-purple-text {
-    color: #5a3e8c;
+  color: #5a3e8c;
 }
 
 .softer-blue {
-    background-color: #4a6fa5; /* Steel blue tone */
-}
-
-.softer-blue-text {
-    color: #4a6fa5;
+  background-color: #0e5597;
 }
 
 .btn-checkout {
-  background-color: #5a9bd8;
+  background-color: #0e5597;
   color: white;
 }
 
 .btn-checkout-text {
-  color: #5a9bd8;
+  color: #0e5597;
 }
 
 .btn-checkout:hover {
   background-color: #3a7fc1;
   color: white;
 }
+
+.alert-custom {
+  display: flex;
+  align-items: center;
+  background-color: #fff5f5;
+  color: #721c24;
+  border-left: 4px solid #f5c6cb;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  padding: 1rem;
+  border-radius: 0.25rem;
+  font-family: "Segoe UI", sans-serif;
+  animation: fadeInDown 0.3s ease-out;
+  margin-bottom: 10px;
+}
+
+.alert-custom .icon {
+  margin-right: 0.75rem;
+  font-size: 1.4rem;
+}
+
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeOutUp {
+  from { opacity: 1; transform: translateY(0); }
+  to   { opacity: 0; transform: translateY(-8px); }
+}
+
+.alert-custom.fade-out {
+  animation: fadeOutUp 0.3s ease-in forwards;
+}
+
+.alert-custom .close-btn {
+  margin-left: auto;
+  background: transparent;
+  border: none;
+  font-size: 1.2rem;
+  cursor: pointer;
+}
+
+.promo-card {
+  border-radius: .5rem;
+  transition: transform .2s, box-shadow .2s;
+}
+.promo-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 .75rem 1.5rem rgba(0,0,0,.1);
+}
+
+.ribbon {
+  position: absolute;
+  top: 0.5rem;
+  left: -2.5rem;
+  width: 8rem;
+  text-align: center;
+  transform: rotate(-45deg);
+  font-weight: bold;
+  box-shadow: 0 0 5px rgba(0,0,0,.2);
+}
+
+.promo-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+  overflow: hidden;
+  transition: width .5s ease, background-color .5s ease;
+  transform-origin: right;
+}
+
+.promo-remaining {
+  font-size: 0.8rem;
+  color: #dc3545;
+  min-height: 1rem;
+}
+
+.promo-odd .promo-card {
+  background-color: #FFF3E0; 
+}
+.promo-even .promo-card {
+  background-color: #E1F5FE;
+}
+
+.promo-card {
+  border: 1px solid #DEE2E6;
+  border-radius: 0.5rem;
+  box-shadow: 0 0.125rem 0.25rem rgba(0,0,0,0.075);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.promo-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.1);
+}
+
+.promo-card + .promo-card {
+  margin-top: 1rem;
+}
+
+.text-success {
+  color: #155724 !important;
+}
+
+#adminSidebar {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+#adminSidebar .sidebar {
+  flex: 1;              
+  overflow-y: auto; 
+}
+
+#logoutForm {
+  flex-shrink: 0;
+}
+
+#venda-form .card {
+  margin-bottom: 1.25rem;
+}
+
+#venda-form .list-group {
+  margin-bottom: 1rem;
+}
+
+#itens-venda-container td {
+  padding: .5rem .75rem;
+}
+
+ #pagamentos-container > .row {
+  margin-bottom: .75rem;
+}
+
+.icon-action { color: #6c757d; cursor: pointer; transition: color .18s; }
+.icon-action:hover { color: #0d6efd; }
+
+.table tbody tr:hover { background-color: #f8f9fa; transition: background-color .18s; }
+
+.btn { transition: background-color .18s, color .18s; }
+
+.btn-custom-width { min-width: 120px; }
+
+@media (max-width: 575.98px) {
+  .btn-custom-width { min-width: 100px; font-size: .9rem; }
+}
+
+#global-discount-row label { min-width: 110px; }
+#global-discount-row .form-select, #global-discount-row .form-control { min-height: 34px; }

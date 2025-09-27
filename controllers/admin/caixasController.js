@@ -4,7 +4,7 @@ const asyncHandler = require('../../utils/handlers/async-handler');
 const { stringValidation, enumValidation, numberValidation, dateValidation } = require('../../utils/data/data-validation');
 const { parseIntValue, parseFloatValue, parseDateValue } = require('../../utils/data/data-parsers');
 const formatDate = require('../../utils/data/date-formatter');
-const { getViewDependencies, getAllCaixas, createCaixa, getEditData, updateCaixa, deleteCaixa, findCaixaById } = require('../../services/admin/caixasService');
+const { getViewDependencies, getAllCaixas, getEditData, updateCaixa, deleteCaixa, findCaixaById, openCaixa, closeCaixa } = require('../../services/admin/caixasService');
 
 router.get('/caixas/new', asyncHandler(async (req, res) => {
     const { pdvs, funcionarios } = await getViewDependencies();
@@ -76,23 +76,16 @@ router.post('/caixas/update/:id_caixa', asyncHandler(async (req, res) => {
 router.post('/caixa/abrir', asyncHandler(async (req, res) => {
     const [parsedIdPdv] = parseIntValue(req.body.id_pdv);
     const [parsedSaldoInicial] = parseFloatValue(req.body.saldo_inicial);
-    const isAdmin = req.session.cargo === 'admin';
-
-    console.log(req.body, typeof parsedIdPdv, typeof parsedSaldoInicial);
-
 
     numberValidation(parsedIdPdv, parsedSaldoInicial);
 
-    const caixa = await createCaixa({
+    const caixa = await openCaixa({
         id_pdv: parsedIdPdv,
-        id_funcionario: isAdmin ? null : req.session.userId,
-        saldo_inicial: parsedSaldoInicial,
-        data_fechamento: null,
-        status: 'aberto'
+        id_funcionario: req.session.cargo === 'admin' ? 1 : req.session.userId,
+        saldo_inicial: parsedSaldoInicial
     });
 
     req.session.caixaId = caixa.id_caixa;
-
     await new Promise((resolve, reject) => {
         req.session.save(err => err ? reject(err) : resolve());
     });
@@ -106,13 +99,15 @@ router.post('/caixa/fechar', asyncHandler(async (req, res) => {
 
     numberValidation(parsedIdCaixa, parsedSaldoFinal);
 
-    await updateCaixa(parsedIdCaixa, {
-        saldo_final: parsedSaldoFinal,
-        data_fechamento: new Date(),
-        status: 'fechado'
+    await closeCaixa({
+        id_caixa: parsedIdCaixa,
+        saldo_final: parsedSaldoFinal
     });
 
     delete req.session.caixaId;
+    await new Promise((resolve, reject) => {
+        req.session.save(err => err ? reject(err) : resolve());
+    });
 
     res.redirect('/admin/dashboard');
 }));

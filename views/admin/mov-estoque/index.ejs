@@ -1,70 +1,66 @@
 <%- include('../../partials/header.ejs') %>
     <%- include('../../partials/navbar.ejs') %>
 
-    <body>
-        <main></main>
-    </body>
-        <div class="container">
-            <hr>
-            <h2>Funcionarios</h2>
-            <a href="/admin/movs/new" class="btn btn-success">Cadastrar mov</a>
-            <hr>
-            <table class="table table-bordered">
-                <thead>
-                    <tr>
-                        <th>Data e Hora</th>
-                        <th>Tipo</th>
-                        <th>Produtos</th>
-                        <th>Quantidade</th>
-                        <th>Funcionario</th>
-                        <th>Ações</th>
-                    </tr>
-                </thead>
-                <tbody id="category-table-body">
-                    <label>
-                        <input type="checkbox" id="toggleExcluir">
-                        Habilitar botão Excluir
-                    </label>
-                    <% movs.forEach(mov=> { %>
-                        <tr>
-                            <td>
-                                <%= formatDate(mov.data_hora) %>
-                            </td>
-                            <td>
-                                <%= mov.tipo %>
-                            </td>
-                            <td>
-                                <% const estoque=mov.estoque; %>
-                                    <% if (estoque) { %>
-                                        <% const produto=produtos.find(p=> p.id_produto === estoque.id_produto); %>
-                                            <%= produto ? produto.nome : 'Produto Desconhecido' %>
-                                                <% } else { %>
-                                                    -
-                                                    <% } %>
-                            </td>
-                            <td>
-                                <%= mov.quantidade %>
-                            </td>
-                            <td>
-                                <% const funcionario=funcionarios.find(c=> c.id_funcionario === mov.id_funcionario);
-                                    if (funcionario) { %>
-                                    <%= funcionario.nome %>
-                                        <% } else { %>
-                                            -
-                                            <% } %>
-                            </td>
-                            <td>
-                                <a href="/admin/movs/edit/<%= mov.id_mov %>" class="btn btn-warning">Editar</a>
-                                <form action="/admin/movs/delete/<%= mov.id_mov %>" method="POST"
-                                    style="display: inline;">
-                                    <input type="hidden" name="id_mov" value="<%= mov.id_mov %>">
-                                    <button class="btn btn-danger excluir-btn" style="display: none;">Excluir</button>
-                                </form>
-                            </td>
-                        </tr>
-                        <% }) %>
-                </tbody>
-            </table>
-        </div>
+        <body>
+            <main class="main-content">
+                <div class="container">
+                    <div id="error-popup-container"></div>
+                    <div class="d-flex justify-content-between align-items-center my-4">
+                        <h2 class="mb-0 h4">
+                            <i class="bi bi-box-seam me-2"></i>
+                            Movimentação de Estoque
+                        </h2>
+                    </div>
+                    <hr>
 
-        <%- include('../../partials/footer.ejs') %>
+                    <div class="card shadow-sm">
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table id="table-data" class="table table-striped table-hover align-middle">
+                                    <thead class="table-dark">
+                                        <tr>
+                                            <th>Data</th>
+                                            <th>Tipo</th>
+                                            <th>Produtos</th>
+                                            <th>Quantidade</th>
+                                            <th>Funcionário</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="mov-table-body">
+                                        <% movs.forEach(mov=> { %>
+                                            <tr>
+                                                <td>
+                                                    <%= formatDate(mov.data_hora) %>
+                                                </td>
+                                                <td class="text-capitalize">
+                                                    <%= mov.tipo %>
+                                                </td>
+
+                                                <!-- coluna Produto -->
+                                                <td>
+                                                    <%= mov.lote?.produto ? mov.lote.produto.nome
+                                                        : 'Produto Desconhecido' %>
+                                                </td>
+
+                                                <td>
+                                                    <%= mov.quantidade %>
+                                                </td>
+                                                <td class="text-capitalize">
+                                                    <%= funcionarios.find(f=> f.id_funcionario ===
+                                                        mov.id_funcionario)?.nome
+                                                        || '-' %>
+                                                </td>
+                                            </tr>
+                                            <% }) %>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+
+            <%- include('../../partials/footer.ejs') %>
+        </body>
+
+        </html>

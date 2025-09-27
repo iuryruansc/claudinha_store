@@ -41,6 +41,7 @@ module.exports = [
     ]
   },
   { label: 'Clientes', href: '/admin/clientes' },
+  { label: 'Funcionarios', href: '/admin/funcionarios' },
   { label: 'PDVs', href: '/admin/pdvs' },
   { label: 'Caixas', href: '/admin/caixas' },
   { label: 'Movimentações', href: '/admin/movimentacoes' },

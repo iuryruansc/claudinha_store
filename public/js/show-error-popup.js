@@ -1,34 +1,37 @@
-export function showErrorPopup(message, details = []) {
-    const popupContainer = document.getElementById('error-popup-container');
-    if (!popupContainer) {
-        console.error('No element with ID "error-popup-container" found.');
-        return;
-    }
+export function showErrorPopup(message, details = [], dismissAfter = 3000) {
+    const container = document.getElementById('error-popup-container');
+    if (!container) return console.error('Container não encontrado.');
 
-    popupContainer.innerHTML = '';
+    container.innerHTML = '';
+
     const popup = document.createElement('div');
-    popup.className = 'alert alert-danger alert-dismissible fade show mt-3';
+    popup.className = 'alert-custom';
     popup.setAttribute('role', 'alert');
 
-    let detailsHtml = '';
-    if (Array.isArray(details) && details.length > 0) {
-        const listItems = details.map(d => `<li>${d}</li>`).join('');
-        detailsHtml = `<ul>${listItems}</ul>`;
+    // Ícone + texto principal
+    popup.innerHTML = `
+    <i class="bi bi-exclamation-triangle-fill icon" aria-hidden="true"></i>
+    <div>
+      <strong>${message}</strong>
+      ${Array.isArray(details) && details.length
+            ? `<ul>${details.map(d => `<li>${d}</li>`).join('')}</ul>`
+            : ''}
+    </div>
+    <button class="close-btn" aria-label="Fechar">&times;</button>
+  `;
+
+    container.appendChild(popup);
+
+    function fadeAndRemove() {
+        popup.classList.add('fade-out');
+        popup.addEventListener('animationend', () => popup.remove());
     }
 
-    popup.innerHTML =
-        '<strong>' + message + '</strong>' +
-        detailsHtml +
-        '<button type="button" class="close" data-dismiss="alert" aria-label="Close">' +
-        '<span aria-hidden="true">&times;</span>' +
-        '</button>';
+    const timer = setTimeout(fadeAndRemove, dismissAfter);
 
-    popupContainer.appendChild(popup);
-
-    const closeButton = popup.querySelector('.close');
-    if (closeButton) {
-        closeButton.addEventListener('click', () => {
-            popup.remove();
+    popup.querySelector('.close-btn')
+        .addEventListener('click', () => {
+            clearTimeout(timer);
+            fadeAndRemove();
         });
-    }
 }

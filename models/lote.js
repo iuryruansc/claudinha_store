@@ -11,6 +11,10 @@ const Lote = connection.define('lote', {
         type: Sequelize.INTEGER,
         allowNull: false,
     },
+    preco_produto: {
+        type: Sequelize.FLOAT,
+        allowNull: false
+    },
     numero_lote: {
         type: Sequelize.INTEGER,
         allowNull: false

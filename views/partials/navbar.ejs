@@ -1,9 +1,8 @@
 <nav id="adminSidebar" class="d-flex flex-column bg-dark text-white vh-100 p-3 position-fixed" style="width: 250px;">
     <% const iconMap={ 'Painel Admin' : 'bi-box-seam' , 'Produtos' : 'bi-box2' , 'Vendas' : 'bi-currency-dollar'
-        , 'Catálogo' : 'bi-book' , 'Categorias'
-        : 'bi-tags' , 'Fornecedores' : 'bi-truck' , 'Marcas' : 'bi-award' , 'Clientes' : 'bi-people' , 'Lotes'
-        : 'bi-boxes' , 'PDVs' : 'bi-shop' , 'Caixas' : 'bi-safe' , 'Movimentações' : 'bi-arrow-left-right'
-        , 'Pagamentos' : 'bi-credit-card' }; %>
+        , 'Catálogo' : 'bi-book' , 'Categorias' : 'bi-tags' , 'Fornecedores' : 'bi-truck' , 'Marcas' : 'bi-award'
+        , 'Clientes' : 'bi-people' , 'Funcionarios' : 'bi bi-person-badge' , 'Lotes' : 'bi-boxes' , 'PDVs' : 'bi-shop'
+        , 'Caixas' : 'bi-safe' , 'Movimentações' : 'bi-arrow-left-right' , 'Pagamentos' : 'bi-credit-card' }; %>
 
         <% function renderSidebar(items, accordionId='sidebarAccordion' , level=0) { let html='' ; items.forEach((item,
             idx)=> {
@@ -59,17 +58,18 @@
             }
             %>
 
-
             <a href="/admin/dashboard" class="navbar-brand text-white mb-4">
                 <i class="bi bi-shop ms-3 me-2"></i> Claudinha Store
             </a>
 
-            <div class="accordion accordion-flush sidebar" id="sidebarAccordion">
-                <%- renderSidebar(navLinks) %>
+            <div class="flex-grow-1 overflow-auto">
+                <div class="accordion accordion-flush sidebar" id="sidebarAccordion">
+                    <%- renderSidebar(navLinks) %>
+                </div>
             </div>
 
-            <form action="/logout" method="POST" class="mt-auto">
-                <button class="btn btn-outline-light w-100">
+            <form id="logoutForm" method="POST" class="mt-auto">
+                <button type="submit" class="btn btn-outline-light w-100">
                     </i>Logout</button>
             </form>
 

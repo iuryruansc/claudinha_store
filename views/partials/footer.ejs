@@ -1,9 +1,9 @@
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
-    integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
-    crossorigin="anonymous"></script>
-
+<script src="/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <script src="https://cdn.datatables.net/2.3.4/js/dataTables.min.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="/js/show-success-popup.js"></script>
 
 <script>
     $(document).ready(function () {
@@ -27,3 +27,56 @@
         });
     });
 </script>
+
+<script src="https://cdn.jsdelivr.net/npm/dayjs@1/dayjs.min.js"></script>
+<script>
+    dayjs.locale('pt-br');
+
+    document.querySelectorAll('.promo-bar').forEach(bar => {
+        const tInicio = dayjs(bar.dataset.inicio);
+        const tFim = dayjs(bar.dataset.fim);
+        const totalMs = tFim.diff(tInicio);
+
+        function atualizar() {
+            const agora = dayjs();
+            let pct = agora.isBefore(tInicio) ? 100
+                : agora.isAfter(tFim) ? 0
+                    : (1 - agora.diff(tInicio) / totalMs) * 100;
+            pct = Math.max(0, Math.min(100, pct));
+            bar.style.width = pct + '%';
+
+            const diffMs = tFim.diff(agora);
+            const horasRest = tFim.diff(agora, 'hour');
+            const minutosRest = tFim.diff(agora, 'minute');
+            const restanteEl = bar.parentElement.nextElementSibling;
+
+            let textoRestante = '';
+            if (diffMs <= 0) {
+                textoRestante = 'Promoção encerrada';
+            }
+            else if (horasRest >= 1 && horasRest < 24) {
+                textoRestante = `${horasRest} h restantes`;
+            }
+            else if (horasRest > 0 && horasRest < 1) {
+                textoRestante = `${minutosRest} m restantes`;
+            } else {
+                textoRestante = '';
+            }
+            restanteEl.textContent = textoRestante;
+
+            bar.classList.remove('bg-success', 'bg-warning', 'bg-danger');
+            const colorClass = pct > 66
+                ? 'bg-success'
+                : pct > 33
+                    ? 'bg-warning'
+                    : 'bg-danger';
+            bar.classList.add(colorClass);
+        }
+
+        atualizar();
+
+        setInterval(atualizar, 60 * 1000);
+    });
+</script>
+
+<%- include('./caixa-venda-erro.ejs') %>

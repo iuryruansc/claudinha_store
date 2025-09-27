@@ -2,15 +2,13 @@ const express = require('express');
 const router = express.Router();
 const asyncHandler = require('../../utils/handlers/async-handler');
 const Usuario = require('../../models/usuario');
-
+const Funcionario = require('../../models/funcionario');
 
 router.post('/register', asyncHandler(async (req, res) => {
-    const { nome, email, cargo, senha, confirmarSenha } = req.body;
-
-    console.log(req.body);
+    const { nome, email, senha, confirmarSenha } = req.body;
+    const funcionario = await Funcionario.findOne({ where: { nome } });
     
-
-    if (!nome || !email || !cargo || !senha || !confirmarSenha) {
+    if (!nome || !email || !senha || !confirmarSenha) {
         return res.status(400).json({
             error: {
                 message: 'Todos os campos são obrigatórios.',
@@ -38,9 +36,9 @@ router.post('/register', asyncHandler(async (req, res) => {
         });
     }
 
-    await Usuario.create({ nome, email, cargo, senha });
+    await Usuario.create({ nome, id_funcionario: funcionario.id_funcionario, email, cargo: funcionario.cargo, senha });
 
-    res.status(201).json({ message: 'Conta criada com sucesso!' });
+    res.redirect('/login');
 }));
 
 module.exports = router;

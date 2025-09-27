@@ -26,11 +26,11 @@ router.get('/funcionarios/edit/:id_funcionario', asyncHandler(async (req, res) =
 }));
 
 router.post('/funcionarios/save', asyncHandler(async (req, res) => {
-    const { nome, cpf, cargo } = req.body;
+    const { nome, cpf } = req.body;
 
-    stringValidation(nome, cpf, cargo);
+    stringValidation(nome, cpf);
 
-    await createFuncionario({ nome, cpf, cargo });
+    await createFuncionario({ nome, cpf, cargo: 'funcionario' });
 
     res.redirect('/admin/funcionarios');
 }));
@@ -47,12 +47,14 @@ router.post('/funcionarios/delete/:id_funcionario', asyncHandler(async (req, res
 
 router.post('/funcionarios/update/:id_funcionario', asyncHandler(async (req, res) => {
     const [parsedId] = parseIntValue(req.params.id_funcionario);
-    const { nome, cpf, cargo } = req.body;
+    const { nome } = req.body;
 
     numberValidation(parsedId);
-    stringValidation(nome, cpf, cargo);
+    stringValidation(nome);
 
-    await updateFuncionario(parsedId, { nome, cpf, cargo });
+    console.log(parsedId);
+
+    await updateFuncionario(parsedId, { nome });
 
     res.redirect('/admin/funcionarios');
 }));

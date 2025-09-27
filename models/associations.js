@@ -1,6 +1,7 @@
 const Caixa = require('./caixa');
 const Category = require('./category');
 const Cliente = require('./cliente');
+const Desconto = require('./desconto');
 const Lote = require('./lote');
 const Funcionario = require('./funcionario');
 const ItemVenda = require('./itemVenda');
@@ -36,13 +37,15 @@ MovimentacaoEstoque.belongsTo(Venda, { foreignKey: 'id_venda' });
 Pagamento.hasMany(ParcelaPagamento, { foreignKey: 'id_pagamento' });
 ParcelaPagamento.belongsTo(Pagamento, { foreignKey: 'id_pagamento' });
 
-// Funcionario -> Venda, Caixa, MovimentacaoEstoque
+// Funcionario -> Venda, Caixa, MovimentacaoEstoque, Usuario
 Funcionario.hasMany(Venda, { foreignKey: 'id_funcionario' });
 Venda.belongsTo(Funcionario, { foreignKey: 'id_funcionario' });
 Funcionario.hasMany(Caixa, { foreignKey: 'id_funcionario' });
 Caixa.belongsTo(Funcionario, { foreignKey: 'id_funcionario' });
 Funcionario.hasMany(MovimentacaoEstoque, { foreignKey: 'id_funcionario' });
 MovimentacaoEstoque.belongsTo(Funcionario, { foreignKey: 'id_funcionario' });
+Funcionario.hasOne(Usuario, { foreignKey: 'id_funcionario' });
+Usuario.belongsTo(Funcionario, { foreignKey: 'id_funcionario' });
 
 // Caixa -> Venda
 Caixa.hasMany(Venda, { foreignKey: 'id_caixa' });
@@ -82,10 +85,12 @@ Produto.belongsTo(Fornecedor, { foreignKey: 'id_fornecedor' });
 Marca.hasMany(Produto, {foreignKey: 'id_marca'});
 Produto.belongsTo(Marca, {foreignKey: 'id_marca'});
 
+// Export all models and their associations
 module.exports = {
   Caixa,
   Category,
   Cliente,
+  Desconto,
   Lote,
   Funcionario,
   ItemVenda,

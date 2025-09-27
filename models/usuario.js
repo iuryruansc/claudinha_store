@@ -8,9 +8,15 @@ const Usuario = connection.define('usuario', {
         primaryKey: true,
         autoIncrement: true
     },
+    id_funcionario: {
+        type: Sequelize.INTEGER,
+        allowNull: true,
+        unique: true
+    },
     nome: {
         type: Sequelize.STRING,
-        allowNull: false
+        allowNull: false,
+        unique: true
     },
     email: {
         type: Sequelize.STRING,
@@ -33,11 +39,11 @@ const Usuario = connection.define('usuario', {
     timestamps: true,
     hooks: {
         beforeCreate: async (usuario) => {
-            if(usuario.senha) {
+            if (usuario.senha) {
                 const salt = await bcrypt.genSalt(10);
                 usuario.senha = await bcrypt.hash(usuario.senha, salt);
             }
-        }, 
+        },
         beforeUpdate: async (usuario) => {
             if (usuario.changed('senha')) {
                 const salt = await bcrypt.genSalt(10);

@@ -10,7 +10,8 @@ const Funcionario = connection.define('funcionario', {
     },
     nome: {
         type: Sequelize.STRING,
-        allowNull: false
+        allowNull: false,
+        unique: true
     },
     cpf: {
         type: Sequelize.STRING,

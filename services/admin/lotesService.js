@@ -1,3 +1,4 @@
+const connection = require('../../database/database');
 const Lote = require('../../models/lote');
 const Produto = require('../../models/produto');
 const MovimentacaoEstoque = require('../../models/movimentacaoEstoque');
@@ -79,6 +80,40 @@ const getLowStockLotes = async () => {
     return lotes;
 };
 
+const createLoteWithMovimentacao = async (data, id_funcionario) => {
+    return await connection.transaction(async (t) => {
+
+        const produto = await Produto.findByPk(data.id_produto);
+
+        const novoLote = await Lote.create({
+            id_produto: data.id_produto,
+            preco_produto: data.preco_produto,
+            numero_lote: data.numero_lote,
+            quantidade: data.quantidade,
+            data_validade: data.data_validade,
+            localizacao: data.localizacao
+        }, { transaction: t });
+
+        await MovimentacaoEstoque.create({
+            id_lote: novoLote.id_lote,
+            data_hora: new Date(),
+            tipo: 'entrada',
+            quantidade: novoLote.quantidade,
+            id_funcionario,
+            observacao: 'Entrada via cadastro de lote'
+        }, { transaction: t });
+
+        const precoAntigo = parseFloat(produto.preco_compra);
+        const precoNovo = parseFloat(data.preco_produto);
+
+        if (precoNovo != precoAntigo) {
+            await produto.update({ preco_compra: data.preco_produto }, { transaction: t })
+        }
+
+        return novoLote;
+    });
+}
+
 module.exports = {
     findLoteById,
     getViewDependencies,
@@ -88,5 +123,6 @@ module.exports = {
     updateLote,
     deleteLote,
     adicionarQuantidadeAoLote,
-    getLowStockLotes
+    getLowStockLotes,
+    createLoteWithMovimentacao
 }
