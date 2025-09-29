@@ -32,7 +32,11 @@ router.post('/pdvs/save', asyncHandler(async (req, res) => {
     enumValidation(status, 'ativo', 'inativo');
 
     await createPdv({ identificacao, descricao, status });
-    res.redirect('/admin/pdvs');
+
+    res.status(200).json({
+        message: 'PDV registrado com sucesso!',
+        redirectUrl: '/admin/pdvs'
+    });
 }));
 
 router.post('/pdvs/delete/:id_pdv', asyncHandler(async (req, res) => {
@@ -55,7 +59,10 @@ router.post('/pdvs/update/:id_pdv', asyncHandler(async (req, res) => {
 
     await updatePdv(parsedId, { identificacao, descricao, status });
 
-    res.redirect('/admin/pdvs');
+    res.status(200).json({
+        message: 'PDV atualizado com sucesso!',
+        redirectUrl: '/admin/produtos'
+    });;
 }));
 
 module.exports = router;

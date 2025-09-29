@@ -1,4 +1,5 @@
 import { showErrorPopup } from '/js/lib/show-error-popup.js'
+import { showSuccessPopup } from '/js/lib/show-success-popup.js';
 
 export function setupSingleFieldNew({
     formSelector,
@@ -42,7 +43,13 @@ export function setupSingleFieldNew({
             });
 
             if (response.ok) {
-                window.location.href = redirectUrl;
+                const successData = await response.json();
+
+                showSuccessPopup(successData.message);
+
+                setTimeout(() => {
+                    window.location.href = redirectUrl;
+                }, 500);
             } else {
                 const errorData = await response.json();
                 showErrorPopup(errorData.error.message, errorData.error.details);

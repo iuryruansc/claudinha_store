@@ -32,7 +32,10 @@ router.post('/clientes/save', asyncHandler(async (req, res) => {
 
     await createCliente({ nome, email, telefone, cpf });
 
-    res.redirect('/admin/clientes');
+    res.status(200).json({
+        message: 'Cliente registrado com sucesso!',
+        redirectUrl: '/admin/clientes'
+    });
 }));
 
 router.post('/clientes/delete/:id_cliente', asyncHandler(async (req, res) => {
@@ -54,7 +57,10 @@ router.post('/clientes/update/:id_cliente', asyncHandler(async (req, res) => {
 
     await updateCliente(parsedId, { nome, email, telefone, cpf });
 
-    res.redirect('/admin/clientes');
+    res.status(200).json({
+        message: 'Cliente registrado com sucesso!',
+        redirectUrl: '/admin/clientes'
+    });
 }));
 
 module.exports = router;

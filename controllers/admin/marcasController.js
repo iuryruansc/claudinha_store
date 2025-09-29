@@ -33,7 +33,10 @@ router.post('/marcas/save', asyncHandler(async (req, res) => {
 
     await createMarca({ nome_marca });
 
-    res.status(200).json({ message: 'Marca criada com sucesso' });
+    res.status(200).json({
+        message: 'Marca registrada com sucesso!',
+        redirectUrl: '/admin/marcas'
+    });
 }));
 
 router.post('/marcas/delete/:id_marca', asyncHandler(async (req, res) => {
@@ -61,7 +64,10 @@ router.post('/marcas/update/:id_marca', asyncHandler(async (req, res) => {
 
     await updateMarca(parsedId, { nome_marca });
 
-    res.status(200).json({ message: 'Marca atualizada com sucesso' });
+    res.status(200).json({
+        message: 'Marca atualizada com sucesso!',
+        redirectUrl: '/admin/marcas'
+    });
 }));
 
 module.exports = router;

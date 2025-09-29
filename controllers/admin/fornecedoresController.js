@@ -33,7 +33,10 @@ router.post('/fornecedores/save', asyncHandler(async (req, res) => {
 
     await createFornecedor({ nome_fornecedor });
 
-    res.status(200).json({ message: 'Fornecedor criado com sucesso' });
+    res.status(200).json({
+        message: 'Fornecedor registrado com sucesso!',
+        redirectUrl: '/admin/fornecedores'
+    });
 }));
 
 router.post('/fornecedores/delete/:id_fornecedor', asyncHandler(async (req, res) => {
@@ -49,7 +52,7 @@ router.post('/fornecedores/delete/:id_fornecedor', asyncHandler(async (req, res)
 
     await deleteFornecedor(parsedId);
 
-    res.json({ message: 'Fornecedor excluído com sucesso'});
+    res.json({ message: 'Fornecedor excluído com sucesso' });
 }));
 
 router.post('/fornecedores/update/:id_fornecedor', asyncHandler(async (req, res) => {
@@ -61,7 +64,10 @@ router.post('/fornecedores/update/:id_fornecedor', asyncHandler(async (req, res)
 
     await updateFornecedor(parsedId, { nome_fornecedor });
 
-    res.status(200).json({ message: 'Fornecedor atualizado com sucesso' });
+    res.status(200).json({
+        message: 'Fornecedor atualizado com sucesso!',
+        redirectUrl: '/admin/fornecedores'
+    });
 }));
 
 module.exports = router;

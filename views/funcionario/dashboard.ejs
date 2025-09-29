@@ -1,0 +1,101 @@
+<%- include('../partials/header.ejs') %>
+    <%- include('../partials/navbar-funcionario.ejs') %>
+
+        <body>
+            <main>
+                <div class="container my-4">
+
+                    <h2 class="h4 mb-4">Painel do Operador</h2>
+
+                    <% if (caixa) { %>
+                        <div class="row g-4">
+                            <div class="col-12">
+                                <div class="d-grid">
+                                    <a href="/funcionario/vendas/new" class="btn btn-primary btn-lg py-3">
+                                        <i class="bi bi-cart-plus-fill me-2"></i> Registrar Nova Venda
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="card shadow-sm">
+                                    <div class="card-header d-flex justify-content-between align-items-center">
+                                        <h5 class="mb-0">Resumo do Turno Atual</h5>
+                                        <span class="badge bg-success">Caixa Aberto</span>
+                                    </div>
+                                    <div class="card-body">
+                                        <ul class="list-group list-group-flush">
+                                            <li class="list-group-item"><strong>PDV:</strong>
+                                                <%= caixa.pdv.identificacao %>
+                                            </li>
+                                            <li class="list-group-item"><strong>Abertura:</strong>
+                                                <%= new Date(caixa.data_abertura).toLocaleString('pt-BR') %>
+                                            </li>
+                                            <li class="list-group-item"><strong>Saldo Inicial:</strong>
+                                                <%= parseFloat(caixa.saldo_inicial).toLocaleString('pt-BR',
+                                                    {style:'currency', currency:'BRL'}) %>
+                                            </li>
+                                            <li class="list-group-item"><strong>Vendas no Turno:</strong>
+                                                <%= resumoCaixa.numVendas %>
+                                            </li>
+                                            <li class="list-group-item fw-bold d-flex justify-content-between">
+                                                <span>Saldo Esperado em Caixa:</span>
+                                                <span>
+                                                    <%= resumoCaixa.saldoEsperado.toLocaleString('pt-BR',
+                                                        {style:'currency', currency:'BRL'}) %>
+                                                </span>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <div class="card-footer text-end">
+                                        <form action="/funcionario/caixa/fechar" method="POST" class="d-inline">
+                                            <input type="hidden" name="id_caixa" value="<%= caixa.id_caixa %>">
+                                            <input type="number" step="0.01" name="saldo_final"
+                                                placeholder="Saldo Final Contado" required>
+                                            <button type="submit" class="btn btn-danger">
+                                                <i class="bi bi-lock-fill me-1"></i> Fechar Caixa
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <% } else { %>
+                            <div class="text-center py-5">
+                                <h3 class="fw-light">Bem-vindo(a), <%= user.nome %>!</h3>
+                                <p class="lead text-muted">Para começar, você precisa abrir o seu caixa.</p>
+                                <div class="card shadow-sm mx-auto mt-4" style="max-width: 400px;">
+                                    <div class="card-body">
+                                        <h5 class="card-title mb-3"><i class="bi-cash-stack me-2"></i>Abrir Caixa</h5>
+                                        <form action="/funcionario/caixa/abrir" method="POST"
+                                            class="d-flex flex-column gap-3">
+                                            <select name="id_pdv" class="form-select" required>
+                                                <option value="" disabled selected>Selecione o Ponto de Venda</option>
+                                                <% pdvs.forEach(pdv=> { %>
+                                                    <option value="<%= pdv.id_pdv %>">
+                                                        <%= pdv.identificacao %>
+                                                    </option>
+                                                    <% }) %>
+                                            </select>
+                                            <div class="form-floating">
+                                                <input type="number" step="0.01" name="saldo_inicial"
+                                                    class="form-control" placeholder="Saldo inicial" required
+                                                    id="saldo_inicial">
+                                                <label for="saldo_inicial">Saldo Inicial (Suprimento)</label>
+                                            </div>
+                                            <div class="d-grid">
+                                                <button type="submit" class="btn btn-success">
+                                                    <i class="bi-unlock-fill me-2"></i> Iniciar Turno
+                                                </button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                            <% } %>
+                </div>
+            </main>
+            <%- include('../partials/footer.ejs') %>
+        </body>
+
+        </html>

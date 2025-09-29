@@ -32,7 +32,10 @@ router.post('/funcionarios/save', asyncHandler(async (req, res) => {
 
     await createFuncionario({ nome, cpf, cargo: 'funcionario' });
 
-    res.redirect('/admin/funcionarios');
+    res.status(200).json({
+        message: 'Funcionario registrado com sucesso!',
+        redirectUrl: '/admin/funcionarios'
+    });
 }));
 
 router.post('/funcionarios/delete/:id_funcionario', asyncHandler(async (req, res) => {
@@ -54,7 +57,10 @@ router.post('/funcionarios/update/:id_funcionario', asyncHandler(async (req, res
 
     await updateFuncionario(parsedId, { nome });
 
-    res.redirect('/admin/funcionarios');
+    res.status(200).json({
+        message: 'Funcionario atualizado com sucesso!',
+        redirectUrl: '/admin/funcionarios'
+    });
 }));
 
 module.exports = router;

@@ -59,6 +59,7 @@ router.get('/vendas/produtos/:id_produto/lote', asyncHandler(async (req, res) =>
 
         return res.json(loteProcessado);
 
+    
     } catch (err) {
         console.error('Erro ao buscar lote/desconto', err);
         return res.status(500).json({ error: 'Erro interno' });
@@ -87,6 +88,8 @@ router.post('/vendas/save', asyncHandler(async (req, res) => {
     }
 
     await vendaService.createVenda(vendaData, id_funcionario, id_caixa);
+
+    req.flash('success_msg', `Venda #${novaVenda.id_venda} registrada com sucesso!`);
 
     res.redirect('/admin/vendas');
 }));

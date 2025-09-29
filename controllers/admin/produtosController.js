@@ -104,14 +104,17 @@ router.post('/produtos/save', asyncHandler(async (req, res) => {
 
     await createProduto({
         nome,
-        preco,
+        preco_compra: preco,
         codigo_barras,
         id_categoria,
         id_fornecedor,
         id_marca
     });
 
-    res.json({ message: 'Produto criado com sucesso' });
+    res.status(200).json({
+        message: 'Produto registrado com sucesso!',
+        redirectUrl: '/admin/produtos'
+    });
 }));
 
 router.post('/produtos/delete/:id_produto', asyncHandler(async (req, res) => {
@@ -139,14 +142,17 @@ router.post('/produtos/update/:id_produto', asyncHandler(async (req, res) => {
 
     await updateProduto(id_produto, {
         nome,
-        preco,
+        preco_compra: preco,
         codigo_barras,
         id_categoria,
         id_fornecedor,
         id_marca
     });
 
-    res.status(200).json({ message: 'Produto atualizado com sucesso' });
+    res.status(200).json({
+        message: 'Produto atualizado com sucesso!',
+        redirectUrl: '/admin/produtos'
+    });
 }));
 
 module.exports = router;

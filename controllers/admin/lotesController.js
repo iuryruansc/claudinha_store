@@ -35,7 +35,9 @@ router.post('/lotes/save', asyncHandler(async (req, res) => {
         localizacao
     }, id_funcionario);
 
-    res.sendSuccess('Produto adicionado ao estoque.');
+    req.flash('success_msg', 'Novo lote cadastrado e estoque atualizado!');
+
+    res.redirect('/admin/lotes');
 }));
 
 router.post('/lotes/delete/:id_lote', asyncHandler(async (req, res) => {
@@ -44,6 +46,8 @@ router.post('/lotes/delete/:id_lote', asyncHandler(async (req, res) => {
     numberValidation(parsedId);
 
     await deleteLote(parsedId);
+
+    req.flash('success_msg', 'Lote removido com sucesso!');
 
     res.redirect('/admin/lotes');
 }));
@@ -65,6 +69,8 @@ router.post('/lotes/update/:id_lote', asyncHandler(async (req, res) => {
         numero_lote: parsedNumLote,
         data_validade: parsedValidade
     }), id_funcionario);
+
+    req.flash('success_msg', 'Lote atualizado com sucesso!');
 
     res.redirect('/admin/lotes');
 }));

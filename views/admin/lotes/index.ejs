@@ -5,108 +5,110 @@
             <main class="main-content">
                 <div class="container">
 
-                    <div class="d-flex justify-content-between align-items-center my-4">
-                        <h2 class="mb-0 h4">
-                            <i class="bi bi-box-seam me-2"></i>
-                            Gerenciamento de Lotes de Estoque
-                        </h2>
-                        <a href="/admin/dashboard" class="btn btn-secondary">
-                            <i class="bi bi-arrow-left me-2"></i>Voltar
-                        </a>
-                    </div>
+                    <%- include('../../partials/messages.ejs') %>
 
-                    <div class="card shadow-sm">
-                        <div class="card-body">
-                            <div class="table-responsive">
-                                <table id="table-data" class="table table-hover align-middle">
-                                    <thead class="table-dark">
-                                        <tr>
-                                            <th>Produto</th>
-                                            <th>Número do Lote</th>
-                                            <th class="text-center">Quantidade</th>
-                                            <th>Localização</th>
-                                            <th>Status da Validade</th>
-                                            <th class="text-center">
-                                                <div class="d-flex align-items-center justify-content-center">
-                                                    <span>Ações</span>
-                                                    <div class="form-check form-switch d-inline-block ms-2"
-                                                        data-bs-toggle="tooltip" title="Habilitar exclusão em massa">
-                                                        <input class="form-check-input" type="checkbox" role="switch"
-                                                            id="toggleExcluir">
+                        <div class="d-flex justify-content-between align-items-center my-4">
+                            <h2 class="mb-0 h4">
+                                <i class="bi bi-box-seam me-2"></i>
+                                Gerenciamento de Lotes de Estoque
+                            </h2>
+                            <a href="/admin/dashboard" class="btn btn-secondary">
+                                <i class="bi bi-arrow-left me-2"></i>Voltar
+                            </a>
+                        </div>
+
+                        <div class="card shadow-sm">
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table id="table-data" class="table table-hover align-middle">
+                                        <thead class="table-dark">
+                                            <tr>
+                                                <th>Produto</th>
+                                                <th>Número do Lote</th>
+                                                <th class="text-center">Quantidade</th>
+                                                <th>Localização</th>
+                                                <th>Status da Validade</th>
+                                                <th class="text-center">
+                                                    <div class="d-flex align-items-center justify-content-center">
+                                                        <span>Ações</span>
+                                                        <div class="form-check form-switch d-inline-block ms-2"
+                                                            data-bs-toggle="tooltip"
+                                                            title="Habilitar exclusão em massa">
+                                                            <input class="form-check-input" type="checkbox"
+                                                                role="switch" id="toggleExcluir">
+                                                        </div>
                                                     </div>
-                                                </div>
-                                            </th>
-                                        </tr>
-                                    </thead>
-<tbody id="lotes-table-body">
-        <% lotes.forEach(lote => { %>
-            <%
-                // Acessa o produto diretamente, sem necessidade de 'find'
-                const produto = lote.produto;
-
-                // Lógica de status de validade
-                const hoje = new Date();
-                const dataValidade = new Date(lote.data_validade);
-                const diffDias = Math.ceil((dataValidade - hoje) / (1000 * 60 * 60 * 24));
-                
-                let rowClass = '';
-                let statusTexto = `Válido até ${dataValidade.toLocaleDateString('pt-BR')}`;
-                if (diffDias < 0) {
-                    rowClass = 'table-danger';
-                    statusTexto = `Vencido há ${Math.abs(diffDias)} dia(s)`;
-                } else if (diffDias <= 30) {
-                    rowClass = 'table-warning';
-                    statusTexto = `Vence em ${diffDias} dia(s)`;
-                }
-                
-                // Lógica de status da quantidade
-                const qtd = lote.quantidade;
-                let qtdClass = '';
-                if (qtd === 0) {
-                    qtdClass = 'text-danger fw-bold';
-                } else if (qtd <= 10) { 
-                    qtdClass = 'text-warning fw-bold';
-                }
-            %>
-            <tr class="<%= rowClass %>">
-                <td><%= produto ? produto.nome : 'Produto não encontrado' %></td>
-                <td><%= lote.numero_lote %></td>
-                <td class="text-center <%= qtdClass %>"><%= qtd %></td>
-                <td><%= lote.localizacao %></td>
-                <td><%= statusTexto %></td>
-                <td class="text-center">
-                    <div class="btn-group">
-                        <button class="btn btn-sm btn-outline-success" 
-                                data-bs-toggle="modal" 
-                                data-bs-target="#addQuantidadeModal"
-                                data-lote-id="<%= lote.id_lote %>"
-                                data-lote-numero="<%= lote.numero_lote %>"
-                                data-produto-nome="<%= produto ? produto.nome : '' %>"
-                                title="Adicionar quantidade">
-                            <i class="bi bi-plus-lg"></i>
-                        </button>
-                        <button class="btn btn-sm btn-outline-primary edit-lote-btn"
-                                data-bs-toggle="modal"
-                                data-bs-target="#editLoteModal"
-                                data-lote-id="<%= lote.id_lote %>"
-                                title="Editar lote">
-                            <i class="bi bi-pencil-fill"></i>
-                        </button>
-                        <form data-delete-form class="d-inline" action="/admin/lotes/delete/<%= lote.id_lote %>" method="POST">
-                            <input type="hidden" name="id_lote" value="<%= lote.id_lote %>">
-                            <button type="submit" class="btn btn-sm btn-outline-danger excluir-btn" title="Excluir lote" style="display: none;">
-                                <i class="bi bi-trash"></i>
-                            </button>
-                        </form>
-                    </div>
-                </td>
-            </tr>
-        <% }) %>
-</tbody>
-                                </table>
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="lotes-table-body">
+                                            <% lotes.forEach(lote=> { %>
+                                                <% const produto=lote.produto; const hoje=new Date(); const
+                                                    dataValidade=new Date(lote.data_validade); const
+                                                    diffDias=Math.ceil((dataValidade - hoje) / (1000 * 60 * 60 * 24));
+                                                    let rowClass='' ; let statusTexto=`Válido até
+                                                    ${dataValidade.toLocaleDateString('pt-BR')}`; if (diffDias < 0) {
+                                                    rowClass='table-danger' ; statusTexto=`Vencido há
+                                                    ${Math.abs(diffDias)} dia(s)`; } else if (diffDias <=30) {
+                                                    rowClass='table-warning' ; statusTexto=`Vence em ${diffDias}
+                                                    dia(s)`; } const qtd=lote.quantidade; let qtdClass='' ; if (qtd===0)
+                                                    { qtdClass='text-danger fw-bold' ; } else if (qtd <=10) {
+                                                    qtdClass='text-warning fw-bold' ; } %>
+                                                    <tr class="<%= rowClass %>">
+                                                        <td>
+                                                            <%= produto ? produto.nome : 'Produto não encontrado' %>
+                                                        </td>
+                                                        <td>
+                                                            <%= lote.numero_lote %>
+                                                        </td>
+                                                        <td class="text-center <%= qtdClass %>">
+                                                            <%= qtd %>
+                                                        </td>
+                                                        <td>
+                                                            <%= lote.localizacao %>
+                                                        </td>
+                                                        <td>
+                                                            <%= statusTexto %>
+                                                        </td>
+                                                        <td class="text-center">
+                                                            <div class="btn-group">
+                                                                <button class="btn btn-sm btn-outline-success"
+                                                                    data-bs-toggle="modal"
+                                                                    data-bs-target="#addQuantidadeModal"
+                                                                    data-lote-id="<%= lote.id_lote %>"
+                                                                    data-lote-numero="<%= lote.numero_lote %>"
+                                                                    data-produto-nome="<%= produto ? produto.nome : '' %>"
+                                                                    title="Adicionar quantidade">
+                                                                    <i class="bi bi-plus-lg"></i>
+                                                                </button>
+                                                                <button
+                                                                    class="btn btn-sm btn-outline-primary edit-lote-btn"
+                                                                    data-bs-toggle="modal"
+                                                                    data-bs-target="#editLoteModal"
+                                                                    data-lote-id="<%= lote.id_lote %>"
+                                                                    title="Editar lote">
+                                                                    <i class="bi bi-pencil-fill"></i>
+                                                                </button>
+                                                                <form data-delete-form class="d-inline"
+                                                                    action="/admin/lotes/delete/<%= lote.id_lote %>"
+                                                                    method="POST">
+                                                                    <input type="hidden" name="id_lote"
+                                                                        value="<%= lote.id_lote %>">
+                                                                    <button type="submit"
+                                                                        class="btn btn-sm btn-outline-danger excluir-btn"
+                                                                        title="Excluir lote" style="display: none;">
+                                                                        <i class="bi bi-trash"></i>
+                                                                    </button>
+                                                                </form>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                    <% }) %>
+                                        </tbody>
+                                    </table>
+                                </div>
                             </div>
                         </div>
-                    </div>
                 </div>
             </main>
 

@@ -17,12 +17,13 @@ const syncDatabase = require('./utils/data/data-sync');
 const navLinks = require('./utils/navigation/nav-links');
 const errorHandler = require('./utils/handlers/error-handler');
 const tokenCleanUp = require('./utils/clean-tokens');
-const promoCleanUp = require('./utils/clean-promos');
+const startPromoCleanup = require('./utils/clean-promos');
 
 //Routers
 const adminRouter = require('./routes/adminRoutes');
 const loginRouter = require('./routes/loginRoutes');
-const startPromoCleanup = require('./utils/clean-promos');
+const funcRouter = require('./routes/funcRoutes');
+
 
 //Configuration
 const port = process.env.PORT || 3000;
@@ -115,6 +116,7 @@ app.use((req, res, next) => {
 
 //Main Routes
 app.use('/admin', adminRouter);
+app.use('/funcionario', funcRouter);
 app.use('/', loginRouter);
 
 //Error Handling middleware

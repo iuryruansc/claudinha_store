@@ -23,7 +23,6 @@ router.post('/caixas/delete/:id_caixa', asyncHandler(async (req, res) => {
         });
     }
 
-
     numberValidation(parsedId);
 
     await deleteCaixa(parsedId);
