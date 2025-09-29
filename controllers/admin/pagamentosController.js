@@ -1,77 +1,60 @@
 const express = require('express');
 const router = express.Router();
 const asyncHandler = require('../../utils/handlers/async-handler');
-const { numberValidation, enumValidation } = require('../../utils/data/data-validation');
-const { parseIntValue, parseFloatValue } = require('../../utils/data/data-parsers');
-const { getAllPagamentos, getViewDependencies, deletePagamento, createPagamento } = require('../../services/admin/pagamentosService');
-
-router.get('/pagamentos/new/:id_venda', asyncHandler(async (req, res) => {
-    const [parsedId] = parseIntValue(req.params.id_venda)
-
-    res.render('admin/pagamentos/new', { id_venda: parsedId });
-}));
+const pagamentosService = require('../../services/admin/pagamentosService');
 
 router.get('/pagamentos', asyncHandler(async (req, res) => {
-    const { pagamentos, vendas } = await getAllPagamentos();
+    const hoje = new Date();
+    const anoAtual = hoje.getFullYear();
+    const mesAtual = hoje.getMonth() + 1;
 
-    res.render('admin/pagamentos/index', { pagamentos, vendas, });
-}));
+    const anoSelecionado = parseInt(req.query.ano, 10) || anoAtual;
+    const mesSelecionado = parseInt(req.query.mes, 10) || mesAtual;
 
-router.get('/pagamentos/edit/:id_pagamento', asyncHandler(async (req, res) => {
-    const [parsedId] = parseIntValue(req.params.id_pagamento);
+    const [historico, periodosDisponiveis] = await Promise.all([
+        pagamentosService.getHistoricoPagamentos({ ano: anoSelecionado, mes: mesSelecionado }),
+        pagamentosService.getPeriodosDisponiveis()
+    ]);
 
-    numberValidation(parsedId);
-
-    const { pagamento, vendas } = await getEditData(parsedId);
-
-    res.render('admin/pagamentos/edit', { pagamento, vendas });
-}));
-
-router.post('/pagamentos/save', asyncHandler(async (req, res) => {
-    const { forma_pagamento } = req.body;
-    const [parsedId, parsedParcelas] = parseIntValue(req.body.id_venda, req.body.parcelas);
-    const [parsedValor] = parseFloatValue(req.body.valor_total);
-
-    numberValidation(parsedId, parsedValor, parsedParcelas);
-    enumValidation(forma_pagamento, 'dinheiro', 'cartao_credito', 'cartao_debito', 'pix', 'outro');
-
-    await createPagamento({
-        id_venda: parsedId,
-        forma_pagamento,
-        valor_total: parsedValor,
-        parcelas: parsedParcelas
+    res.render('admin/pagamentos/index', {
+        historico,
+        periodosDisponiveis,
+        anoSelecionado,
+        mesSelecionado
     });
-
-    res.redirect('/admin/vendas');
 }));
 
-router.post('/pagamentos/delete/:id_pagamento', asyncHandler(async (req, res) => {
-    const [parsedId] = parseIntValue(req.params.id_pagamento);
-
-    numberValidation(parsedId);
-
-    await deletePagamento(parsedId);
-
-    res.redirect('/admin/pagamentos');
+router.get('/pagamentos/contas-a-receber', asyncHandler(async (req, res) => {
+    const contas = await pagamentosService.getContasAReceber();
+    res.render('admin/pagamentos/contas-a-receber', { contas });
 }));
 
-router.post('/pagamentos/update/:id_pagamento', asyncHandler(async (req, res) => {
-    const [parsedIdPag] = parseIntValue(req.params.id_pagamento)
-    const { forma_pagamento } = req.body;
-    const [parsedIdVenda, parsedParcelas] = parseIntValue(req.body.id_venda, req.body.parcelas);
-    const [parsedValor] = parseFloatValue(req.body.valor_total);
+router.get('/pagamentos/parcelas-a-receber', asyncHandler(async (req, res) => {
+    const vendas = await pagamentosService.getParcelasAReceber();
+    res.render('admin/pagamentos/parcelas-a-receber', { vendas });
+}));
 
-    numberValidation(parsedIdPag, parsedIdVenda, parsedValor, parsedParcelas);
-    enumValidation(forma_pagamento, 'dinheiro', 'cartao_credito', 'cartao_debito', 'pix', 'outro');
+router.post('/parcelas/quitar', asyncHandler(async (req, res) => {
+    const { parcelasIds } = req.body;
+    if (!parcelasIds || parcelasIds.length === 0) {
+        throw new Error('Nenhuma parcela foi selecionada para quitação.');
+    }
+    const ids = Array.isArray(parcelasIds) ? parcelasIds : [parcelasIds];
+    await pagamentosService.quitarParcelas(ids);
+    res.redirect('/admin/pagamentos/parcelas-a-receber');
+}));
 
-    await updateProduto(parsedIdPag, ({
-        id_venda: parsedIdVenda,
-        forma_pagamento,
-        valor_total: parsedValor,
-        parcelas: parsedParcelas
-    }));
-
-    res.redirect('/admin/pagamentos');
+router.post('/pagamentos/registrar', asyncHandler(async (req, res) => {
+    const dadosPagamento = {
+        id_venda: req.body.id_venda,
+        valor_pago: req.body.valor_pago,
+        forma_pagamento: req.body.forma_pagamento
+    };
+    if (!dadosPagamento.id_venda || !dadosPagamento.valor_pago || !dadosPagamento.forma_pagamento) {
+        throw new Error('Dados de pagamento incompletos.');
+    }
+    await pagamentosService.registrarPagamentoPendente(dadosPagamento);
+    res.redirect('/admin/pagamentos/contas-a-receber');
 }));
 
 module.exports = router;

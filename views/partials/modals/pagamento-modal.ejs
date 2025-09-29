@@ -1,0 +1,33 @@
+<div class="modal fade" id="registrarPagamentoModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <form id="form-registrar-pagamento" method="POST" action="/admin/pagamentos/registrar">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Registrar Novo Pagamento</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" name="id_venda" id="modal-id-venda">
+                    <p>Saldo devedor atual: <strong id="modal-saldo-devedor">R$ 0,00</strong></p>
+                    <div class="mb-3">
+                        <label for="modal-valor-pago" class="form-label">Valor a Pagar</label>
+                        <input type="number" class="form-control" name="valor_pago" id="modal-valor-pago" step="0.01"
+                            required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="modal-forma-pagamento" class="form-label">Forma de Pagamento</label>
+                        <select class="form-select" name="forma_pagamento" id="modal-forma-pagamento" required>
+                            <option value="dinheiro">Dinheiro</option>
+                            <option value="pix">PIX</option>
+                            <option value="cartao_debito">Cartão de Débito</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Confirmar Pagamento</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

@@ -24,6 +24,7 @@ router.post('/login', asyncHandler(async (req, res) => {
     req.session.cargo = usuarioEncontrado.cargo;
 
     if (usuarioEncontrado.cargo === 'admin') {
+        req.session.userId = '1';
         return res.redirect('/admin/dashboard');
     }
 

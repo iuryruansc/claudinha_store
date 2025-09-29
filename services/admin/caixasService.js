@@ -1,6 +1,10 @@
 const connection = require('../../database/database');
 const Caixa = require('../../models/caixa');
 const Pdv = require('../../models/pdv');
+const Venda = require('../../models/venda');
+const Cliente = require('../../models/cliente');
+const Pagamento = require('../../models/pagamento');
+const PagamentoParcial = require('../../models/pagamentoParcial');
 const Funcionario = require('../../models/funcionario');
 const { modelValidation } = require('../../utils/data/data-validation');
 
@@ -10,38 +14,15 @@ const findCaixaById = async (id) => {
     return caixa;
 };
 
-const getViewDependencies = async () => {
-    const [pdvs, funcionarios] = await Promise.all([
-        Pdv.findAll(),
-        Funcionario.findAll()
-    ]);
-    return { pdvs, funcionarios };
-};
-
 const getAllCaixas = async () => {
-    const caixaPromise = Caixa.findAll();
-    const dependenciesPromise = getViewDependencies()
-
-    const [caixas, dependencies] = await Promise.all([caixaPromise, dependenciesPromise]);
-
-    return { caixas, ...dependencies };
-};
-
-const getEditData = async (id) => {
-    const caixaPromise = findCaixaById(id);
-    const dependenciesPromise = getViewDependencies();
-
-    const [caixa, dependencies] = await Promise.all([caixaPromise, dependenciesPromise]);
-
-    return { caixa, ...dependencies };
-}
-
-const updateCaixa = async (id, updateData) => {
-    return await Caixa.update(updateData, {
-        where: {
-            id_caixa: id
-        }
+    const caixas = await Caixa.findAll({
+        include: [
+            { model: Funcionario, as: 'funcionario' },
+            { model: Pdv, as: 'pdv' }
+        ],
+        order: [['data_abertura', 'DESC']]
     });
+    return { caixas };
 };
 
 const deleteCaixa = async (id) => {
@@ -79,7 +60,7 @@ const closeCaixa = async ({ id_caixa, saldo_final }) => {
         caixa.data_fechamento = new Date();
         caixa.status = 'fechado';
         await caixa.save({ transaction: t });
-        
+
         await Pdv.update(
             { status: 'ativo' },
             { where: { id_pdv: caixa.id_pdv }, transaction: t }
@@ -89,13 +70,72 @@ const closeCaixa = async ({ id_caixa, saldo_final }) => {
     });
 };
 
+const findCaixaDetailsById = async (id_caixa) => {
+    const caixa = await Caixa.findByPk(id_caixa, {
+        include: [
+            { model: Funcionario, as: 'funcionario' },
+            { model: Pdv, as: 'pdv' },
+            {
+                model: Venda,
+                as: 'vendas',
+                include: [
+                    { model: Pagamento, as: 'pagamentos' },
+                    { model: PagamentoParcial, as: 'pagamentoparcials' },
+                    { model: Cliente, as: 'cliente' }
+                ]
+            }
+        ]
+    });
+
+    if (!caixa) {
+        throw new Error('Registro de caixa não encontrado.');
+    }
+
+    let resumoFinanceiro = {
+        totalVendas: 0,
+        totalRecebidoDinheiro: 0,
+        totalRecebidoCartao: 0,
+        totalRecebidoPix: 0,
+        totalRecebidoOutros: 0,
+        saldoEsperado: parseFloat(caixa.saldo_inicial)
+    };
+
+    if (caixa.vendas) {
+        resumoFinanceiro.totalVendas = caixa.vendas.reduce((acc, v) => acc + parseFloat(v.valor_total), 0);
+
+        const todosPagamentos = caixa.vendas.flatMap(v =>
+            [...v.pagamentos, ...v.pagamentoparcials]
+        );
+
+        todosPagamentos.forEach(p => {
+            const valor = parseFloat(p.valor_total || p.valor_pago);
+            switch (p.forma_pagamento) {
+                case 'dinheiro':
+                    resumoFinanceiro.totalRecebidoDinheiro += valor;
+                    break;
+                case 'cartao_credito':
+                case 'cartao_debito':
+                    resumoFinanceiro.totalRecebidoCartao += valor;
+                    break;
+                case 'pix':
+                    resumoFinanceiro.totalRecebidoPix += valor;
+                    break;
+                default:
+                    resumoFinanceiro.totalRecebidoOutros += valor;
+            }
+        });
+
+        resumoFinanceiro.saldoEsperado += resumoFinanceiro.totalRecebidoDinheiro;
+    }
+
+    return { caixa, resumoFinanceiro };
+};
+
 module.exports = {
     findCaixaById,
-    getViewDependencies,
     getAllCaixas,
-    getEditData,
     openCaixa,
     closeCaixa,
-    updateCaixa,
-    deleteCaixa
+    deleteCaixa,
+    findCaixaDetailsById
 };

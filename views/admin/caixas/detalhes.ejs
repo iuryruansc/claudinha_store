@@ -1,0 +1,105 @@
+<%- include('../../partials/header.ejs') %>
+<%- include('../../partials/navbar.ejs') %>
+
+<body>
+    <main class="main-content">
+        <div class="container my-4">
+
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2 class="mb-0 h4">
+                    <i class="bi bi-file-earmark-spreadsheet me-2"></i>
+                    Relatório do Caixa #<%= caixa.id_caixa %>
+                </h2>
+                <a href="/admin/caixas" class="btn btn-secondary btn-sm">
+                    <i class="bi bi-arrow-left-circle me-1"></i>Voltar para a Lista
+                </a>
+            </div>
+
+            <div class="row mb-4">
+                <div class="col-md-3">
+                    <div class="card text-center h-100">
+                        <div class="card-body">
+                            <h6 class="card-title text-muted">Saldo Inicial</h6>
+                            <p class="card-text fs-4 fw-semibold"><%= parseFloat(caixa.saldo_inicial).toLocaleString('pt-BR', {style:'currency', currency:'BRL'}) %></p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card text-center h-100">
+                         <div class="card-body">
+                            <h6 class="card-title text-muted">Saldo Esperado (Sistema)</h6>
+                            <p class="card-text fs-4 fw-semibold"><%= resumoFinanceiro.saldoEsperado.toLocaleString('pt-BR', {style:'currency', currency:'BRL'}) %></p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card text-center h-100">
+                         <div class="card-body">
+                            <h6 class="card-title text-muted">Saldo Final (Contado)</h6>
+                            <p class="card-text fs-4 fw-semibold"><%= parseFloat(caixa.saldo_final).toLocaleString('pt-BR', {style:'currency', currency:'BRL'}) %></p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <% const diferenca = parseFloat(caixa.saldo_final) - resumoFinanceiro.saldoEsperado; %>
+                    <div class="card text-center h-100 <%= diferenca < 0 ? 'bg-danger-subtle' : (diferenca > 0 ? 'bg-primary-subtle' : 'bg-success-subtle') %>">
+                         <div class="card-body">
+                            <h6 class="card-title text-muted">Diferença (Quebra)</h6>
+                            <p class="card-text fs-4 fw-bold <%= diferenca < 0 ? 'text-danger-emphasis' : (diferenca > 0 ? 'text-primary-emphasis' : 'text-success-emphasis') %>">
+                                <%= diferenca.toLocaleString('pt-BR', {style:'currency', currency:'BRL'}) %>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row g-4">
+                <div class="col-lg-4">
+                    <div class="card">
+                        <div class="card-header">Informações do Turno</div>
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item"><strong>Funcionário:</strong> <%= caixa.funcionario.nome %></li>
+                            <li class="list-group-item"><strong>PDV:</strong> <%= caixa.pdv.identificacao %></li>
+                            <li class="list-group-item"><strong>Abertura:</strong> <%= new Date(caixa.data_abertura).toLocaleString('pt-BR') %></li>
+                            <li class="list-group-item"><strong>Fechamento:</strong> <%= new Date(caixa.data_fechamento).toLocaleString('pt-BR') %></li>
+                        </ul>
+                    </div>
+                     <div class="card mt-4">
+                        <div class="card-header">Resumo de Entradas</div>
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item d-flex justify-content-between"><span>Dinheiro:</span> <strong><%= resumoFinanceiro.totalRecebidoDinheiro.toLocaleString('pt-BR', {style:'currency', currency:'BRL'}) %></strong></li>
+                            <li class="list-group-item d-flex justify-content-between"><span>Cartão:</span> <strong><%= resumoFinanceiro.totalRecebidoCartao.toLocaleString('pt-BR', {style:'currency', currency:'BRL'}) %></strong></li>
+                            <li class="list-group-item d-flex justify-content-between"><span>PIX:</span> <strong><%= resumoFinanceiro.totalRecebidoPix.toLocaleString('pt-BR', {style:'currency', currency:'BRL'}) %></strong></li>
+                            <li class="list-group-item d-flex justify-content-between"><strong>Total de Vendas:</strong> <strong class="fs-5"><%= resumoFinanceiro.totalVendas.toLocaleString('pt-BR', {style:'currency', currency:'BRL'}) %></strong></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-lg-8">
+                     <div class="card">
+                        <div class="card-header">Vendas Realizadas neste Turno</div>
+                        <div class="card-body">
+                             <div class="table-responsive">
+                                <table class="table table-sm table-hover">
+                                    <thead><tr><th>ID</th><th>Cliente</th><th class="text-end">Total</th><th class="text-center">Status</th></tr></thead>
+                                    <tbody>
+                                        <% caixa.vendas.forEach(v => { %>
+                                            <tr>
+                                                <td><a href="/admin/vendas/detalhes/<%= v.id_venda %>">#<%= v.id_venda %></a></td>
+                                                <td><%= v.cliente ? v.cliente.nome : 'Anônimo' %></td>
+                                                <td class="text-end"><%= parseFloat(v.valor_total).toLocaleString('pt-BR', {style:'currency', currency:'BRL'}) %></td>
+                                                <td class="text-center"><span class="badge <%= v.status === 'CONCLUIDA' ? 'bg-success' : 'bg-warning' %>"><%= v.status %></span></td>
+                                            </tr>
+                                        <% }) %>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                     </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+</body>
+<%- include('../../partials/footer.ejs') %>
+</html>

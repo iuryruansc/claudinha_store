@@ -1,0 +1,45 @@
+<div class="modal fade" id="editLoteModal" tabindex="-1" aria-labelledby="editLoteModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <form id="edit-lote-form" method="POST">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editLoteModalLabel">Editar Lote</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" name="id_lote" id="edit-id-lote">
+
+                    <p><strong>Produto:</strong> <span id="edit-produto-nome"></span></p>
+
+                    <div class="mb-3 form-floating">
+                        <input class="form-control" type="text" name="numero_lote" id="edit-numero-lote"
+                            placeholder="Número do lote" required>
+                        <label for="edit-numero-lote">Número do Lote</label>
+                    </div>
+
+                    <div class="mb-3 form-floating">
+                        <input class="form-control" type="number" name="quantidade" id="edit-quantidade"
+                            placeholder="Quantidade" required>
+                        <label for="edit-quantidade">Quantidade Atual</label>
+                    </div>
+
+                    <div class="mb-3 form-floating">
+                        <input class="form-control" type="text" name="localizacao" id="edit-localizacao"
+                            placeholder="Localização" required>
+                        <label for="edit-localizacao">Localização</label>
+                    </div>
+
+                    <div class="mb-3 form-floating">
+                        <input class="form-control" type="date" name="data_validade" id="edit-data-validade"
+                            placeholder="Data de validade">
+                        <label for="edit-data-validade">Data de Validade</label>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Salvar Alterações</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

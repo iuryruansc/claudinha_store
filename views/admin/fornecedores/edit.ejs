@@ -1,54 +1,55 @@
 <%- include('../../partials/header.ejs') %>
-<%- include('../../partials/navbar.ejs') %>
+    <%- include('../../partials/navbar.ejs') %>
 
-<body>
-    <main class="main-content">
-        <div class="container">
-            <div id="error-popup-container"></div>
-            <div class="d-flex justify-content-between align-items-center my-4">
-                <h2 class="mb-0 h4">
-                    <i class="bi bi-truck me-2"></i>
-                    Editar Fornecedor
-                </h2>
-                <a href="/admin/fornecedores" class="btn btn-secondary">
-                    <i class="bi bi-arrow-left me-2"></i>Voltar
-                </a>
-            </div>
+        <body>
+            <main class="main-content">
+                <div class="container">
+                    <div id="error-popup-container"></div>
+                    <div class="d-flex justify-content-between align-items-center my-4">
+                        <h2 class="mb-0 h4">
+                            <i class="bi bi-truck me-2"></i>
+                            Editar Fornecedor
+                        </h2>
+                        <a href="/admin/fornecedores" class="btn btn-secondary">
+                            <i class="bi bi-arrow-left me-2"></i>Voltar
+                        </a>
+                    </div>
 
-            <div class="card shadow-sm">
-                <div class="card-body">
-                    <form id="fornecedor-form" method="POST"
-                        action="/admin/fornecedores/update/<%= fornecedor.id_fornecedor %>">
-                        <div class="mb-3">
-                            <label for="fornecedorName" class="form-label">Nome do Fornecedor</label>
-                            <input class="form-control" type="text" id="fornecedorName" name="nome_fornecedor"
-                                placeholder="Defina o nome do fornecedor" value="<%= fornecedor.nome_fornecedor %>"
-                                required>
+                    <div class="card shadow-sm">
+                        <div class="card-body">
+                            <form id="fornecedor-form" method="POST"
+                                action="/admin/fornecedores/update/<%= fornecedor.id_fornecedor %>">
+                                <div class="mb-3">
+                                    <label for="fornecedorName" class="form-label">Nome do Fornecedor</label>
+                                    <input class="form-control" type="text" id="fornecedorName" name="nome_fornecedor"
+                                        placeholder="Defina o nome do fornecedor"
+                                        value="<%= fornecedor.nome_fornecedor %>" required>
+                                </div>
+                                <input type="hidden" name="id_fornecedor" value="<%= fornecedor.id_fornecedor %>">
+                                <button type="submit" class="btn btn-success" disabled>
+                                    <i class="bi bi-arrow-clockwise me-2"></i>Salvar Alterações
+                                </button>
+                            </form>
                         </div>
-                        <input type="hidden" name="id_fornecedor" value="<%= fornecedor.id_fornecedor %>">
-                        <button type="submit" class="btn btn-success" disabled>
-                            <i class="bi bi-arrow-clockwise me-2"></i>Salvar Alterações
-                        </button>
-                    </form>
+                    </div>
                 </div>
-            </div>
-        </div>
 
-    </main>
+            </main>
 
-    <%- include('../../partials/footer.ejs') %>
+            <%- include('../../partials/footer.ejs') %>
 
-    <script type="module">
-        import { setupSingleFieldEdit } from '/js/single-field-edit.js';
+                <script type="module">
+                    import { setupSingleFieldEdit } from '/js/lib/single-field-edit.js';
 
-        document.addEventListener('DOMContentLoaded', function () {
-            setupSingleFieldEdit({
-                formSelector: '#fornecedor-form',
-                inputName: 'nome_fornecedor',
-                redirectUrl: '/admin/fornecedores',
-                fieldKey: 'nome_fornecedor'
-            });
-        });
-    </script>
-</body>
-</html>
+                    document.addEventListener('DOMContentLoaded', function () {
+                        setupSingleFieldEdit({
+                            formSelector: '#fornecedor-form',
+                            inputName: 'nome_fornecedor',
+                            redirectUrl: '/admin/fornecedores',
+                            fieldKey: 'nome_fornecedor'
+                        });
+                    });
+                </script>
+        </body>
+
+        </html>

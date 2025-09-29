@@ -3,15 +3,15 @@
 <script src="https://cdn.datatables.net/2.3.4/js/dataTables.min.js"></script>
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script src="/js/show-success-popup.js"></script>
+<script src="/js/lib/show-success-popup.js"></script>
 
 <script>
     $(document).ready(function () {
         let actionsColumnIndex = -1;
         $('#table-data thead th').each(function (index) {
-            if ($(this).text().trim() === 'Ações') {
+            if ($(this).text().trim().includes('Ações')) {
                 actionsColumnIndex = index;
-                return false; // Found it, exit the loop
+                return false; 
             }
         });
 
@@ -20,9 +20,12 @@
                 url: 'https://cdn.jsdelivr.net/npm/datatables.net-plugins@1.13.4/i18n/pt-BR.json'
             },
             pageLength: 10,
-            order: [[4, 'asc']],
-            "columnDefs": [
-                { "orderable": false, "targets": actionsColumnIndex }
+            order: [],
+            columnDefs: [
+                {
+                    orderable: false,
+                    targets: actionsColumnIndex 
+                }
             ]
         });
     });

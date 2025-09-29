@@ -1,21 +1,26 @@
 const express = require('express');
-const { Op } = require('sequelize');
 const router = express.Router();
 const asyncHandler = require('../../utils/handlers/async-handler');
 const { requireCaixa } = require('../../utils/handlers/auth-handler');
 const vendaService = require('../../services/admin/vendasService');
 const formatDate = require('../../utils/data/date-formatter');
-const Produto = require('../../models/produto');
-const Lote = require('../../models/lote');
-const Desconto = require('../../models/desconto');
 
 router.get('/vendas', asyncHandler(async (req, res) => {
-    const { vendas, caixas, clientes, funcionarios, produtos } = await vendaService.getAllVendas();
 
-    res.render('admin/vendas/index', { vendas, caixas, clientes, funcionarios, produtos, formatDate })
+    const { vendas } = await vendaService.getAllVendas();
+
+    res.render('admin/vendas/index', { vendas, formatDate })
 }));
-/* 
-router.use(requireCaixa); */
+
+router.get('/vendas/detalhes/:id', asyncHandler(async (req, res) => {
+    const id_venda = req.params.id;
+
+    const { venda, totalPago, saldo } = await vendaService.findVendaDetailsById(id_venda);
+
+    res.render('admin/vendas/detalhes', { venda, totalPago, saldo });
+}));
+
+/* router.use(requireCaixa); */
 
 router.get('/vendas/new', asyncHandler(async (req, res) => {
     const { clientes, produtos } = await vendaService.getViewDependencies();
@@ -32,7 +37,7 @@ router.get('/vendas/new', asyncHandler(async (req, res) => {
 
 router.get('/vendas/produtos/codigobarras/:codigo', asyncHandler(async (req, res) => {
     const codigo_barras = req.params.codigo;
-    
+
     const resultado = await vendaService.findProdutoLotePorCodigoBarras(codigo_barras);
 
     return res.json(resultado);
@@ -45,7 +50,7 @@ router.get('/vendas/produtos/:id_produto/lote', asyncHandler(async (req, res) =>
         if (isNaN(id_produto)) {
             return res.status(400).json({ error: 'ID de produto inválido.' });
         }
-        
+
         const loteProcessado = await vendaService.findLoteParaVenda(id_produto);
 
         if (!loteProcessado) {
@@ -62,6 +67,29 @@ router.get('/vendas/produtos/:id_produto/lote', asyncHandler(async (req, res) =>
 module.exports = router;
 
 router.post('/vendas/save', asyncHandler(async (req, res) => {
+    const vendaData = req.body;
+
+    const id_funcionario = req.session.userId;
+    const id_caixa = req.session.caixaId;
+
+    const { itens, pagamentos } = req.body;
+
+    const itensValidos = itens && itens.length > 0;
+    const pagamentosValidos = (pagamentos || []).filter(p => parseFloat(p.valor) > 0);
+
+    if (itensValidos && pagamentosValidos.length === 0) {
+        req.flash('error_msg', 'Você deve adicionar pelo menos uma forma de pagamento para criar a venda.');
+        return res.redirect('/admin/vendas/new');
+    }
+
+    if (!vendaData.itens || vendaData.itens.length === 0) {
+        return res.status(400).send('Não é possível criar uma venda sem itens.');
+    }
+
+    await vendaService.createVenda(vendaData, id_funcionario, id_caixa);
+
+    res.redirect('/admin/vendas');
 }));
+
 
 module.exports = router;

@@ -52,8 +52,6 @@ router.post('/funcionarios/update/:id_funcionario', asyncHandler(async (req, res
     numberValidation(parsedId);
     stringValidation(nome);
 
-    console.log(parsedId);
-
     await updateFuncionario(parsedId, { nome });
 
     res.redirect('/admin/funcionarios');

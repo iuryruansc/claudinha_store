@@ -121,25 +121,16 @@
   cursor: pointer;
 }
 
-.promo-card {
-  border-radius: .5rem;
-  transition: transform .2s, box-shadow .2s;
-}
-.promo-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 .75rem 1.5rem rgba(0,0,0,.1);
-}
-
-.ribbon {
-  position: absolute;
-  top: 0.5rem;
-  left: -2.5rem;
-  width: 8rem;
-  text-align: center;
-  transform: rotate(-45deg);
-  font-weight: bold;
-  box-shadow: 0 0 5px rgba(0,0,0,.2);
-}
+.promo-card .ribbon {
+        position: absolute;
+        top: 10px;
+        right: -30px;
+        transform: rotate(45deg);
+        padding: 5px 30px;
+        font-size: 0.8rem;
+        font-weight: bold;
+        z-index: 10;
+    }
 
 .promo-bar {
   display: flex;
@@ -162,6 +153,10 @@
 }
 .promo-even .promo-card {
   background-color: #E1F5FE;
+}
+
+.container-card {
+  border: 1px solid transparent;
 }
 
 .promo-card {
@@ -229,3 +224,11 @@
 
 #global-discount-row label { min-width: 110px; }
 #global-discount-row .form-select, #global-discount-row .form-control { min-height: 34px; }
+
+#mes-select {
+  min-width: 150px;
+}
+
+#mes-select-div{
+  flex-wrap: nowrap;
+}

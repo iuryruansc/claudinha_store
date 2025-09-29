@@ -1,0 +1,161 @@
+<%- include('../../partials/header.ejs') %>
+    <%- include('../../partials/navbar.ejs') %>
+
+        <body>
+            <main class="main-content">
+                <div class="container">
+                    <div class="d-flex justify-content-between align-items-center my-4">
+                        <h2 class="mb-0 h4">
+                            <i class="bi bi-cash-stack me-2"></i>
+                            Contas a Receber (Vendas Pendentes)
+                        </h2>
+                    </div>
+
+                    <ul class="nav nav-tabs mb-3">
+                        <li class="nav-item">
+                            <a class="nav-link" aria-current="page" href="/admin/pagamentos">
+                                <i class="bi bi-clock-history me-1"></i> Histórico Completo
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" href="/admin/pagamentos/contas-a-receber">
+                                <i class="bi bi-cash-stack me-1"></i> Contas a Receber
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/admin/pagamentos/parcelas-a-receber">
+                                <i class="bi bi-credit-card-2-front me-1"></i> Parcelas a Receber
+                            </a>
+                        </li>
+                    </ul>
+
+                    <div class="card shadow-sm">
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-hover align-middle">
+                                    <thead class="table-dark">
+                                        <tr>
+                                            <th>Cliente</th>
+                                            <th>Data da Venda</th>
+                                            <th>Valor Total</th>
+                                            <th>Valor Pago</th>
+                                            <th>Saldo Devedor</th>
+                                            <th class="text-center">Ação</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <% if (contas && contas.length> 0) { %>
+                                            <% contas.forEach(conta=> { %>
+                                                <tr class="table-warning">
+                                                    <td>
+                                                        <%= conta.cliente %>
+                                                    </td>
+                                                    <td>
+                                                        <%= new Date(conta.data_hora).toLocaleDateString('pt-BR') %>
+                                                    </td>
+                                                    <td>
+                                                        <%= parseFloat(conta.valor_total).toLocaleString('pt-BR', {
+                                                            style: 'currency' , currency: 'BRL' }) %>
+                                                    </td>
+                                                    <td>
+                                                        <%= conta.total_pago.toLocaleString('pt-BR', { style: 'currency'
+                                                            , currency: 'BRL' }) %>
+                                                    </td>
+                                                    <td class="fw-bold">
+                                                        <%= conta.saldo_devedor.toLocaleString('pt-BR', {
+                                                            style: 'currency' , currency: 'BRL' }) %>
+                                                    </td>
+                                                    <td class="text-center">
+                                                        <button class="btn btn-sm btn-success" data-bs-toggle="modal"
+                                                            data-bs-target="#registrarPagamentoModal"
+                                                            data-venda-id="<%= conta.id_venda %>"
+                                                            data-saldo-devedor="<%= conta.saldo_devedor %>">
+                                                            <i class="bi bi-plus-circle me-1"></i> Registrar Pagamento
+                                                        </button>
+                                                    </td>
+                                                </tr>
+
+                                                <% if (conta.parcelas && conta.parcelas.length> 0) { %>
+                                                    <tr>
+                                                        <td colspan="6" class="p-0">
+                                                            <div class="accordion accordion-flush">
+                                                                <div class="accordion-item">
+                                                                    <h2 class="accordion-header">
+                                                                        <button class="accordion-button collapsed"
+                                                                            type="button" data-bs-toggle="collapse"
+                                                                            data-bs-target="#collapse-<%= conta.id_venda %>">
+                                                                            Ver Detalhes das Parcelas (<%=
+                                                                                conta.parcelas.length %>)
+                                                                        </button>
+                                                                    </h2>
+                                                                    <div id="collapse-<%= conta.id_venda %>"
+                                                                        class="accordion-collapse collapse">
+                                                                        <div class="accordion-body">
+                                                                            <ul class="list-group">
+                                                                                <% conta.parcelas.forEach(p=> { %>
+                                                                                    <li
+                                                                                        class="list-group-item d-flex justify-content-between">
+                                                                                        <span>Parcela <%=
+                                                                                                p.numero_parcela %>
+                                                                                                (Venc: <%= new
+                                                                                                    Date(p.data_vencimento).toLocaleDateString('pt-BR')
+                                                                                                    %>)</span>
+                                                                                        <span
+                                                                                            class="badge <%= p.status === 'pago' ? 'bg-success' : 'bg-secondary' %>">
+                                                                                            <%= p.status %>
+                                                                                        </span>
+                                                                                    </li>
+                                                                                    <% }) %>
+                                                                            </ul>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                    <% } %>
+                                                        <% }) %>
+                                                            <% } else { %>
+                                                                <tr>
+                                                                    <td colspan="6" class="text-center text-muted py-5">
+                                                                        <p class="mb-1" style="font-size: 2.5rem;"><i
+                                                                                class="bi bi-check2-circle"></i></p>
+                                                                        <h4>Nenhuma conta pendente!</h4>
+                                                                        <p class="mb-0">Todas as vendas estão quitadas.
+                                                                        </p>
+                                                                    </td>
+                                                                </tr>
+                                                                <% } %>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+
+            <%- include('../../partials/modals/pagamento-modal.ejs') %>
+
+        </body>
+
+        <script>
+            const registrarPagamentoModal = document.getElementById('registrarPagamentoModal');
+            registrarPagamentoModal.addEventListener('show.bs.modal', event => {
+                const button = event.relatedTarget;
+                const vendaId = button.getAttribute('data-venda-id');
+                const saldoDevedor = parseFloat(button.getAttribute('data-saldo-devedor'));
+
+                const modalVendaIdInput = registrarPagamentoModal.querySelector('#modal-id-venda');
+                const modalSaldoDevedorEl = registrarPagamentoModal.querySelector('#modal-saldo-devedor');
+                const modalValorPagoInput = registrarPagamentoModal.querySelector('#modal-valor-pago');
+
+                modalVendaIdInput.value = vendaId;
+                modalSaldoDevedorEl.textContent = saldoDevedor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+                modalValorPagoInput.value = saldoDevedor.toFixed(2);
+                modalValorPagoInput.max = saldoDevedor.toFixed(2);
+            });
+        </script>
+
+        <%- include('../../partials/footer.ejs') %>
+
+            </html>

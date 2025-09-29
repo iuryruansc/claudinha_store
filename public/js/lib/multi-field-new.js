@@ -1,6 +1,6 @@
-import { showErrorPopup } from '/js/show-error-popup.js';
+import { showErrorPopup } from '/js/lib/show-error-popup.js';
 
-export function setupMultiFieldEdit({
+export function setupMultiFieldNew({
     formSelector,
     inputFields = [],
     selectFields = [],
@@ -8,8 +8,6 @@ export function setupMultiFieldEdit({
     redirectUrl,
     fieldMap = {},
     errorMessages = {
-        unchanged: 'Nenhuma alteração foi feita.',
-        required: 'Preencha todos os campos obrigatórios.',
         network: 'Ocorreu um erro de rede. Tente novamente mais tarde.',
     }
 }) {
@@ -21,22 +19,13 @@ export function setupMultiFieldEdit({
     const inputs = inputFields.map(sel => document.querySelector(sel));
     const selects = selectFields.map(sel => document.querySelector(sel));
 
-    const fields = {};
-    const originalValues = {};
-
-    for (const [key, selector] of Object.entries(fieldMap)) {
-        const el = document.querySelector(selector);
-        if (el) {
-            fields[key] = el;
-            originalValues[key] = el.value.trim();
-        }
-    }
-
     function validateForm() {
         const allRequiredFilled = requiredFields.every(key => {
-            const el = fields[key];
+            const selector = fieldMap[key];
+            const el = document.querySelector(selector);
             return el && el.value.trim().length > 0;
         });
+
 
         if (allRequiredFilled) {
             button.removeAttribute('disabled');
@@ -54,37 +43,17 @@ export function setupMultiFieldEdit({
     form.addEventListener('submit', async function (event) {
         event.preventDefault();
 
-        const updatedValues = {};
-        for (const [key, el] of Object.entries(fields)) {
-            let value = el.value.trim();
-            
-            if (key === 'preco') {
-                value = value.replace(',', '.');
-            }
-
-            updatedValues[key] = value;
-        }
-
-        const isUnchanged = Object.keys(updatedValues).every(
-            key => updatedValues[key] === originalValues[key]
-        );
-
-        if (isUnchanged) {
-            showErrorPopup(errorMessages.unchanged);
-            return;
-        }
-
-        const missingRequired = requiredFields.some(key => !updatedValues[key]);
-        if (missingRequired) {
-            showErrorPopup(errorMessages.required);
-            return;
+        const payload = {};
+        for (const [key, selector] of Object.entries(fieldMap)) {
+            const el = document.querySelector(selector);
+            if (el) payload[key] = el.value;
         }
 
         try {
             const response = await fetch(form.getAttribute('action'), {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(updatedValues),
+                body: JSON.stringify(payload),
             });
 
             if (response.ok) {
@@ -98,5 +67,4 @@ export function setupMultiFieldEdit({
             showErrorPopup(errorMessages.network);
         }
     });
-    validateForm();
 }

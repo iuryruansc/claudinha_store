@@ -1,12 +1,11 @@
-import { showErrorPopup } from "/js/show-error-popup.js";
+import { showErrorPopup } from '/js/lib/show-error-popup.js'
 
-export function setupSingleFieldEdit({
+export function setupSingleFieldNew({
     formSelector,
     inputName,
     redirectUrl,
     errorMessages = {
         empty: 'O campo não pode ser vazio.',
-        unchanged: 'O valor não foi alterado. Requisição não enviada.',
         network: 'Ocorreu um erro de rede. Tente novamente mais tarde.',
     },
     fieldKey
@@ -16,20 +15,22 @@ export function setupSingleFieldEdit({
 
     const input = form.querySelector(`input[name="${inputName}"]`);
     const button = form.querySelector('button[type="submit"]');
-    const originalValue = input.value;
+
+    input.addEventListener('input', function () {
+        if (this.value.trim().length > 0) {
+            button.removeAttribute('disabled');
+        } else {
+            button.setAttribute('disabled', 'disabled');
+        }
+    });
 
     form.addEventListener('submit', async function (event) {
         event.preventDefault();
 
-        const newValue = input.value.trim();
+        const value = input.value.trim();
 
-        if (newValue.length === 0) {
+        if (value.length === 0) {
             showErrorPopup(errorMessages.empty);
-            return;
-        }
-
-        if (newValue === originalValue) {
-            showErrorPopup(errorMessages.unchanged);
             return;
         }
 
@@ -37,7 +38,7 @@ export function setupSingleFieldEdit({
             const response = await fetch(form.getAttribute('action'), {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ [fieldKey]: newValue }),
+                body: JSON.stringify({ [fieldKey]: value }),
             });
 
             if (response.ok) {
@@ -49,14 +50,6 @@ export function setupSingleFieldEdit({
         } catch (error) {
             console.error('Erro de rede:', error);
             showErrorPopup(errorMessages.network);
-        }
-    });
-
-    input.addEventListener('input', function () {
-        if (this.value.trim().length > 0) {
-            button.removeAttribute('disabled');
-        } else {
-            button.setAttribute('disabled', 'disabled');
         }
     });
 }

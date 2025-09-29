@@ -1,6 +1,6 @@
-import { showErrorPopup } from '/js/show-error-popup.js';
+import { showErrorPopup } from '/js/lib/show-error-popup.js';
 
-export function setupMultiFieldNew({
+export function setupMultiFieldEdit({
     formSelector,
     inputFields = [],
     selectFields = [],
@@ -8,6 +8,8 @@ export function setupMultiFieldNew({
     redirectUrl,
     fieldMap = {},
     errorMessages = {
+        unchanged: 'Nenhuma alteração foi feita.',
+        required: 'Preencha todos os campos obrigatórios.',
         network: 'Ocorreu um erro de rede. Tente novamente mais tarde.',
     }
 }) {
@@ -19,13 +21,22 @@ export function setupMultiFieldNew({
     const inputs = inputFields.map(sel => document.querySelector(sel));
     const selects = selectFields.map(sel => document.querySelector(sel));
 
+    const fields = {};
+    const originalValues = {};
+
+    for (const [key, selector] of Object.entries(fieldMap)) {
+        const el = document.querySelector(selector);
+        if (el) {
+            fields[key] = el;
+            originalValues[key] = el.value.trim();
+        }
+    }
+
     function validateForm() {
         const allRequiredFilled = requiredFields.every(key => {
-            const selector = fieldMap[key];
-            const el = document.querySelector(selector);
+            const el = fields[key];
             return el && el.value.trim().length > 0;
         });
-
 
         if (allRequiredFilled) {
             button.removeAttribute('disabled');
@@ -43,17 +54,37 @@ export function setupMultiFieldNew({
     form.addEventListener('submit', async function (event) {
         event.preventDefault();
 
-        const payload = {};
-        for (const [key, selector] of Object.entries(fieldMap)) {
-            const el = document.querySelector(selector);
-            if (el) payload[key] = el.value;
+        const updatedValues = {};
+        for (const [key, el] of Object.entries(fields)) {
+            let value = el.value.trim();
+
+            if (key === 'preco') {
+                value = value.replace(',', '.');
+            }
+
+            updatedValues[key] = value;
+        }
+
+        const isUnchanged = Object.keys(updatedValues).every(
+            key => updatedValues[key] === originalValues[key]
+        );
+
+        if (isUnchanged) {
+            showErrorPopup(errorMessages.unchanged);
+            return;
+        }
+
+        const missingRequired = requiredFields.some(key => !updatedValues[key]);
+        if (missingRequired) {
+            showErrorPopup(errorMessages.required);
+            return;
         }
 
         try {
             const response = await fetch(form.getAttribute('action'), {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload),
+                body: JSON.stringify(updatedValues),
             });
 
             if (response.ok) {
@@ -67,4 +98,5 @@ export function setupMultiFieldNew({
             showErrorPopup(errorMessages.network);
         }
     });
+    validateForm();
 }

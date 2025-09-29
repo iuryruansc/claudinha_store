@@ -32,18 +32,45 @@
                                                 <td>
                                                     <%= formatDate(mov.data_hora) %>
                                                 </td>
-                                                <td class="text-capitalize">
-                                                    <%= mov.tipo %>
+                                                <td>
+                                                    <% if (mov.quantidade> 0) { %>
+                                                        <span
+                                                            class="badge bg-success-subtle text-success-emphasis rounded-pill">
+                                                            <i class="bi bi-arrow-down-circle me-1"></i> Entrada
+                                                        </span>
+                                                        <% } else { %>
+                                                            <span
+                                                                class="badge bg-danger-subtle text-danger-emphasis rounded-pill">
+                                                                <i class="bi bi-arrow-up-circle me-1"></i> Saída
+                                                            </span>
+                                                            <% } %>
+                                                                <span class="ms-1 text-muted small">
+                                                                    <%= mov.tipo.replace('_', ' ' ).toLowerCase() %>
+                                                                </span>
                                                 </td>
 
-                                                <!-- coluna Produto -->
                                                 <td>
-                                                    <%= mov.lote?.produto ? mov.lote.produto.nome
-                                                        : 'Produto Desconhecido' %>
+                                                    <% if (mov.lote && mov.lote.produto) { %>
+                                                        <div class="fw-semibold">
+                                                            <%= mov.lote.produto.nome %>
+                                                        </div>
+                                                        <small class="text-muted">
+                                                            Lote: <%= mov.lote.numero_lote %>
+                                                                <% if (mov.id_venda) { %>
+                                                                    | <a href="/admin/vendas/detalhes/<%= mov.id_venda %>"
+                                                                        class="text-decoration-none">Ver Venda #<%=
+                                                                            mov.id_venda %></a>
+                                                                    <% } %>
+                                                        </small>
+                                                        <% } else { %>
+                                                            <span class="text-danger fst-italic">Informação do
+                                                                Lote/Produto indisponível</span>
+                                                            <% } %>
                                                 </td>
 
-                                                <td>
-                                                    <%= mov.quantidade %>
+                                                <td
+                                                    class="fw-bold <%= mov.quantidade > 0 ? 'text-success' : 'text-danger' %>">
+                                                    <%= mov.quantidade> 0 ? '+' : '' %><%= mov.quantidade %>
                                                 </td>
                                                 <td class="text-capitalize">
                                                     <%= funcionarios.find(f=> f.id_funcionario ===

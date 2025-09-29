@@ -1,0 +1,63 @@
+<%- include('../../partials/header.ejs') %>
+<%- include('../../partials/navbar.ejs') %>
+
+<body>
+    <main class="main-content">
+        <div class="container">
+            <h2 class="h4 my-4"><i class="bi bi-graph-up-arrow me-2"></i>Relatório de Vendas</h2>
+
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <form method="GET" action="/admin/relatorios/vendas" class="row g-3 align-items-end">
+                        <div class="col-md-4">
+                            <label for="dataInicio" class="form-label">Data de Início</label>
+                            <input type="date" name="dataInicio" id="dataInicio" class="form-control" value="<%= filters.dataInicio %>">
+                        </div>
+                        <div class="col-md-4">
+                            <label for="dataFim" class="form-label">Data de Fim</label>
+                            <input type="date" name="dataFim" id="dataFim" class="form-control" value="<%= filters.dataFim %>">
+                        </div>
+                        <div class="col-md-2">
+                            <button type="submit" class="btn btn-primary w-100">Gerar Relatório</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="row mb-4">
+                <div class="col-md-3"><div class="card text-center"><div class="card-body"><h6 class="text-muted">Faturamento Bruto</h6><h4 class="fw-bold"><%= relatorio.kpis.faturamentoBruto.toLocaleString('pt-BR', {style:'currency', currency:'BRL'}) %></h4></div></div></div>
+                <div class="col-md-3"><div class="card text-center"><div class="card-body"><h6 class="text-muted">Lucro Bruto</h6><h4 class="fw-bold text-success"><%= relatorio.kpis.lucroBruto.toLocaleString('pt-BR', {style:'currency', currency:'BRL'}) %></h4></div></div></div>
+                <div class="col-md-3"><div class="card text-center"><div class="card-body"><h6 class="text-muted">Nº de Vendas</h6><h4 class="fw-bold"><%= relatorio.kpis.numVendas %></h4></div></div></div>
+                <div class="col-md-3"><div class="card text-center"><div class="card-body"><h6 class="text-muted">Ticket Médio</h6><h4 class="fw-bold"><%= relatorio.kpis.ticketMedio.toLocaleString('pt-BR', {style:'currency', currency:'BRL'}) %></h4></div></div></div>
+            </div>
+
+            <div class="card shadow-sm">
+                <div class="card-header">Vendas no Período</div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table id="table-data" class="table table-sm table-striped table-hover">
+                            <thead class="table-light">
+                                <tr><th>ID</th><th>Data</th><th>Cliente</th><th>Itens</th><th class="text-end">Total</th><th class="text-center">Status</th></tr>
+                            </thead>
+                            <tbody>
+                                <% relatorio.vendas.forEach(venda => { %>
+                                    <tr>
+                                        <td><a href="/admin/vendas/detalhes/<%= venda.id_venda %>">#<%= venda.id_venda %></a></td>
+                                        <td><%= new Date(venda.data_hora).toLocaleDateString('pt-BR') %></td>
+                                        <td><%= venda.cliente?.nome || 'Anônimo' %></td>
+                                        <td class="text-center"><%= venda.itemvendas.reduce((acc, item) => acc + item.quantidade, 0) %></td>
+                                        <td class="text-end fw-semibold"><%= parseFloat(venda.valor_total).toLocaleString('pt-BR', {style:'currency', currency:'BRL'}) %></td>
+                                        <td class="text-center"><span class="badge <%= venda.status === 'CONCLUIDA' ? 'bg-success' : 'bg-warning' %>"><%= venda.status %></span></td>
+                                    </tr>
+                                <% }) %>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+</body>
+<%- include('../../partials/footer.ejs') %>
+</html>

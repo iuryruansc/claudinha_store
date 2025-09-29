@@ -2,29 +2,16 @@ const express = require('express');
 const router = express.Router();
 const asyncHandler = require('../../utils/handlers/async-handler');
 const formatDate = require('../../utils/data/date-formatter');
+const Lote = require('../../models/lote')
+const Produto = require('../../models/produto')
 const { stringValidation, numberValidation, dateValidation } = require('../../utils/data/data-validation');
 const { parseIntValue, parseDateValue } = require('../../utils/data/data-parsers');
-const { getAllLotes, getEditData, getViewDependencies, updateLote, deleteLote, adicionarQuantidadeAoLote, createLoteWithMovimentacao } = require('../../services/admin/lotesService');
-
-router.get('/lotes/new', asyncHandler(async (req, res) => {
-    const produtos = await getViewDependencies();
-    res.render('admin/lotes/new', { produtos });
-}));
+const { getAllLotes, getEditData, updateLote, deleteLote, adicionarQuantidadeAoLote, createLoteWithMovimentacao } = require('../../services/admin/lotesService');
 
 router.get('/lotes', asyncHandler(async (req, res) => {
-    const { lotes, produtos } = await getAllLotes();
+    const { lotes } = await getAllLotes();
 
-    res.render('admin/lotes/', { lotes, produtos, formatDate });
-}));
-
-router.get('/lotes/edit/:id_lote', asyncHandler(async (req, res) => {
-    const [parsedId] = parseIntValue(req.params.id_lote);
-
-    numberValidation(parsedId);
-
-    const { lote, produtos } = await getEditData(parsedId);
-
-    res.render('admin/lotes/edit', { lote, produtos })
+    res.render('admin/lotes/', { lotes, formatDate });
 }));
 
 router.post('/lotes/save', asyncHandler(async (req, res) => {
@@ -65,8 +52,8 @@ router.post('/lotes/update/:id_lote', asyncHandler(async (req, res) => {
     const [parsedId] = parseIntValue(req.params.id_lote);
     const [parsedQuant, parsedNumLote] = parseIntValue(req.body.quantidade, req.body.numero_lote);
     const { localizacao } = req.body;
+    const id_funcionario = req.session.userId;
     const parsedValidade = parseDateValue(req.body.data_validade);
-
 
     numberValidation(parsedId, parsedQuant, parsedNumLote);
     stringValidation(localizacao);
@@ -77,21 +64,33 @@ router.post('/lotes/update/:id_lote', asyncHandler(async (req, res) => {
         localizacao,
         numero_lote: parsedNumLote,
         data_validade: parsedValidade
-    }));
+    }), id_funcionario);
 
     res.redirect('/admin/lotes');
 }));
 
 router.post('/lotes/add-quantidade/:id_lote', asyncHandler(async (req, res) => {
-    const [id_lote] = parseIntValue(req.params.id_lote);
-    const [quantidade] = parseIntValue(req.body.quantidade);
+    const id_lote = parseInt(req.params.id_lote);
+    const quantidade = parseInt(req.body.quantidade);
+    const { observacao } = req.body;
+    const id_funcionario = req.session.userId;
 
     numberValidation(id_lote, quantidade);
 
-    await adicionarQuantidadeAoLote(id_lote, quantidade);
+    const loteAtualizado = await adicionarQuantidadeAoLote(id_lote, quantidade, id_funcionario, observacao);
 
-    res.status(200).json({ message: 'Quantidade adicionada com sucesso' });
+    res.status(200).json(loteAtualizado);
 }));
 
+router.get('/lotes/json/:id', asyncHandler(async (req, res) => {
+    const lote = await Lote.findByPk(req.params.id, {
+        include: [{ model: Produto, as: 'produto' }]
+    });
+    if (lote) {
+        res.json(lote);
+    } else {
+        res.status(404).json({ error: 'Lote não encontrado' });
+    }
+}));
 
 module.exports = router;

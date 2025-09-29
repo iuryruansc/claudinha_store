@@ -1,143 +1,145 @@
 <%- include('../../partials/header.ejs') %>
-<%- include('../../partials/navbar.ejs') %>
+    <%- include('../../partials/navbar.ejs') %>
 
-<body>
-    <main class="main-content">
-        <div class="container">
-            <div id="error-popup-container"></div>
-            <div class="d-flex justify-content-between align-items-center my-4">
-                <h2 class="mb-0 h4">
-                    <i class="bi bi-pencil-square me-2"></i>
-                    Edição de Produto
-                </h2>
-                <a href="/admin/produtos" class="btn btn-secondary">
-                    <i class="bi bi-arrow-left me-2"></i>Voltar
-                </a>
-            </div>
+        <body>
+            <main class="main-content">
+                <div class="container">
+                    <div id="error-popup-container"></div>
+                    <div class="d-flex justify-content-between align-items-center my-4">
+                        <h2 class="mb-0 h4">
+                            <i class="bi bi-pencil-square me-2"></i>
+                            Edição de Produto
+                        </h2>
+                        <a href="/admin/produtos" class="btn btn-secondary">
+                            <i class="bi bi-arrow-left me-2"></i>Voltar
+                        </a>
+                    </div>
 
-            <div class="card shadow-sm">
-                <div class="card-body">
-                    <form id="produto-form" method="POST"
-                        action="/admin/produtos/update/<%= produto.id_produto %>">
-                        <div class="row g-4">
-                            <div class="col-md-6">
-                                <div class="form-floating">
-                                    <input id="produto-name-input" class="form-control" type="text"
-                                        name="nome" placeholder="Nome do produto"
-                                        value="<%= produto.nome %>" required>
-                                    <label for="produto-name-input"><i class="bi bi-box-seam me-2"></i>Nome do produto</label>
-                                </div>
-                            </div>
+                    <div class="card shadow-sm">
+                        <div class="card-body">
+                            <form id="produto-form" method="POST"
+                                action="/admin/produtos/update/<%= produto.id_produto %>">
+                                <div class="row g-4">
+                                    <div class="col-md-6">
+                                        <div class="form-floating">
+                                            <input id="produto-name-input" class="form-control" type="text" name="nome"
+                                                placeholder="Nome do produto" value="<%= produto.nome %>" required>
+                                            <label for="produto-name-input"><i class="bi bi-box-seam me-2"></i>Nome do
+                                                produto</label>
+                                        </div>
+                                    </div>
 
-                            <div class="col-md-6">
-                                <div class="input-group">
-                                    <span class="input-group-text"><i class="bi bi-currency-dollar"></i></span>
-                                    <div class="form-floating">
-                                        <input id="produto-preco-input" class="form-control" type="number"
-                                            step="0.01" name="preco_compra" placeholder="Preço do produto"
-                                            value="<%= produto.preco_compra %>" required>
-                                        <label for="produto-preco-input">Preço do produto</label>
+                                    <div class="col-md-6">
+                                        <div class="input-group">
+                                            <span class="input-group-text"><i class="bi bi-currency-dollar"></i></span>
+                                            <div class="form-floating">
+                                                <input id="produto-preco-input" class="form-control" type="number"
+                                                    step="0.01" name="preco_compra" placeholder="Preço do produto"
+                                                    value="<%= produto.preco_compra %>" required>
+                                                <label for="produto-preco-input">Preço do produto</label>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-12">
+                                        <div class="form-floating">
+                                            <input id="produto-code-input" class="form-control" type="text"
+                                                name="codigo_barras" placeholder="Código de barras"
+                                                value="<%= produto.codigo_barras %>" required>
+                                            <label for="produto-code-input"><i class="bi bi-upc-scan me-2"></i>Código de
+                                                barras</label>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-4">
+                                        <div class="form-floating">
+                                            <select id="produto-categoria-select" name="id_categoria"
+                                                class="form-select" required>
+                                                <% categorias.forEach(categoria=> { %>
+                                                    <option value="<%= categoria.id_categoria %>"
+                                                        <%=categoria.id_categoria==produto.id_categoria ? 'selected'
+                                                        : '' %>>
+                                                        <%= categoria.nome %>
+                                                    </option>
+                                                    <% }) %>
+                                            </select>
+                                            <label for="produto-categoria-select">Categoria</label>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-4">
+                                        <div class="form-floating">
+                                            <select id="produto-fornecedor-select" name="id_fornecedor"
+                                                class="form-select" required>
+                                                <% fornecedores.forEach(fornecedor=> { %>
+                                                    <option value="<%= fornecedor.id_fornecedor %>"
+                                                        <%=fornecedor.id_fornecedor==produto.id_fornecedor ? 'selected'
+                                                        : '' %>>
+                                                        <%= fornecedor.nome_fornecedor %>
+                                                    </option>
+                                                    <% }) %>
+                                            </select>
+                                            <label for="produto-fornecedor-select">Fornecedor</label>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-4">
+                                        <div class="form-floating">
+                                            <select id="produto-marca-select" name="id_marca" class="form-select"
+                                                required>
+                                                <% marcas.forEach(marca=> { %>
+                                                    <option value="<%= marca.id_marca %>"
+                                                        <%=marca.id_marca==produto.id_marca ? 'selected' : '' %>>
+                                                        <%= marca.nome_marca %>
+                                                    </option>
+                                                    <% }) %>
+                                            </select>
+                                            <label for="produto-marca-select">Marca</label>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
 
-                            <div class="col-12">
-                                <div class="form-floating">
-                                    <input id="produto-code-input" class="form-control" type="text"
-                                        name="codigo_barras" placeholder="Código de barras"
-                                        value="<%= produto.codigo_barras %>" required>
-                                    <label for="produto-code-input"><i class="bi bi-upc-scan me-2"></i>Código de barras</label>
-                                </div>
-                            </div>
-
-                            <div class="col-md-4">
-                                <div class="form-floating">
-                                    <select id="produto-categoria-select" name="id_categoria"
-                                        class="form-select" required>
-                                        <% categorias.forEach(categoria=> { %>
-                                            <option value="<%= categoria.id_categoria %>"
-                                                <%=categoria.id_categoria==produto.id_categoria ? 'selected'
-                                                : '' %>>
-                                                <%= categoria.nome %>
-                                            </option>
-                                        <% }) %>
-                                    </select>
-                                    <label for="produto-categoria-select">Categoria</label>
-                                </div>
-                            </div>
-
-                            <div class="col-md-4">
-                                <div class="form-floating">
-                                    <select id="produto-fornecedor-select" name="id_fornecedor"
-                                        class="form-select" required>
-                                        <% fornecedores.forEach(fornecedor=> { %>
-                                            <option value="<%= fornecedor.id_fornecedor %>"
-                                                <%=fornecedor.id_fornecedor==produto.id_fornecedor
-                                                ? 'selected' : '' %>>
-                                                <%= fornecedor.nome_fornecedor %>
-                                            </option>
-                                        <% }) %>
-                                    </select>
-                                    <label for="produto-fornecedor-select">Fornecedor</label>
-                                </div>
-                            </div>
-
-                            <div class="col-md-4">
-                                <div class="form-floating">
-                                    <select id="produto-marca-select" name="id_marca" class="form-select"
-                                        required>
-                                        <% marcas.forEach(marca=> { %>
-                                            <option value="<%= marca.id_marca %>"
-                                                <%=marca.id_marca==produto.id_marca ? 'selected' : '' %>>
-                                                <%= marca.nome_marca %>
-                                            </option>
-                                        <% }) %>
-                                    </select>
-                                    <label for="produto-marca-select">Marca</label>
-                                </div>
-                            </div>
+                                <input type="hidden" name="id_produto" value="<%= produto.id_produto %>">
+                                <button type="submit" class="btn btn-success w-100 mt-4 py-2" disabled>
+                                    <i class="bi bi-arrow-clockwise me-2"></i>Salvar Alterações
+                                </button>
+                            </form>
                         </div>
-
-                        <input type="hidden" name="id_produto" value="<%= produto.id_produto %>">
-                        <button type="submit" class="btn btn-success w-100 mt-4 py-2" disabled>
-                            <i class="bi bi-arrow-clockwise me-2"></i>Salvar Alterações
-                        </button>
-                    </form>
+                    </div>
                 </div>
-            </div>
-        </div>
-    </main>
+            </main>
 
-    <%- include('../../partials/footer.ejs') %>
+            <%- include('../../partials/footer.ejs') %>
 
-    <script type="module">
-        import { setupMultiFieldEdit } from '/js/multi-field-edit.js';
+                <script type="module">
+                    import { setupMultiFieldEdit } from '/js/lib/multi-field-edit.js';
 
-        document.addEventListener('DOMContentLoaded', function () {
-            setupMultiFieldEdit({
-                formSelector: '#produto-form',
-                redirectUrl: '/admin/produtos',
-                inputFields: [
-                    '#produto-name-input',
-                    '#produto-preco-input',
-                    '#produto-code-input',
-                ],
-                selectFields: [
-                    '#produto-categoria-select',
-                    '#produto-fornecedor-select',
-                    '#produto-marca-select'
-                ],
-                requiredFields: ['nome', 'preco', 'codigo_barras', 'id_categoria', 'id_fornecedor', 'id_marca'],
-                fieldMap: {
-                    nome: '#produto-name-input',
-                    preco: '#produto-preco-input',
-                    codigo_barras: '#produto-code-input',
-                    id_categoria: '#produto-categoria-select',
-                    id_fornecedor: '#produto-fornecedor-select',
-                    id_marca: '#produto-marca-select'
-                }
-            });
-        });
-    </script>
-</body>
-</html>
+                    document.addEventListener('DOMContentLoaded', function () {
+                        setupMultiFieldEdit({
+                            formSelector: '#produto-form',
+                            redirectUrl: '/admin/produtos',
+                            inputFields: [
+                                '#produto-name-input',
+                                '#produto-preco-input',
+                                '#produto-code-input',
+                            ],
+                            selectFields: [
+                                '#produto-categoria-select',
+                                '#produto-fornecedor-select',
+                                '#produto-marca-select'
+                            ],
+                            requiredFields: ['nome', 'preco', 'codigo_barras', 'id_categoria', 'id_fornecedor', 'id_marca'],
+                            fieldMap: {
+                                nome: '#produto-name-input',
+                                preco: '#produto-preco-input',
+                                codigo_barras: '#produto-code-input',
+                                id_categoria: '#produto-categoria-select',
+                                id_fornecedor: '#produto-fornecedor-select',
+                                id_marca: '#produto-marca-select'
+                            }
+                        });
+                    });
+                </script>
+        </body>
+
+        </html>

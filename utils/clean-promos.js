@@ -10,7 +10,6 @@ function startcaCleanup() {
           data_fim: { [Op.lt]: new Date() }
         }
       });
-      console.log(`🧹 ${deletedCount} cações expiradas removidas`);
     } catch (err) {
       console.error('Erro ao limpar cações expiradas:', err);
     }

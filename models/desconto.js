@@ -7,7 +7,7 @@ const Desconto = connection.define('desconto', {
         primaryKey: true,
         autoIncrement: true
     },
-    id_produto: {
+    id_lote: {
         type: Sequelize.INTEGER,
         allowNull: false
     },

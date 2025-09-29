@@ -16,12 +16,15 @@ const getViewDependencies = async () => {
 }
 
 const getAllLotes = async () => {
-    const lotesPromise = Lote.findAll();
-    const produtosPromise = getViewDependencies();
+    const lotes = await Lote.findAll({
+        include: [{
+            model: Produto,
+            as: 'produto'
+        }],
+        order: [['createdAt', 'DESC']]
+    });
 
-    const [lotes, produtos] = await Promise.all([lotesPromise, produtosPromise])
-
-    return { lotes, produtos };
+    return { lotes };
 };
 
 const getEditData = async (id) => {
@@ -37,11 +40,29 @@ const createLote = async (clienteData) => {
     return await Lote.create(clienteData);
 };
 
-const updateLote = async (id, updateData) => {
-    return await Lote.update(updateData, {
-        where: {
-            id_lote: id
+const updateLote = async (id, updateData, id_funcionario) => {
+    return await connection.transaction(async (t) => {
+        const lote = await Lote.findByPk(id, { transaction: t });
+        modelValidation(lote);
+
+        const quantidadeAntiga = lote.quantidade;
+        const quantidadeNova = updateData.quantidade;
+
+        await lote.update(updateData, { transaction: t });
+
+        const diferenca = quantidadeNova - quantidadeAntiga;
+        if (diferenca !== 0) {
+            await MovimentacaoEstoque.create({
+                id_lote: id,
+                data_hora: new Date(),
+                tipo: diferenca > 0 ? 'ENTRADA_AJUSTE' : 'SAIDA_AJUSTE',
+                quantidade: diferenca,
+                id_funcionario,
+                observacao: 'Ajuste de estoque via edição de lote.'
+            }, { transaction: t });
         }
+
+        return lote;
     });
 };
 
@@ -53,26 +74,33 @@ const deleteLote = async (id) => {
     });
 };
 
-const adicionarQuantidadeAoLote = async (id_lote, quantidadeAdicional) => {
-    const lote = await Lote.findByPk(id_lote);
-    modelValidation(lote);
+const adicionarQuantidadeAoLote = async (id_lote, quantidadeAdicional, id_funcionario, observacao) => {
+    return await connection.transaction(async (t) => {
+        const lote = await Lote.findByPk(id_lote, { transaction: t });
+        modelValidation(lote);
 
-    lote.quantidade += quantidadeAdicional;
-    await lote.save();
+        await lote.increment('quantidade', { by: quantidadeAdicional, transaction: t });
 
-    await MovimentacaoEstoque.create({
-        id_lote: id_lote,
-        data_hora: new Date(),
-        quantidade: quantidadeAdicional,
-        tipo: 'entrada',
-        observacao: 'Adição de quantidade ao lote por administrador'
+        await MovimentacaoEstoque.create({
+            id_lote: id_lote,
+            data_hora: new Date(),
+            quantidade: quantidadeAdicional,
+            tipo: 'ENTRADA_AJUSTE',
+            id_funcionario,
+            observacao: observacao || 'Adição manual de estoque'
+        }, { transaction: t });
+
+        await lote.reload({ transaction: t });
+        return lote;
     });
-    return lote;
 };
 
 const getLowStockLotes = async () => {
     const lotes = await Lote.findAll({
-        include: [Produto],
+        include: [{
+            model: Produto,
+            as: 'produto'
+        }],
         order: [['quantidade', 'ASC']],
         limit: 5
     });

@@ -1,4 +1,4 @@
-import { showErrorPopup } from "/js/show-error-popup.js";
+import { showErrorPopup } from "/js/lib/show-error-popup.js";
 
 export function setupRowDelete(deleteForms, toggleExcluir, tableBody) {
 
@@ -11,7 +11,7 @@ export function setupRowDelete(deleteForms, toggleExcluir, tableBody) {
                 .querySelectorAll(".excluir-btn")
                 .forEach((btn) => {
                     if (btn.offsetParent !== null && !btn._tooltip) {
- 
+
                         btn._tooltip = new bootstrap.Tooltip(btn);
                     }
                 });

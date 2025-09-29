@@ -3,6 +3,7 @@ require('dotenv').config();
 //Imports
 const express = require('express');
 const path = require('path');
+const flash = require('connect-flash');
 const app = express();
 const session = require('express-session');
 const https = require('https')
@@ -15,7 +16,6 @@ const syncDatabase = require('./utils/data/data-sync');
 //Utils
 const navLinks = require('./utils/navigation/nav-links');
 const errorHandler = require('./utils/handlers/error-handler');
-const sendSuccess = require('./utils/handlers/success-handler');
 const tokenCleanUp = require('./utils/clean-tokens');
 const promoCleanUp = require('./utils/clean-promos');
 
@@ -54,8 +54,18 @@ app.use(helmet({
   contentSecurityPolicy: {
     directives: {
       defaultSrc: ["'self'"],
-      scriptSrc: ["'self'", "https://cdn.jsdelivr.net", "https://code.jquery.com", "https://cdn.datatables.net", "'unsafe-inline'"],
-      connectSrc: ["'self'", "https://cdn.jsdelivr.net"],
+      scriptSrc: [
+        "'self'",
+        "https://cdn.jsdelivr.net",
+        "https://code.jquery.com",
+        "https://cdn.datatables.net",
+        "'unsafe-inline'"
+      ],
+      connectSrc: [
+        "'self'",
+        "https://cdn.jsdelivr.net",
+        "https://cdn.datatables.net"
+      ],
     },
   },
 }));
@@ -95,8 +105,13 @@ app.use((req, res, next) => {
   next();
 });
 
-//Success Handling middleware
-app.use(sendSuccess);
+app.use(flash());
+
+app.use((req, res, next) => {
+    res.locals.success_msg = req.flash('success_msg');
+    res.locals.error_msg = req.flash('error_msg');
+    next();
+});
 
 //Main Routes
 app.use('/admin', adminRouter);

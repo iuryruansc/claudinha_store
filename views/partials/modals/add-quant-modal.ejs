@@ -1,0 +1,28 @@
+<div class="modal fade" id="addQuantidadeModal" tabindex="-1" aria-labelledby="addQuantidadeModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <form id="add-quantidade-form" method="POST">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addQuantidadeModalLabel">Adicionar Estoque ao Lote</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <strong>Produto:</strong> <span id="modal-produto-nome"></span><br>
+                        <strong>Lote:</strong> <span id="modal-lote-numero"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label for="modal-quantidade" class="form-label">Quantidade a Adicionar:</label>
+                        <input type="number" name="quantidade" id="modal-quantidade" class="form-control" min="1"
+                            required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Confirmar Entrada</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

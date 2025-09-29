@@ -1,0 +1,130 @@
+<%- include('../../partials/header.ejs') %>
+    <%- include('../../partials/navbar.ejs') %>
+
+        <body>
+            <main class="main-content">
+                <div class="container">
+                    <div class="d-flex justify-content-between align-items-center my-4">
+                        <h2 class="mb-0 h4">
+                            <i class="bi bi-credit-card-2-front me-2"></i>
+                            Parcelas a Receber
+                        </h2>
+                    </div>
+
+                    <ul class="nav nav-tabs mb-3">
+                        <li class="nav-item">
+                            <a class="nav-link" aria-current="page" href="/admin/pagamentos">
+                                <i class="bi bi-clock-history me-1"></i> Histórico Completo
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/admin/pagamentos/contas-a-receber">
+                                <i class="bi bi-cash-stack me-1"></i> Contas a Receber
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" href="/admin/pagamentos/parcelas-a-receber">
+                                <i class="bi bi-credit-card-2-front me-1"></i> Parcelas a Receber
+                            </a>
+                        </li>
+                    </ul>
+
+                    <% if (vendas.length> 0) { %>
+                        <div class="accordion" id="accordionVendas">
+                            <% vendas.forEach((vendaAgrupada, index)=> { %>
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header" id="heading-<%= vendaAgrupada.venda.id_venda %>">
+                                        <button class="accordion-button <%= index > 0 ? 'collapsed' : '' %>"
+                                            type="button" data-bs-toggle="collapse"
+                                            data-bs-target="#collapse-<%= vendaAgrupada.venda.id_venda %>"
+                                            aria-expanded="<%= index === 0 ? 'true' : 'false' %>">
+
+                                            <div class="d-flex justify-content-between align-items-center w-100 me-3">
+                                                <div class="flex-grow-1">
+                                                    <div class="fw-semibold">
+                                                        <%= vendaAgrupada.resumoVenda %>
+                                                    </div>
+                                                    <small class="text-muted">Cliente: <%= vendaAgrupada.cliente %>
+                                                            </small>
+                                                </div>
+                                                <div class="text-end">
+                                                    <span class="d-block text-danger fw-bold">
+                                                        <%= vendaAgrupada.saldoDevedor.toLocaleString('pt-BR', {
+                                                            style: 'currency' , currency: 'BRL' }) %>
+                                                    </span>
+                                                    <small class="text-muted">
+                                                        <%= vendaAgrupada.parcelas.length %> parcela(s) pendente(s)
+                                                    </small>
+                                                </div>
+                                            </div>
+                                        </button>
+                                    </h2>
+                                    <div id="collapse-<%= vendaAgrupada.venda.id_venda %>"
+                                        class="accordion-collapse collapse <%= index === 0 ? 'show' : '' %>">
+                                        <div class="accordion-body">
+                                            <form method="POST" action="/admin/parcelas/quitar">
+                                                <input type="hidden" name="id_venda"
+                                                    value="<%= vendaAgrupada.venda.id_venda %>">
+                                                <ul class="list-group">
+                                                    <% vendaAgrupada.parcelas.forEach(p=> { %>
+                                                        <li class="list-group-item">
+                                                            <div class="row align-items-center">
+                                                                <div class="col-auto">
+                                                                    <input class="form-check-input" type="checkbox"
+                                                                        name="parcelasIds"
+                                                                        value="<%= p.id_parcelapagamento %>"
+                                                                        id="parcela-<%= p.id_parcelapagamento %>">
+                                                                </div>
+                                                                <div class="col">
+                                                                    <label class="form-check-label"
+                                                                        for="parcela-<%= p.id_parcelapagamento %>">
+                                                                        Parcela <%= p.numero_parcela %> - <strong>
+                                                                                <%= parseFloat(p.valor_parcela).toLocaleString('pt-BR',
+                                                                                    { style: 'currency' ,
+                                                                                    currency: 'BRL' }) %>
+                                                                            </strong>
+                                                                    </label>
+                                                                    <div class="text-muted small">
+                                                                        Vencimento: <%= new
+                                                                            Date(p.data_vencimento).toLocaleDateString('pt-BR')
+                                                                            %>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-auto">
+                                                                    <% if(p.dataValues.atrasada) { %>
+                                                                        <span class="badge bg-danger">Atrasada</span>
+                                                                        <% } else { %>
+                                                                            <span
+                                                                                class="badge bg-warning text-dark">Pendente</span>
+                                                                            <% } %>
+                                                                </div>
+                                                            </div>
+                                                        </li>
+                                                        <% }) %>
+                                                </ul>
+                                                <div class="text-end mt-3">
+                                                    <button type="submit" class="btn btn-success">
+                                                        <i class="bi bi-check-lg"></i> Quitar Parcelas Selecionadas
+                                                    </button>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                                <% }) %>
+                        </div>
+                </div>
+                <% } else { %>
+                    <div class="card shadow-sm">
+                        <div class="card-body text-center text-muted py-5">
+                            🎉 Nenhuma parcela pendente!
+                        </div>
+                    </div>
+                    <% } %>
+                        </div>
+            </main>
+        </body>
+
+        <%- include('../../partials/footer.ejs') %>
+
+            </html>

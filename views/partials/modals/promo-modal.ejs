@@ -1,0 +1,63 @@
+<div class="modal fade" id="promoModal" tabindex="-1" aria-labelledby="promoModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <form id="promo-form" method="POST">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="promoModalLabel">Nova Promoção</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" name="id_desconto" id="id_desconto">
+
+                    <div class="mb-3">
+                        <label for="id_lote" class="form-label">Lote para Aplicar Desconto</label>
+                        <select name="id_lote" id="id_lote" class="form-select" required>
+                            <option value="" disabled selected>Selecione um lote com estoque...</option>
+                            <% if (lotes && lotes.length > 0) { %>
+                                <% lotes.forEach(lote => { %>
+                                    <option value="<%= lote.id_lote %>">
+                                        <%= lote.produto.nome %> (Lote: <%= lote.numero_lote %>, Qtd: <%= lote.quantidade %>, Val: <%= new Date(lote.data_validade).toLocaleDateString('pt-BR') %>)
+                                    </option>
+                                <% }) %>
+                            <% } %>
+                        </select>
+                    </div>
+
+                    <div class="row">
+                         <div class="col-md-6 mb-3">
+                             <label for="tipo" class="form-label">Tipo de Desconto</label>
+                             <select name="tipo" id="tipo" class="form-select" required>
+                                 <option value="porcentagem">Porcentagem (%)</option>
+                                 <option value="valor_fixo">Valor Fixo (R$)</option>
+                             </select>
+                         </div>
+                         <div class="col-md-6 mb-3">
+                            <label for="valor" class="form-label">Valor do Desconto</label>
+                            <input type="number" name="valor" id="valor" class="form-control" step="0.01" min="0" required>
+                         </div>
+                    </div>
+
+                    <div class="row">
+                         <div class="col-md-6 mb-3">
+                            <label for="data_inicio" class="form-label">Data de Início</label>
+                            <input type="date" name="data_inicio" id="data_inicio" class="form-control" required>
+                         </div>
+                         <div class="col-md-6 mb-3">
+                            <label for="data_fim" class="form-label">Data de Fim</label>
+                            <input type="date" name="data_fim" id="data_fim" class="form-control" required>
+                         </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="observacao" class="form-label">Observação (Opcional)</label>
+                        <textarea class="form-control" name="observacao" id="observacao" rows="2"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Salvar Promoção</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

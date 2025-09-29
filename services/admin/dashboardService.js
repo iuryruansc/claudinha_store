@@ -1,0 +1,192 @@
+const { Op } = require('sequelize');
+const Venda = require('../../models/venda');
+const Cliente = require('../../models/cliente');
+const Caixa = require('../../models/caixa')
+const Lote = require('../../models/lote');
+const Produto = require('../../models/produto');
+const Pagamento = require('../../models/pagamento');
+const PagamentoParcial = require('../../models/pagamentoParcial');
+const ParcelaPagamento = require('../../models/parcelaPagamento');
+const MovimentacaoEstoque = require('../../models/movimentacaoEstoque');
+const { calcularTempoAtras } = require('../../utils/data/date-calc');
+const { getLowStockLotes } = require('../../services/admin/lotesService');
+const { getPdvsAtivos } = require('../../services/admin/pdvsService');
+const { getPromocoes } = require('../../services/admin/descontosService');
+
+const getFeed = async () => {
+    const ultimasVendas = await Venda.findAll({
+        limit: 4,
+        order: [['data_hora', 'DESC']],
+        include: [{ model: Cliente, as: 'cliente' }]
+    });
+
+    const ultimasMovimentacoes = await MovimentacaoEstoque.findAll({
+        limit: 4,
+        order: [['data_hora', 'DESC']],
+        include: [{ model: Lote, as: 'lote', include: [{ model: Produto, as: 'produto' }] }]
+    });
+
+    let atividades = [];
+
+    ultimasVendas.forEach(v => {
+        atividades.push({
+            tipo: 'venda',
+            icone: 'bi-cart-check-fill',
+            cor: 'text-success',
+            texto: `Nova Venda <a href="/admin/vendas/detalhes/${v.id_venda}" class="fw-semibold">#${v.id_venda}</a> para <strong>${v.cliente?.nome || 'Anônimo'}</strong>.`,
+            data: v.data_hora
+        });
+    });
+
+    ultimasMovimentacoes.forEach(mov => {
+
+        if (mov.tipo === 'SAIDA_VENDA') return;
+
+        const ehEntrada = mov.quantidade > 0;
+        atividades.push({
+            tipo: ehEntrada ? 'entrada' : 'saida',
+            icone: ehEntrada ? 'bi-box-arrow-in-down' : 'bi-box-arrow-up',
+            cor: ehEntrada ? 'text-primary' : 'text-danger',
+            texto: `${ehEntrada ? 'Entrada' : 'Saída'} de <strong>${Math.abs(mov.quantidade)} unidade(s)</strong> de <strong>${mov.lote?.produto?.nome || ''}</strong>. Motivo: ${mov.tipo.toLowerCase().replace('_', ' ')}.`,
+            data: mov.data_hora
+        });
+    });
+
+    atividades.sort((a, b) => new Date(b.data) - new Date(a.data));
+    atividades = atividades.slice(0, 3);
+
+    atividades.forEach(a => {
+        a.tempoAtras = calcularTempoAtras(a.data);
+    });
+
+
+
+    return atividades;
+}
+
+const getUltimasVendasStatus = async (limit = 5) => {
+    const vendas = await Venda.findAll({
+        limit: limit,
+        order: [['data_hora', 'DESC']],
+        include: [{
+            model: Cliente,
+            as: 'cliente',
+            attributes: ['nome']
+        }]
+    });
+    return vendas;
+};
+
+const getResumoPendencias = async () => {
+    const vendasPendentes = await Venda.findAll({
+        where: { status: 'PENDENTE' },
+        include: [
+            { model: PagamentoParcial, as: 'pagamentoparcials' },
+            { model: Pagamento, as: 'pagamentos' }
+        ]
+    });
+
+    let totalContasAReceber = 0;
+    vendasPendentes.forEach(venda => {
+        let totalPago = 0;
+        totalPago += venda.pagamentoparcials.reduce((acc, p) => acc + parseFloat(p.valor_pago), 0);
+        totalPago += venda.pagamentos.reduce((acc, p) => acc + parseFloat(p.valor_total), 0);
+        totalContasAReceber += parseFloat(venda.valor_total) - totalPago;
+    });
+
+    const { count, rows } = await ParcelaPagamento.findAndCountAll({
+        where: {
+            status: { [Op.ne]: 'pago' }
+        }
+    });
+
+    const totalParcelasAReceber = rows.reduce((acc, p) => acc + parseFloat(p.valor_parcela), 0);
+
+    return {
+        countContas: vendasPendentes.length,
+        totalContas: totalContasAReceber,
+        countParcelas: count,
+        totalParcelas: totalParcelasAReceber,
+        totalPendencias: totalContasAReceber + totalParcelasAReceber
+    };
+};
+
+const getDashboardData = async (userId) => {
+    const [
+        atividades,
+        lotesBaixoEstoque,
+        ultimasVendas,
+        pdvs,
+        promoList,
+        resumoPendencias,
+        caixaAtivo,
+        lotesParaModal
+    ] = await Promise.all([
+        getFeed(),
+        getLowStockLotes(),
+        getUltimasVendasStatus(5),
+        getPdvsAtivos(),
+        getPromocoes({ omitSemLote: true }),
+        getResumoPendencias(),
+        Caixa.findOne({ where: { data_fechamento: null, id_funcionario: userId } }),
+        Lote.findAll({
+            where: { quantidade: { [Op.gt]: 0 } },
+            include: [{ model: Produto, as: 'produto' }],
+            order: [[{ model: Produto }, 'nome', 'ASC']]
+        })
+    ]);
+
+    let resumoCaixa = null;
+    if (caixaAtivo) {
+        const vendasNoCaixa = await Venda.findAll({
+            where: { id_caixa: caixaAtivo.id_caixa }
+        });
+
+        const pagamentosNoCaixa = await Pagamento.findAll({
+            where: { id_venda: { [Op.in]: vendasNoCaixa.map(v => v.id_venda) } }
+        });
+        const pagamentosParciaisNoCaixa = await PagamentoParcial.findAll({
+            where: { id_venda: { [Op.in]: vendasNoCaixa.map(v => v.id_venda) } }
+        });
+        const todosPagamentos = [...pagamentosNoCaixa, ...pagamentosParciaisNoCaixa];
+
+        const totalRecebidoDinheiro = todosPagamentos
+            .filter(p => p.forma_pagamento === 'dinheiro')
+            .reduce((acc, p) => acc + parseFloat(p.valor_total || p.valor_pago), 0);
+
+        const totalRecebidoCartao = todosPagamentos
+            .filter(p => ['cartao_credito', 'cartao_debito'].includes(p.forma_pagamento))
+            .reduce((acc, p) => acc + parseFloat(p.valor_total || p.valor_pago), 0);
+
+        const totalRecebidoPix = todosPagamentos
+            .filter(p => p.forma_pagamento === 'pix')
+            .reduce((acc, p) => acc + parseFloat(p.valor_total || p.valor_pago), 0);
+
+        resumoCaixa = {
+            totalVendas: vendasNoCaixa.reduce((acc, v) => acc + parseFloat(v.valor_total), 0),
+            totalRecebidoDinheiro,
+            totalRecebidoCartao,
+            totalRecebidoPix,
+            saldoEsperado: parseFloat(caixaAtivo.saldo_inicial) + totalRecebidoDinheiro
+        };
+    }
+
+    return {
+        atividades,
+        lotesBaixoEstoque,
+        ultimasVendas,
+        pdvs,
+        promoList,
+        resumoPendencias,
+        caixa: caixaAtivo,
+        resumoCaixa,
+        lotes: lotesParaModal
+    };
+};
+
+module.exports = {
+    getFeed,
+    getUltimasVendasStatus,
+    getResumoPendencias,
+    getDashboardData
+}

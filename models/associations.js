@@ -64,14 +64,16 @@ Category.hasMany(Produto, { foreignKey: 'id_categoria' });
 Produto.belongsTo(Category, { foreignKey: 'id_categoria' });
 
 // Produto -> Lote, ItemVenda
-Produto.hasMany(Lote, { foreignKey: 'id_produto' });
-Lote.belongsTo(Produto, { foreignKey: 'id_produto' });
+Produto.hasMany(Lote, { foreignKey: 'id_produto', as: 'lote' });
+Lote.belongsTo(Produto, { foreignKey: 'id_produto', as: 'produto' });
 Produto.hasMany(ItemVenda, { foreignKey: 'id_produto' });
 ItemVenda.belongsTo(Produto, { foreignKey: 'id_produto' });
 
 // Lote -> MovimentacaoEstoque
 Lote.hasMany(MovimentacaoEstoque, { foreignKey: 'id_lote' });
 MovimentacaoEstoque.belongsTo(Lote, { foreignKey: 'id_lote' });
+Lote.hasMany(Desconto, { foreignKey: 'id_lote', as: 'descontos' });
+Desconto.belongsTo(Lote, { foreignKey: 'id_lote', as: 'lote' });
 
 // Usuario -> UserMeta
 Usuario.hasOne(UserMeta, { foreignKey: 'id_usuario' });
@@ -82,8 +84,8 @@ Fornecedor.hasMany(Produto, { foreignKey: 'id_fornecedor' });
 Produto.belongsTo(Fornecedor, { foreignKey: 'id_fornecedor' });
 
 // Marca -> Produto
-Marca.hasMany(Produto, {foreignKey: 'id_marca'});
-Produto.belongsTo(Marca, {foreignKey: 'id_marca'});
+Marca.hasMany(Produto, { foreignKey: 'id_marca' });
+Produto.belongsTo(Marca, { foreignKey: 'id_marca' });
 
 // Export all models and their associations
 module.exports = {

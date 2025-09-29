@@ -1,0 +1,97 @@
+<%- include('../../partials/header.ejs') %>
+<%- include('../../partials/navbar.ejs') %>
+
+<body>
+    <main class="main-content">
+        <div class="container">
+            <div class="d-flex justify-content-between align-items-center">
+                <h2 class="h4 my-4"><i class="bi bi-clipboard2-data-fill me-2"></i>Log de Auditoria do Sistema</h2>
+                <a href="/admin/dashboard" class="btn btn-secondary">
+                    <i class="bi bi-arrow-left me-2"></i>Voltar
+                </a>
+            </div>
+
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <form method="GET" action="/admin/auditoria" class="row g-3 align-items-end">
+                        <div class="col-md-3">
+                            <label for="tipo" class="form-label">Tipo de Evento</label>
+                            <select name="tipo" id="tipo" class="form-select">
+                                <option value="">Todos</option>
+                                <option value="venda" <%= currentFilters.tipo === 'venda' ? 'selected' : '' %>>Vendas</option>
+                                <option value="entrada" <%= currentFilters.tipo === 'entrada' ? 'selected' : '' %>>Entradas de Estoque</option>
+                                <option value="saida" <%= currentFilters.tipo === 'saida' ? 'selected' : '' %>>Outras Saídas</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label for="id_funcionario" class="form-label">Funcionário</label>
+                            <select name="id_funcionario" id="id_funcionario" class="form-select">
+                                <option value="">Todos</option>
+                                <% funcionarios.forEach(f => { %>
+                                    <option value="<%= f.id_funcionario %>" <%= parseInt(currentFilters.id_funcionario) === f.id_funcionario ? 'selected' : '' %>>
+                                        <%= f.nome %>
+                                    </option>
+                                <% }) %>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <button type="submit" class="btn btn-primary w-100">Filtrar</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Data & Hora</th>
+                                    <th>Usuário</th>
+                                    <th>Ação</th>
+                                    <th>Detalhes</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% if (logs.length > 0) { %>
+                                    <% logs.forEach(log => { %>
+                                        <tr>
+                                            <td class="text-nowrap"><%= new Date(log.data).toLocaleString('pt-BR') %></td>
+                                            <td><%= log.usuario %></td>
+                                            <td>
+                                                <span class="badge <%= log.cor.replace('text-', 'bg-') %>-subtle <%= log.cor %>-emphasis rounded-pill">
+                                                    <i class="bi <%= log.icone %> me-1"></i>
+                                                    <%= log.tipo.charAt(0).toUpperCase() + log.tipo.slice(1) %>
+                                                </span>
+                                            </td>
+                                            <td><%- log.detalhes %></td>
+                                        </tr>
+                                    <% }) %>
+                                <% } else { %>
+                                    <tr><td colspan="4" class="text-center py-4">Nenhum registro encontrado para os filtros aplicados.</td></tr>
+                                <% } %>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="card-footer d-flex justify-content-center">
+                     <% if (pagination.totalPages > 1) { %>
+                        <nav>
+                            <ul class="pagination mb-0">
+                                <% for (let i = 1; i <= pagination.totalPages; i++) { %>
+                                    <li class="page-item <%= i === pagination.currentPage ? 'active' : '' %>">
+                                        <a class="page-link" href="/admin/auditoria?page=<%= i %>&<%= new URLSearchParams(currentFilters).toString() %>"><%= i %></a>
+                                    </li>
+                                <% } %>
+                            </ul>
+                        </nav>
+                    <% } %>
+                </div>
+            </div>
+        </div>
+    </main>
+</body>
+
+<%- include('../../partials/footer.ejs') %>
+</html>

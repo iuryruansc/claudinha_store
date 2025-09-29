@@ -1,81 +1,92 @@
 const { Op, fn, col } = require('sequelize');
+const connection = require('../../database/database');
 const Desconto = require('../../models/desconto');
 const Produto = require('../../models/produto');
 const Lote = require('../../models/lote');
 
-const getPromocoes = async (omitSemLote = false) => {
+const getPromocoes = async (options = {}) => {
     const hoje = new Date();
 
-    const descontos = await Desconto.findAll({
+    const promocoes = await Desconto.findAll({
         where: {
             ativo: true,
             data_inicio: { [Op.lte]: hoje },
             data_fim: { [Op.gte]: hoje }
         },
-        raw: true
+        include: [{
+            model: Lote,
+            as: 'lote',
+            required: true,
+            where: {
+                quantidade: { [Op.gt]: 0 },
+                data_validade: { [Op.gte]: hoje }
+            },
+            include: [{ model: Produto, as: 'produto', required: true }]
+        }],
+        limit: 6
     });
-    if (!descontos.length) return [];
 
-    const produtoIds = [...new Set(descontos.map(d => d.id_produto))];
+    return promocoes.map(promo => {
 
-    const lotesMin = await Lote.findAll({
-        where: { id_produto: produtoIds },
-        attributes: [
-            'id_produto',
-            [fn('MIN', col('preco_produto')), 'precoMin']
-        ],
-        group: ['id_produto'],
-        raw: true
-    });
-    const precoMinMap = lotesMin.reduce((acc, l) => {
-        acc[l.id_produto] = parseFloat(l.precoMin);
-        return acc;
-    }, {});
+        const produto = promo.lote.produto;
+        const lote = promo.lote;
+        const precoOriginal = parseFloat(lote.preco_produto);
+        let precoPromocional = precoOriginal;
 
-    const produtos = await Produto.findAll({
-        where: { id_produto: produtoIds },
-        attributes: ['id_produto', 'nome', 'preco_compra'],
-        raw: true
-    });
-    const produtoMap = produtos.reduce((acc, p) => {
-        acc[p.id_produto] = p;
-        return acc;
-    }, {});
-
-    const promoList = [];
-    for (const d of descontos) {
-        const produto = produtoMap[d.id_produto];
-        if (!produto) continue;
-
-        
-        const precoOriginal = precoMinMap[d.id_produto] ?? produto.preco_venda;
-        if (precoOriginal == null || (omitSemLote && precoMinMap[d.id_produto] === undefined)) {
-            
-            continue;
+        if (promo.tipo === 'porcentagem') {
+            precoPromocional = precoOriginal * (1 - parseFloat(promo.valor) / 100);
+        } else {
+            precoPromocional = precoOriginal - parseFloat(promo.valor);
         }
 
-        let precoPromocional = d.tipo === 'porcentagem'
-            ? precoOriginal * (1 - d.valor / 100)
-            : precoOriginal - d.valor;
-        precoPromocional = Math.max(precoPromocional, 0);
-
-        promoList.push({
+        return {
             nome: produto.nome,
+            lote: lote.id_lote,
             precoOriginal: precoOriginal.toFixed(2),
             precoPromocional: precoPromocional.toFixed(2),
-            dataInicio: d.data_inicio.toISOString(),
-            dataFim: d.data_fim.toISOString()
-        });
-    }
-
-    return promoList;
-}
+            dataInicio: promo.data_inicio,
+            dataFim: promo.data_fim,
+        };
+    });
+};
 
 const createDesconto = async (descData) => {
     return await Desconto.create(descData);
 }
 
+const createDescontoParaLoteMaisProximo = async (data) => {
+    return await connection.transaction(async (t) => {
+        const lote = await Lote.findOne({
+            where: {
+                id_produto: data.id_produto,
+                quantidade: { [Op.gt]: 0 },
+                data_validade: { [Op.gte]: new Date() }
+            },
+            order: [['data_validade', 'ASC']],
+            transaction: t
+        });
+
+        if (!lote) {
+            const produto = await Produto.findByPk(data.id_produto);
+            throw new Error(`Nenhum lote com estoque e validade futura encontrado para o produto "${produto.nome}".`);
+        }
+
+        const novoDesconto = await Desconto.create({
+            id_lote: lote.id_lote,
+            tipo: data.tipo,
+            valor: data.valor,
+            data_inicio: data.data_inicio,
+            data_fim: data.data_fim,
+            ativo: true,
+            observacao: data.observacao
+        }, { transaction: t });
+
+        return novoDesconto;
+    });
+};
+
 module.exports = {
     createDesconto,
-    getPromocoes
+    getPromocoes,
+    createDescontoParaLoteMaisProximo
 }

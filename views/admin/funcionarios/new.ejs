@@ -1,68 +1,68 @@
 <%- include('../../partials/header.ejs') %>
-<%- include('../../partials/navbar.ejs') %>
+    <%- include('../../partials/navbar.ejs') %>
 
-<body>
-    <main class="main-content">
-        <div class="container">
-            <div id="error-popup-container"></div>
-            <div class="d-flex justify-content-between align-items-center my-4">
-                <h2 class="mb-0 h4">
-                    <i class="bi bi-person-plus me-2"></i>
-                    Cadastrar Novo Funcionário
-                </h2>
-                <a href="/admin/funcionarios" class="btn btn-secondary">
-                    <i class="bi bi-arrow-left me-2"></i>Voltar
-                </a>
-            </div>
-            <hr>
-            
-            <div class="card shadow-sm">
-                <div class="card-body">
-                    <form id="func-form" method="POST" action="/admin/funcionarios/save">
-                        <div class="form-floating mb-3">
-                            <input id="func-name-input" class="form-control" type="text" name="nome"
-                                placeholder="Nome do Funcionário" required>
-                            <label for="func-name-input">Nome do Funcionário</label>
-                        </div>
+        <body>
+            <main class="main-content">
+                <div class="container">
+                    <div id="error-popup-container"></div>
+                    <div class="d-flex justify-content-between align-items-center my-4">
+                        <h2 class="mb-0 h4">
+                            <i class="bi bi-person-plus me-2"></i>
+                            Cadastrar Novo Funcionário
+                        </h2>
+                        <a href="/admin/funcionarios" class="btn btn-secondary">
+                            <i class="bi bi-arrow-left me-2"></i>Voltar
+                        </a>
+                    </div>
+                    <hr>
 
-                        <div class="form-floating mb-3">
-                            <input id="func-cpf-input" class="form-control" type="text" name="cpf"
-                                placeholder="CPF do Funcionário" required>
-                            <label for="func-cpf-input">CPF</label>
-                        </div>
+                    <div class="card shadow-sm">
+                        <div class="card-body">
+                            <form id="func-form" method="POST" action="/admin/funcionarios/save">
+                                <div class="form-floating mb-3">
+                                    <input id="func-name-input" class="form-control" type="text" name="nome"
+                                        placeholder="Nome do Funcionário" required>
+                                    <label for="func-name-input">Nome do Funcionário</label>
+                                </div>
 
-                        <div class="d-flex justify-content-between mt-4">
-                            <button type="submit" class="btn btn-success">
-                                <i class="bi bi-check-circle me-2"></i>Cadastrar
-                            </button>
+                                <div class="form-floating mb-3">
+                                    <input id="func-cpf-input" class="form-control" type="text" name="cpf"
+                                        placeholder="CPF do Funcionário" required>
+                                    <label for="func-cpf-input">CPF</label>
+                                </div>
+
+                                <div class="d-flex justify-content-between mt-4">
+                                    <button type="submit" class="btn btn-success">
+                                        <i class="bi bi-check-circle me-2"></i>Cadastrar
+                                    </button>
+                                </div>
+                            </form>
                         </div>
-                    </form>
+                    </div>
                 </div>
-            </div>
-        </div>
-    </main>
-    <%- include('../../partials/footer.ejs') %>
+            </main>
+            <%- include('../../partials/footer.ejs') %>
 
-    <script type="module">
-        import { setupMultiFieldNew } from '/js/multi-field-new.js';
+                <script type="module">
+                    import { setupMultiFieldNew } from '/js/lib/multi-field-new.js';
 
-        document.addEventListener('DOMContentLoaded', function () {
-            setupMultiFieldNew({
-                formSelector: '#func-form',
-                inputFields: [
-                    '#func-name-input',
-                    '#func-cpf-input'
-                ],
-                selectFields: [],
-                requiredFields: ['nome', 'cpf'],
-                redirectUrl: '/admin/funcionarios',
-                fieldMap: {
-                    nome: '#func-name-input',
-                    cpf: '#func-cpf-input'
-                }
-            });
-        });
-    </script>
-</body>
+                    document.addEventListener('DOMContentLoaded', function () {
+                        setupMultiFieldNew({
+                            formSelector: '#func-form',
+                            inputFields: [
+                                '#func-name-input',
+                                '#func-cpf-input'
+                            ],
+                            selectFields: [],
+                            requiredFields: ['nome', 'cpf'],
+                            redirectUrl: '/admin/funcionarios',
+                            fieldMap: {
+                                nome: '#func-name-input',
+                                cpf: '#func-cpf-input'
+                            }
+                        });
+                    });
+                </script>
+        </body>
 
-</html>
+        </html>

@@ -1,0 +1,63 @@
+<%- include('../../partials/header.ejs') %>
+<%- include('../../partials/navbar.ejs') %>
+
+<body>
+    <main class="main-content">
+        <div class="container">
+            <div class="d-flex justify-content-between align-items-center my-4">
+                <h2 class="mb-0 h4"><i class="bi bi-tag-fill me-2"></i>Gerenciamento de Promoções</h2>
+            </div>
+
+            <ul class="nav nav-tabs mb-3" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#ativas-pane" type="button">
+                        Ativas <span class="badge bg-success"><%= ativas.length %></span>
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" data-bs-toggle="tab" data-bs-target="#agendadas-pane" type="button">
+                        Agendadas <span class="badge bg-info"><%= agendadas.length %></span>
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" data-bs-toggle="tab" data-bs-target="#encerradas-pane" type="button">
+                        Encerradas <span class="badge bg-secondary"><%= encerradas.length %></span>
+                    </button>
+                </li>
+            </ul>
+
+            <div class="tab-content">
+                <div class="tab-pane fade show active" id="ativas-pane">
+                    <div class="row g-4">
+                        <% ativas.forEach(promo => { %>
+                            <%- include('../../partials/modals/promo-card', { promo: promo }) %>
+                        <% }) %>
+                        <% if(ativas.length === 0) { %><p class="text-muted ms-3">Nenhuma promoção ativa no momento.</p><% } %>
+                    </div>
+                </div>
+                <div class="tab-pane fade" id="agendadas-pane">
+                     <div class="row g-4">
+                        <% agendadas.forEach(promo => { %>
+                            <%- include('../../partials/modals/promo-card', { promo: promo }) %>
+                        <% }) %>
+                        <% if(agendadas.length === 0) { %><p class="text-muted ms-3">Nenhuma promoção agendada.</p><% } %>
+                    </div>
+                </div>
+                <div class="tab-pane fade" id="encerradas-pane">
+                     <div class="row g-4">
+                        <% encerradas.forEach(promo => { %>
+                            <%- include('../../partials/modals/promo-card', { promo: promo }) %>
+                        <% }) %>
+                        <% if(encerradas.length === 0) { %><p class="text-muted ms-3">Nenhuma promoção na lista de encerradas.</p><% } %>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <%- include('../../partials/modals/promo-modal.ejs', { lotes: lotes }) %>
+</body>
+<%- include('../../partials/footer.ejs') %>
+<script src="/js/promo-timer.js"></script>
+<script src="/js/promo-modal-handler.js"></script>
+</html>

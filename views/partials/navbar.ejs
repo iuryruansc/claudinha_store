@@ -1,9 +1,4 @@
 <nav id="adminSidebar" class="d-flex flex-column bg-dark text-white vh-100 p-3 position-fixed" style="width: 250px;">
-    <% const iconMap={ 'Painel Admin' : 'bi-box-seam' , 'Produtos' : 'bi-box2' , 'Vendas' : 'bi-currency-dollar'
-        , 'Catálogo' : 'bi-book' , 'Categorias' : 'bi-tags' , 'Fornecedores' : 'bi-truck' , 'Marcas' : 'bi-award'
-        , 'Clientes' : 'bi-people' , 'Funcionarios' : 'bi bi-person-badge' , 'Lotes' : 'bi-boxes' , 'PDVs' : 'bi-shop'
-        , 'Caixas' : 'bi-safe' , 'Movimentações' : 'bi-arrow-left-right' , 'Pagamentos' : 'bi-credit-card' }; %>
-
         <% function renderSidebar(items, accordionId='sidebarAccordion' , level=0) { let html='' ; items.forEach((item,
             idx)=> {
             const id = `${accordionId}-${idx}`;
@@ -21,7 +16,7 @@
 
             const showClass = isActive ? 'show' : '';
             const collapsedClass = isActive ? '' : 'collapsed';
-            const iconClass = item.icon || iconMap[item.label] || '';
+            const iconClass = item.icon || '';
             const iconMarkup = iconClass ? `<i class="bi ${iconClass} me-2"></i>` : '';
 
             if (item.dropdown) {
@@ -33,7 +28,7 @@
                         aria-controls="${collapseId}">
                         ${iconMarkup}
                         <span>${item.label}</span>
-                        <i class="bi bi-chevron-down ms-auto"></i>
+                        <i class="bi bi-chevron-down ms-auto"></i> 
                     </button>
                 </h2>
                 <div id="${collapseId}" class="accordion-collapse collapse ${showClass}"
