@@ -33,7 +33,7 @@ router.post('/categories/save', asyncHandler(async (req, res) => {
 
     await createCategory({ nome });
 
-        res.status(200).json({
+    res.status(200).json({
         message: 'Categoria registrada com sucesso!',
         redirectUrl: '/admin/categories'
     });
@@ -64,7 +64,7 @@ router.post('/categories/update/:id_categoria', asyncHandler(async (req, res) =>
 
     await updateCategory(parsedId, { nome });
 
-        res.status(200).json({
+    res.status(200).json({
         message: 'Categoria atualizada com sucesso!',
         redirectUrl: '/admin/categories'
     });

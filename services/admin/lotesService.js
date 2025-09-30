@@ -1,3 +1,4 @@
+const { Op } = require('sequelize');
 const connection = require('../../database/database');
 const Lote = require('../../models/lote');
 const Produto = require('../../models/produto');
@@ -16,25 +17,51 @@ const getViewDependencies = async () => {
 }
 
 const getAllLotes = async () => {
-    const lotes = await Lote.findAll({
+    const lotesGeral = await Lote.findAll({
         include: [{
             model: Produto,
             as: 'produto'
         }],
-        order: [['createdAt', 'DESC']]
+        order: [
+            ['data_validade', 'ASC'],
+            ['quantidade', 'ASC']
+        ]
+    });
+
+    const hoje = new Date();
+    const lotes = lotesGeral.map(lote => {
+        const dataValidade = new Date(lote.data_validade);
+        const diffDias = Math.ceil((dataValidade - hoje) / (1000 * 60 * 60 * 24));
+        const qtd = lote.quantidade;
+
+        let statusValidade = 'ok';
+        if (diffDias < 0) {
+            statusValidade = 'vencido';
+        } else if (diffDias <= 7) {
+            statusValidade = 'critico';
+        } else if (diffDias <= 30) {
+            statusValidade = 'atencao';
+        }
+
+        let statusQuantidade = 'ok';
+        if (qtd === 0) {
+            statusQuantidade = 'zerado';
+        } else if (qtd <= 5) {
+            statusQuantidade = 'critico';
+        } else if (qtd <= 10) {
+            statusQuantidade = 'baixo';
+        }
+
+        return {
+            ...lote.get({ plain: true }),
+            diffDias: diffDias,
+            statusValidade: statusValidade,
+            statusQuantidade: statusQuantidade,
+        };
     });
 
     return { lotes };
 };
-
-const getEditData = async (id) => {
-    const lotePromise = findLoteById(id);
-    const produtosPromise = getViewDependencies()
-
-    const [lote, produtos] = await Promise.all([lotePromise, produtosPromise]);
-
-    return { lote, produtos };
-}
 
 const createLote = async (clienteData) => {
     return await Lote.create(clienteData);
@@ -96,17 +123,92 @@ const adicionarQuantidadeAoLote = async (id_lote, quantidadeAdicional, id_funcio
 };
 
 const getLowStockLotes = async () => {
-    const lotes = await Lote.findAll({
+    const limiteBaixoEstoque = 10;
+
+    const lotesGeral = await Lote.findAll({
+        where: {
+            quantidade: {
+                [Op.gt]: 0,
+                [Op.lte]: limiteBaixoEstoque
+            }
+        },
         include: [{
             model: Produto,
-            as: 'produto'
+            as: 'produto',
+            required: true
         }],
-        order: [['quantidade', 'ASC']],
-        limit: 5
+        order: [['quantidade', 'ASC']]
     });
 
-    return lotes;
+    const lotesBaixoEstoque = lotesGeral.map(lote => {
+        const hoje = new Date();
+        const dataValidade = lote.data_validade ? new Date(lote.data_validade) : null;
+        const qtd = lote.quantidade;
+
+        const diasParaVencer = (dataValidade && dataValidade > hoje)
+            ? Math.ceil((dataValidade - hoje) / (1000 * 60 * 60 * 24))
+            : null;
+
+        let statusEstoque = 'saudavel';
+        if (qtd <= 5) {
+            statusEstoque = 'critico';
+        } else if (qtd <= 10) {
+            statusEstoque = 'baixo';
+        }
+
+        return {
+            ...lote.get({ plain: true }),
+            diasParaVencer: (diasParaVencer !== null && diasParaVencer <= 30) ? diasParaVencer : null,
+            statusEstoque: statusEstoque
+        };
+    });
+
+    return lotesBaixoEstoque;
 };
+
+const getLotesProximosVencimento = async () => {
+    const hoje = new Date();
+    const dataLimite = new Date();
+    dataLimite.setDate(hoje.getDate() + 30);
+
+    const lotesGeral = await Lote.findAll({
+        where: {
+            quantidade: { [Op.gt]: 0 },
+            data_validade: {
+                [Op.between]: [hoje, dataLimite]
+            }
+        },
+        include: [{
+            model: Produto,
+            as: 'produto',
+            required: true
+        }],
+        order: [['data_validade', 'ASC']]
+    });
+
+    const lotesProximosVencimento = lotesGeral.map(lote => {
+        const dataValidade = new Date(lote.data_validade);
+        const qtd = lote.quantidade;
+
+        const diasParaVencer = Math.ceil((dataValidade - hoje) / (1000 * 60 * 60 * 24));
+
+        let statusEstoque = 'saudavel';
+        if (qtd <= 5) {
+            statusEstoque = 'critico';
+        } else if (qtd <= 10) {
+            statusEstoque = 'baixo';
+        }
+
+        return {
+            ...lote.get({ plain: true }),
+            diasParaVencer: diasParaVencer,
+            statusEstoque: statusEstoque
+        };
+    });
+
+    return lotesProximosVencimento;
+};
+
 
 const createLoteWithMovimentacao = async (data, id_funcionario) => {
     return await connection.transaction(async (t) => {
@@ -146,11 +248,11 @@ module.exports = {
     findLoteById,
     getViewDependencies,
     getAllLotes,
-    getEditData,
     createLote,
     updateLote,
     deleteLote,
     adicionarQuantidadeAoLote,
     getLowStockLotes,
-    createLoteWithMovimentacao
+    createLoteWithMovimentacao,
+    getLotesProximosVencimento
 }

@@ -17,6 +17,19 @@
                             </a>
                         </div>
 
+                        <% if (typeof alertaEstoqueBaixo !== 'undefined' && alertaEstoqueBaixo) { %>
+    <div class="alert alert-warning d-flex align-items-center justify-content-between" role="alert">
+        <div>
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+            <strong>Atenção:</strong> Existem lotes com estoque baixo ou crítico.
+        </div>
+        <div>
+            <a href="#" class="btn btn-sm btn-warning fw-bold" id="filtrar-estoque-baixo">Ver Itens</a>
+            <a href="#" class="btn btn-sm btn-outline-secondary" id="limpar-filtro-estoque" style="display: none;">Limpar Filtro</a>
+        </div>
+    </div>
+<% } %>
+
                         <div class="card shadow-sm">
                             <div class="card-body">
                                 <div class="table-responsive">
@@ -24,7 +37,8 @@
                                         <thead class="table-dark">
                                             <tr>
                                                 <th>Produto</th>
-                                                <th>Número do Lote</th>
+                                                <th>Preço de Compra</th>
+                                                <th>Lote</th>
                                                 <th class="text-center">Quantidade</th>
                                                 <th>Localização</th>
                                                 <th>Status da Validade</th>
@@ -41,36 +55,31 @@
                                                 </th>
                                             </tr>
                                         </thead>
-                                        <tbody id="lotes-table-body">
-                                            <% lotes.forEach(lote=> { %>
-                                                <% const produto=lote.produto; const hoje=new Date(); const
-                                                    dataValidade=new Date(lote.data_validade); const
-                                                    diffDias=Math.ceil((dataValidade - hoje) / (1000 * 60 * 60 * 24));
-                                                    let rowClass='' ; let statusTexto=`Válido até
-                                                    ${dataValidade.toLocaleDateString('pt-BR')}`; if (diffDias < 0) {
-                                                    rowClass='table-danger' ; statusTexto=`Vencido há
-                                                    ${Math.abs(diffDias)} dia(s)`; } else if (diffDias <=30) {
-                                                    rowClass='table-warning' ; statusTexto=`Vence em ${diffDias}
-                                                    dia(s)`; } const qtd=lote.quantidade; let qtdClass='' ; if (qtd===0)
-                                                    { qtdClass='text-danger fw-bold' ; } else if (qtd <=10) {
-                                                    qtdClass='text-warning fw-bold' ; } %>
-                                                    <tr class="<%= rowClass %>">
-                                                        <td>
-                                                            <%= produto ? produto.nome : 'Produto não encontrado' %>
-                                                        </td>
-                                                        <td>
-                                                            <%= lote.numero_lote %>
-                                                        </td>
-                                                        <td class="text-center <%= qtdClass %>">
-                                                            <%= qtd %>
-                                                        </td>
-                                                        <td>
-                                                            <%= lote.localizacao %>
-                                                        </td>
-                                                        <td>
-                                                            <%= statusTexto %>
-                                                        </td>
-                                                        <td class="text-center">
+<tbody id="lotes-table-body">
+    <% lotes.forEach(lote => { %>
+        <% 
+            const produto = lote.produto;
+            
+            let statusTexto = `Válido até ${new Date(lote.data_validade).toLocaleDateString('pt-BR')}`;
+            if (lote.statusValidade === 'vencido') {
+                statusTexto = `Vencido há ${Math.abs(lote.diffDias)} dia(s)`;
+            } else if (lote.diffDias <= 30) {
+                statusTexto = `Vence em ${lote.diffDias} dia(s)`;
+            }
+        %>
+
+        <tr data-validade="<%= lote.statusValidade %>" data-quantidade="<%= lote.statusQuantidade %>">
+            <td>
+                <%= produto ? produto.nome : 'Produto não encontrado' %>
+            </td>
+            <td>
+                <%= lote.preco_produto.toLocaleString('pt-BR', { style: 'currency' , currency: 'BRL' }) %>
+            </td>
+            <td class="text-center"><%= lote.numero_lote %></td>
+            <td class="text-center fw-bold"><%= lote.quantidade %></td>
+            <td><%= lote.localizacao %></td>
+            <td><%= statusTexto %></td>
+<td class="text-center">
                                                             <div class="btn-group">
                                                                 <button class="btn btn-sm btn-outline-success"
                                                                     data-bs-toggle="modal"
@@ -102,9 +111,9 @@
                                                                 </form>
                                                             </div>
                                                         </td>
-                                                    </tr>
-                                                    <% }) %>
-                                        </tbody>
+        </tr>
+    <% }) %>
+</tbody>
                                     </table>
                                 </div>
                             </div>
@@ -112,12 +121,13 @@
                 </div>
             </main>
 
-            <%- include('../../partials/modals/add-quant-modal.ejs') %>
-                <%- include('../../partials/modals/edit-lote-modal.ejs') %>
-        </body>
-
+        <%- include('../../partials/modals/add-quant-modal.ejs') %>
+        <%- include('../../partials/modals/edit-lote-modal.ejs') %>
+                
         <%- include('../../partials/footer.ejs') %>
 
-            <script src="/js/pages/lotes.js" type="module"></script>
+        <script src="/js/pages/lotes.js" type="module"></script>
+        </body>
 
-            </html>
+
+        </html>

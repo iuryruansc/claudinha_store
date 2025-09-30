@@ -3,6 +3,8 @@
 
         <body>
             <main id="appMain" class="main-content">
+
+
                 <!-- ALERTA DE PAGAMENTOS PENDENTES -->
                 <div class="container">
                     <h2 class="mb-4">
@@ -64,156 +66,161 @@
                         </div>
                         <% } %>
 
-                            <div id="error-popup-container"></div>
-                            <div class="row g-4">
-                                <!-- NOVO CAIXA -->
-                                <div class="col-md-4">
-                                    <div class="card bg-light h-100 shadow">
-                                        <div class="card-body">
+                            <%- include('../../partials/messages.ejs') %>
+                                <div id="error-popup-container"></div>
+                                <div class="row g-4">
+                                    <!-- NOVO CAIXA -->
+                                    <div class="col-md-4">
+                                        <div class="card bg-light h-100 shadow">
+                                            <div class="card-body">
 
-                                            <% if (!caixa) { %>
-                                                <!-- Sem caixa ativo: formulário de abertura -->
+                                                <% if (!caixa) { %>
+                                                    <!-- Sem caixa ativo: formulário de abertura -->
+                                                    <h5 class="card-title btn-checkout-text">
+                                                        <i class="bi-cash-stack me-2"></i>Abrir Caixa
+                                                    </h5>
+                                                    <p class="card-text">Selecione o PDV e informe o saldo inicial.</p>
+                                                    <form action="/admin/caixa/abrir" method="POST"
+                                                        class="d-flex flex-column gap-2">
+                                                        <select name="id_pdv" class="form-select form-select-sm"
+                                                            required>
+                                                            <option value="" disabled selected>Escolha o PDV</option>
+                                                            <% pdvs.forEach(pdv=> { %>
+                                                                <option value="<%= pdv.id_pdv %>">
+                                                                    <%= pdv.descricao %>
+                                                                </option>
+                                                                <% }) %>
+                                                        </select>
+                                                        <input type="number" step="0.01" name="saldo_inicial"
+                                                            class="form-control form-control-sm"
+                                                            placeholder="Saldo inicial" required />
+                                                        <button type="submit"
+                                                            class="btn btn-checkout text-white btn-sm">
+                                                            Abrir Caixa
+                                                        </button>
+                                                    </form>
+
+                                                    <% } else { %>
+                                                        <div class="d-flex justify-content-between align-items-center">
+                                                            <h5 class="card-title mb-0">
+                                                                <i class="bi-unlock-fill me-2"></i>Caixa Aberto
+                                                            </h5>
+                                                            <span class="badge bg-success">ATIVO</span>
+                                                        </div>
+                                                        <hr>
+
+                                                        <p class="card-text small text-muted">Aberto em <%= new
+                                                                Date(caixa.data_abertura).toLocaleString('pt-BR') %>
+                                                        </p>
+                                                        <ul class="list-group list-group-flush small mb-3">
+                                                            <li class="list-group-item d-flex justify-content-between">
+                                                                <span>Saldo Inicial:</span>
+                                                                <strong>
+                                                                    <%= parseFloat(caixa.saldo_inicial).toLocaleString('pt-BR',
+                                                                        {style:'currency', currency: 'BRL' }) %>
+                                                                </strong>
+                                                            </li>
+                                                            <li class="list-group-item d-flex justify-content-between">
+                                                                <span>Vendas no Dinheiro:</span>
+                                                                <span class="text-success">+ <%=
+                                                                        resumoCaixa.totalRecebidoDinheiro.toLocaleString('pt-BR',
+                                                                        {style:'currency', currency: 'BRL' }) %></span>
+                                                            </li>
+                                                            <li class="list-group-item d-flex justify-content-between">
+                                                                <span>Vendas (Outras Formas):</span>
+                                                                <span>
+                                                                    <%= (resumoCaixa.totalRecebidoCartao +
+                                                                        resumoCaixa.totalRecebidoPix).toLocaleString('pt-BR',
+                                                                        {style:'currency', currency: 'BRL' }) %>
+                                                                </span>
+                                                            </li>
+                                                            <li
+                                                                class="list-group-item d-flex justify-content-between bg-light">
+                                                                <strong>Saldo Esperado em Caixa:</strong>
+                                                                <strong class="fs-6">
+                                                                    <%= resumoCaixa.saldoEsperado.toLocaleString('pt-BR',
+                                                                        {style:'currency', currency: 'BRL' }) %>
+                                                                </strong>
+                                                            </li>
+                                                        </ul>
+
+                                                        <form action="/admin/caixa/fechar" method="POST"
+                                                            class="d-flex flex-column gap-2">
+                                                            <input type="hidden" name="id_caixa"
+                                                                value="<%= caixa.id_caixa %>">
+                                                            <div class="form-floating">
+                                                                <input type="number" step="0.01" name="saldo_final"
+                                                                    class="form-control" placeholder="Saldo final"
+                                                                    required id="saldo_final_input" />
+                                                                <label for="saldo_final_input">Saldo Final (contado na
+                                                                    gaveta)</label>
+                                                            </div>
+                                                            <button type="submit" class="btn btn-danger">
+                                                                <i class="bi-lock-fill me-2"></i>Fechar Caixa
+                                                            </button>
+                                                        </form>
+                                                        <% } %>
+
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- NOVO LOTE -->
+                                    <div class="col-md-4">
+                                        <div class="card bg-light h-100 shadow">
+                                            <div class="card-body">
+
                                                 <h5 class="card-title btn-checkout-text">
-                                                    <i class="bi-cash-stack me-2"></i>Abrir Caixa
+                                                    <i class="bi bi-box-arrow-in-down me-2"></i>Entrada de Produto
                                                 </h5>
-                                                <p class="card-text">Selecione o PDV e informe o saldo inicial.</p>
-                                                <form action="/admin/caixa/abrir" method="POST"
-                                                    class="d-flex flex-column gap-2">
-                                                    <select name="id_pdv" class="form-select form-select-sm" required>
-                                                        <option value="" disabled selected>Escolha o PDV</option>
-                                                        <% pdvs.forEach(pdv=> { %>
-                                                            <option value="<%= pdv.id_pdv %>">
-                                                                <%= pdv.descricao %>
-                                                            </option>
-                                                            <% }) %>
-                                                    </select>
-                                                    <input type="number" step="0.01" name="saldo_inicial"
-                                                        class="form-control form-control-sm" placeholder="Saldo inicial"
-                                                        required />
-                                                    <button type="submit" class="btn btn-checkout text-white btn-sm">
-                                                        Abrir Caixa
+                                                <p class="card-text">
+                                                    Escaneie ou digite o código de barras para iniciar a entrada.
+                                                </p>
+
+                                                <form id="formIniciarEntrada">
+                                                    <div class="mb-3">
+                                                        <input type="text" name="codigo_barras" id="cardCodigoBarra"
+                                                            class="form-control form-control-sm"
+                                                            placeholder="Código de Barras" autocomplete="off" required>
+                                                    </div>
+
+                                                    <button type="button" id="btnIniciarEntrada"
+                                                        class="btn btn-checkout text-white btn-sm w-100">
+                                                        Iniciar Entrada
                                                     </button>
                                                 </form>
 
-                                                <% } else { %>
-                                                    <div class="d-flex justify-content-between align-items-center">
-                                                        <h5 class="card-title mb-0">
-                                                            <i class="bi-unlock-fill me-2"></i>Caixa Aberto
-                                                        </h5>
-                                                        <span class="badge bg-success">ATIVO</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- NOVA PROMOÇÃO -->
+                                    <div class="col-md-4">
+                                        <div class="card bg-light h-100 shadow">
+                                            <div class="card-body">
+                                                <h5 class="card-title text-success">
+                                                    <i class="bi bi-tag-fill me-2"></i>Cadastrar Promoção
+                                                </h5>
+                                                <p class="card-text">
+                                                    Escaneie ou digite o código de barras do produto.
+                                                </p>
+                                                <form id="formIniciarPromocao">
+                                                    <div class="mb-3">
+                                                        <input type="text" name="codigo_barras_promo"
+                                                            id="promocaoCodigoBarra"
+                                                            class="form-control form-control-sm"
+                                                            placeholder="Código de Barras" autocomplete="off"
+                                                            required />
                                                     </div>
-                                                    <hr>
-
-                                                    <p class="card-text small text-muted">Aberto em <%= new
-                                                            Date(caixa.data_abertura).toLocaleString('pt-BR') %>
-                                                    </p>
-                                                    <ul class="list-group list-group-flush small mb-3">
-                                                        <li class="list-group-item d-flex justify-content-between">
-                                                            <span>Saldo Inicial:</span>
-                                                            <strong>
-                                                                <%= parseFloat(caixa.saldo_inicial).toLocaleString('pt-BR',
-                                                                    {style:'currency', currency: 'BRL' }) %>
-                                                            </strong>
-                                                        </li>
-                                                        <li class="list-group-item d-flex justify-content-between">
-                                                            <span>Vendas no Dinheiro:</span>
-                                                            <span class="text-success">+ <%=
-                                                                    resumoCaixa.totalRecebidoDinheiro.toLocaleString('pt-BR',
-                                                                    {style:'currency', currency: 'BRL' }) %></span>
-                                                        </li>
-                                                        <li class="list-group-item d-flex justify-content-between">
-                                                            <span>Vendas (Outras Formas):</span>
-                                                            <span>
-                                                                <%= (resumoCaixa.totalRecebidoCartao +
-                                                                    resumoCaixa.totalRecebidoPix).toLocaleString('pt-BR',
-                                                                    {style:'currency', currency: 'BRL' }) %>
-                                                            </span>
-                                                        </li>
-                                                        <li
-                                                            class="list-group-item d-flex justify-content-between bg-light">
-                                                            <strong>Saldo Esperado em Caixa:</strong>
-                                                            <strong class="fs-6">
-                                                                <%= resumoCaixa.saldoEsperado.toLocaleString('pt-BR',
-                                                                    {style:'currency', currency: 'BRL' }) %>
-                                                            </strong>
-                                                        </li>
-                                                    </ul>
-
-                                                    <form action="/admin/caixa/fechar" method="POST"
-                                                        class="d-flex flex-column gap-2">
-                                                        <input type="hidden" name="id_caixa"
-                                                            value="<%= caixa.id_caixa %>">
-                                                        <div class="form-floating">
-                                                            <input type="number" step="0.01" name="saldo_final"
-                                                                class="form-control" placeholder="Saldo final" required
-                                                                id="saldo_final_input" />
-                                                            <label for="saldo_final_input">Saldo Final (contado na
-                                                                gaveta)</label>
-                                                        </div>
-                                                        <button type="submit" class="btn btn-danger">
-                                                            <i class="bi-lock-fill me-2"></i>Fechar Caixa
-                                                        </button>
-                                                    </form>
-                                                    <% } %>
-
+                                                    <button type="button" id="btnIniciarPromocao"
+                                                        class="btn bg-success text-white btn-sm w-100">
+                                                        Cadastrar Promoção
+                                                    </button>
+                                                </form>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-
-                                <!-- NOVO LOTE -->
-                                <div class="col-md-4">
-                                    <div class="card bg-light h-100 shadow">
-                                        <div class="card-body">
-
-                                            <h5 class="card-title btn-checkout-text">
-                                                <i class="bi bi-box-arrow-in-down me-2"></i>Entrada de Produto
-                                            </h5>
-                                            <p class="card-text">
-                                                Escaneie ou digite o código de barras para iniciar a entrada.
-                                            </p>
-
-                                            <form id="formIniciarEntrada">
-                                                <div class="mb-3">
-                                                    <input type="text" name="codigo_barras" id="cardCodigoBarra"
-                                                        class="form-control form-control-sm"
-                                                        placeholder="Código de Barras" autocomplete="off" required>
-                                                </div>
-
-                                                <button type="button" id="btnIniciarEntrada"
-                                                    class="btn btn-checkout text-white btn-sm w-100">
-                                                    Iniciar Entrada
-                                                </button>
-                                            </form>
-
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- NOVA PROMOÇÃO -->
-                                <div class="col-md-4">
-                                    <div class="card bg-light h-100 shadow">
-                                        <div class="card-body">
-                                            <h5 class="card-title text-success">
-                                                <i class="bi bi-tag-fill me-2"></i>Cadastrar Promoção
-                                            </h5>
-                                            <p class="card-text">
-                                                Escaneie ou digite o código de barras do produto.
-                                            </p>
-                                            <form id="formIniciarPromocao">
-                                                <div class="mb-3">
-                                                    <input type="text" name="codigo_barras_promo"
-                                                        id="promocaoCodigoBarra" class="form-control form-control-sm"
-                                                        placeholder="Código de Barras" autocomplete="off" required />
-                                                </div>
-                                                <button type="button" id="btnIniciarPromocao"
-                                                    class="btn bg-success text-white btn-sm w-100">
-                                                    Cadastrar Promoção
-                                                </button>
-                                            </form>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
                 </div>
 
                 <div class="container mt-5">
@@ -224,7 +231,7 @@
                                 <div class="card-header softer-blue text-white">
                                     <i class="bi bi-activity me-2"></i>Feed de Atividade Recente
                                 </div>
-                                <div class="card-body">
+                                <div class="card-body dashboard-card-body-scrollable">
                                     <ul class="list-group list-group-flush">
                                         <% if (atividades && atividades.length> 0) { %>
                                             <% atividades.forEach(atividade=> { %>
@@ -248,10 +255,10 @@
                                                         </li>
                                                         <% } %>
                                     </ul>
-                                    <div class="card-footer text-center">
-                                        <a href="/admin/auditoria" class="btn btn-outline-secondary btn-sm">Ver log
-                                            completo</a>
-                                    </div>
+                                </div>
+                                <div class="card-footer text-center">
+                                    <a href="/admin/auditoria" class="btn btn-outline-secondary btn-sm">Ver log
+                                        completo</a>
                                 </div>
                             </div>
                         </div>
@@ -259,15 +266,12 @@
                         <!-- PROMOÇÕES -->
                         <div class="col-lg-6 mb-4">
                             <div class="card shadow-sm h-100">
-                                <div
-                                    class="card-header bg-success text-white d-flex justify-content-between align-items-center">
-                                    <h5 class="mb-0 fs-5">
-                                        <i class="bi bi-tag-fill me-2"></i> Produtos em Promoção
-                                    </h5>
+                                <div class="card-header bg-success text-white">
+                                    <i class="bi bi-tag-fill me-2"></i> Produtos em Promoção
                                 </div>
-                                <div class="card-body">
+                                <div class="card-body dashboard-card-body-scrollable">
                                     <% if (promoList && promoList.length> 0) { %>
-                                        <div class="row g-3">
+                                        <div class="row g-3" id="promo-items-wrapper">
                                             <% promoList.forEach(promo=> { %>
                                                 <div class="col-12 col-md-6">
                                                     <div
@@ -321,73 +325,119 @@
                         </div>
 
                         <!-- SNAPSHOT ESTOQUE -->
-                        <div class="col-lg-6 mb-4">
-                            <div class="card shadow">
-                                <div class="card-header">
-                                    <h5 class="mb-0 fs-5">
-                                        <i class="bi bi-boxes me-2"></i> Visualização Rápida do Estoque
-                                    </h5>
-                                </div>
-                                <div class="card-body d-flex flex-column">
-                                    <ul class="list-group list-group-flush flex-grow-1">
-                                        <% if (lotesBaixoEstoque && lotesBaixoEstoque.length> 0) { %>
-                                            <% lotesBaixoEstoque.slice(0, 5).forEach(lote=> { %>
-                                                <% const produtoNome=lote.produto?.nome || 'Produto desconhecido' ;
-                                                    const qtd=lote.quantidade; const validade=new
-                                                    Date(lote.data_validade).toLocaleDateString('pt-BR'); const
-                                                    loteNum=lote.numero_lote; let badgeClass='bg-success' ; let
-                                                    iconClass='bi-check-circle-fill' ; if (qtd <=5) {
-                                                    badgeClass='bg-danger' ; iconClass='bi-exclamation-triangle-fill' ;
-                                                    } else if (qtd <=10) { badgeClass='bg-warning text-dark' ;
-                                                    iconClass='bi-exclamation-circle-fill' ; } const hoje=new Date();
-                                                    const dataValidade=new Date(lote.data_validade); const
-                                                    diffDias=Math.ceil((dataValidade - hoje) / (1000 * 60 * 60 * 24));
-                                                    const vencimentoProximo=diffDias <=30 && diffDias>= 0;
-                                                    %>
+<div class="col-lg-6 mb-4">
+    <div class="card shadow h-100">
+        <div class="card-header">
+            <h5 class="mb-0 fs-5">
+                <i class="bi bi-bell-fill me-2"></i> Alertas de Estoque
+            </h5>
+        </div>
+        <div class="card-body d-flex flex-column p-0">
+            <ul class="nav nav-tabs nav-fill px-3" id="stockAlertsTab" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="low-stock-tab" data-bs-toggle="tab"
+                        data-bs-target="#low-stock-pane" type="button" role="tab" aria-controls="low-stock-pane"
+                        aria-selected="true">Estoque Baixo</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="expiring-soon-tab" data-bs-toggle="tab"
+                        data-bs-target="#expiring-soon-pane" type="button" role="tab"
+                        aria-controls="expiring-soon-pane" aria-selected="false">Próximos do Vencimento</button>
+                </li>
+            </ul>
 
-                                                    <li class="list-group-item d-flex justify-content-between align-items-center"
-                                                        data-bs-toggle="tooltip" data-bs-placement="top"
-                                                        title="Lote #<%= loteNum %> — Válido até <%= validade %>">
+            <div class="tab-content flex-grow-1" id="stockAlertsTabContent">
+                <div class="tab-pane fade show active" id="low-stock-pane" role="tabpanel"
+                    aria-labelledby="low-stock-tab" tabindex="0">
+                    <div class="dashboard-card-body-scrollable">
+                        <ul class="list-group list-group-flush" id="stock-list">
+                            <% if (lotesBaixoEstoque && lotesBaixoEstoque.length > 0) { %>
+                                <% lotesBaixoEstoque.forEach(lote => { %>
+                                    <li class="list-group-item d-flex justify-content-between align-items-center" data-status="<%= lote.statusEstoque %>">
+                                        <div class="d-flex align-items-center">
+                                            <% if (lote.statusEstoque === 'critico' ) { %>
+                                                <i class="bi bi-exclamation-triangle-fill text-danger me-2"></i>
+                                            <% } else if (lote.statusEstoque === 'baixo' ) { %>
+                                                <i class="bi bi-exclamation-circle-fill text-warning me-2"></i>
+                                            <% } %>
+                                            <div class="ms-1">
+                                                <div class="fw-semibold"><%= lote.produto.nome %></div>
+                                                <small class="text-muted">Lote: <%= lote.numero_lote %></small>
+                                            </div>
+                                            <% if (lote.diasParaVencer !== null) { %>
+                                                <span class="ms-2 badge bg-danger-subtle text-danger-emphasis rounded-pill">
+                                                    <i class="bi bi-fire"></i> Vence em <%= lote.diasParaVencer %>d
+                                                </span>
+                                            <% } %>
+                                        </div>
+                                        <span class="badge rounded-pill <%= lote.statusEstoque === 'critico' ? 'bg-danger' : 'bg-warning text-dark' %>">
+                                            <%= lote.quantidade %> un.
+                                        </span>
+                                    </li>
+                                <% }) %>
+                            <% } else { %>
+                                <li class="list-group-item text-center text-muted py-4">
+                                    Nenhum lote com baixo estoque.
+                                </li>
+                            <% } %>
+                        </ul>
+                    </div>
+                    <div class="card-footer text-center">
+                         <div class="btn-group w-100" role="group" id="stock-filter-buttons">
+                           <input type="radio" class="btn-check" name="stock-filter" id="filter-all" value="all" autocomplete="off" checked>
+                            <label class="btn btn-outline-secondary btn-sm" for="filter-all">Todos</label>
 
-                                                        <div class="me-2">
-                                                            <i
-                                                                class="bi <%= iconClass %> <%= badgeClass.startsWith('bg-') ? badgeClass.replace('bg-', 'text-') : '' %>"></i>
-                                                            <span class="ms-1">
-                                                                <%= produtoNome %>
-                                                            </span>
+                            <input type="radio" class="btn-check" name="stock-filter" id="filter-critico" value="critico" autocomplete="off">
+                            <label class="btn btn-outline-danger btn-sm" for="filter-critico">Crítico</label>
+                            
+                            <input type="radio" class="btn-check" name="stock-filter" id="filter-baixo" value="baixo" autocomplete="off">
+                            <label class="btn btn-outline-warning btn-sm" for="filter-baixo">Baixo</label>
+                         </div>
+                    </div>
+                </div>
 
-                                                            <% if (vencimentoProximo) { %>
-                                                                <span
-                                                                    class="ms-2 badge bg-danger-subtle text-danger-emphasis rounded-pill">
-                                                                    <i class="bi bi-fire"></i> Vence em <%= diffDias %>d
-                                                                </span>
-                                                                <% } %>
-                                                        </div>
-
-                                                        <span class="badge <%= badgeClass %> rounded-pill">
-                                                            <%= qtd %> un.
-                                                        </span>
-                                                    </li>
-                                                    <% }) %>
-                                                        <% } else { %>
-                                                            <li class="list-group-item text-center text-muted py-4">
-                                                                Nenhum lote com baixo estoque.
-                                                            </li>
-                                                            <% } %>
-                                    </ul>
-                                </div>
-                                <div class="card-footer d-flex justify-content-between align-items-center">
-                                    <div class="small text-muted">
-                                        <span class="badge bg-danger me-1">Crítico</span>
-                                        <span class="badge bg-warning text-dark me-1">Baixo</span>
-                                        <span class="badge bg-success me-1">Saudável</span>
-                                    </div>
-                                    <a href="/admin/lotes" class="btn btn-outline-secondary btn-sm">
-                                        Ver Estoque Completo <i class="bi bi-arrow-right-circle"></i>
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
+                <div class="tab-pane fade" id="expiring-soon-pane" role="tabpanel" aria-labelledby="expiring-soon-tab" tabindex="0">
+                    <div class="dashboard-card-body-scrollable">
+                        <ul class="list-group list-group-flush">
+                            <% if (lotesProximosVencimento && lotesProximosVencimento.length > 0) { %>
+                                <% lotesProximosVencimento.forEach(lote => { %>
+                                     <li class="list-group-item d-flex justify-content-between align-items-center" data-status="<%= lote.statusEstoque %>">
+                                        <div class="d-flex align-items-center">
+                                            <% if (lote.statusEstoque === 'critico' ) { %>
+                                                <i class="bi bi-exclamation-triangle-fill text-danger me-2"></i>
+                                            <% } else if (lote.statusEstoque === 'baixo' ) { %>
+                                                <i class="bi bi-exclamation-circle-fill text-warning me-2"></i>
+                                            <% } else { %>
+                                                <i class="bi bi-check-circle-fill text-success me-2"></i>
+                                            <% } %>
+                                            <div class="ms-1">
+                                                <div class="fw-semibold"><%= lote.produto.nome %></div>
+                                                <small class="text-muted">Lote: <%= lote.numero_lote %></small>
+                                            </div>
+                                            <span class="ms-2 badge bg-danger-subtle text-danger-emphasis rounded-pill">
+                                                <i class="bi bi-fire"></i> Vence em <%= lote.diasParaVencer %>d
+                                            </span>
+                                        </div>
+                                        <span class="badge rounded-pill <%= lote.statusEstoque === 'critico' ? 'bg-danger' : lote.statusEstoque === 'baixo' ? 'bg-warning text-dark' : 'bg-success' %>">
+                                            <%= lote.quantidade %> un.
+                                        </span>
+                                    </li>
+                                <% }) %>
+                            <% } else { %>
+                                <li class="list-group-item text-center text-muted py-4">
+                                    Nenhum lote vencendo nos próximos 30 dias.
+                                </li>
+                            <% } %>
+                        </ul>
+                    </div>
+                    <div class="card-footer text-center">
+                        <small class="text-muted">Lotes vencendo nos próximos 30 dias</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
                         <!-- PAGAMENTOS -->
                         <div class="col-lg-6 mb-4">
@@ -395,7 +445,7 @@
                                 <div class="card-header bg-danger text-white">
                                     <i class="bi bi-credit-card me-2"></i> Pagamentos Recentes
                                 </div>
-                                <div class="card-body">
+                                <div class="card-body dashboard-card-body-scrollable">
                                     <ul class="list-group list-group-flush">
                                         <% if (ultimasVendas && ultimasVendas.length> 0) { %>
                                             <% ultimasVendas.forEach(venda=> { %>
@@ -430,11 +480,11 @@
                                                         </li>
                                                         <% } %>
                                     </ul>
-                                    <div class="card-footer text-center">
-                                        <a href="/admin/pagamentos" class="btn btn-outline-secondary btn-sm">
-                                            Ver Histórico Completo <i class="bi bi-arrow-right-circle"></i>
-                                        </a>
-                                    </div>
+                                </div>
+                                <div class="card-footer text-center">
+                                    <a href="/admin/pagamentos" class="btn btn-outline-secondary btn-sm">
+                                        Ver Histórico Completo <i class="bi bi-arrow-right-circle"></i>
+                                    </a>
                                 </div>
                             </div>
                         </div>
@@ -444,8 +494,8 @@
             <%- include('../../partials/footer.ejs') %>
                 <%- include('../../partials/modals/entrada-produto-modal.ejs') %>
                     <%- include('../../partials/modals/promocao-modal.ejs') %>
-        </body>
 
-        <script src="/js/pages/dashboard.js" type="module"></script>
+                        <script src="/js/pages/dashboard.js" type="module"></script>
+        </body>
 
         </html>

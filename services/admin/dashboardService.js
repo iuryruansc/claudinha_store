@@ -9,7 +9,7 @@ const PagamentoParcial = require('../../models/pagamentoParcial');
 const ParcelaPagamento = require('../../models/parcelaPagamento');
 const MovimentacaoEstoque = require('../../models/movimentacaoEstoque');
 const { calcularTempoAtras } = require('../../utils/data/date-calc');
-const { getLowStockLotes } = require('../../services/admin/lotesService');
+const { getLowStockLotes, getLotesProximosVencimento } = require('../../services/admin/lotesService');
 const { getPdvsAtivos } = require('../../services/admin/pdvsService');
 const { getPromocoes } = require('../../services/admin/descontosService');
 
@@ -53,7 +53,7 @@ const getFeed = async () => {
     });
 
     atividades.sort((a, b) => new Date(b.data) - new Date(a.data));
-    atividades = atividades.slice(0, 3);
+    atividades = atividades.slice(0, 5);
 
     atividades.forEach(a => {
         a.tempoAtras = calcularTempoAtras(a.data);
@@ -115,6 +115,7 @@ const getDashboardData = async (userId) => {
     const [
         atividades,
         lotesBaixoEstoque,
+        lotesProximosVencimento,
         ultimasVendas,
         pdvs,
         promoList,
@@ -124,6 +125,7 @@ const getDashboardData = async (userId) => {
     ] = await Promise.all([
         getFeed(),
         getLowStockLotes(),
+        getLotesProximosVencimento(),
         getUltimasVendasStatus(5),
         getPdvsAtivos(),
         getPromocoes({ omitSemLote: true }),
@@ -174,6 +176,7 @@ const getDashboardData = async (userId) => {
     return {
         atividades,
         lotesBaixoEstoque,
+        lotesProximosVencimento,
         ultimasVendas,
         pdvs,
         promoList,

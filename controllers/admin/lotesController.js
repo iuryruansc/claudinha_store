@@ -6,12 +6,18 @@ const Lote = require('../../models/lote')
 const Produto = require('../../models/produto')
 const { stringValidation, numberValidation, dateValidation } = require('../../utils/data/data-validation');
 const { parseIntValue, parseDateValue } = require('../../utils/data/data-parsers');
-const { getAllLotes, getEditData, updateLote, deleteLote, adicionarQuantidadeAoLote, createLoteWithMovimentacao } = require('../../services/admin/lotesService');
+const { getAllLotes, updateLote, deleteLote, adicionarQuantidadeAoLote, createLoteWithMovimentacao } = require('../../services/admin/lotesService');
 
 router.get('/lotes', asyncHandler(async (req, res) => {
     const { lotes } = await getAllLotes();
 
-    res.render('admin/lotes/', { lotes, formatDate });
+    const alertaEstoqueBaixo = lotes.some(lote =>
+        lote.statusQuantidade === 'baixo' ||
+        lote.statusQuantidade === 'critico' ||
+        lote.statusQuantidade === 'zerado'
+    );
+
+    res.render('admin/lotes/', { lotes, alertaEstoqueBaixo, formatDate });
 }));
 
 router.post('/lotes/save', asyncHandler(async (req, res) => {
@@ -35,9 +41,10 @@ router.post('/lotes/save', asyncHandler(async (req, res) => {
         localizacao
     }, id_funcionario);
 
-    req.flash('success_msg', 'Novo lote cadastrado e estoque atualizado!');
-
-    res.redirect('/admin/lotes');
+    res.status(200).json({
+        success: true,
+        message: 'Novo lote cadastrado e estoque atualizado!', // Pass the message here
+    });
 }));
 
 router.post('/lotes/delete/:id_lote', asyncHandler(async (req, res) => {

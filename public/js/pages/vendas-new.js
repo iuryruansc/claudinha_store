@@ -60,14 +60,27 @@ document.addEventListener('DOMContentLoaded', () => {
         },
 
         fetchAndFillLote(row, id_produto, preFetchedLote = null) {
-            const fillData = (data) => {
+            const produtoSelecionado = produtos.find(p => p.id_produto == id_produto);
+
+            if (!produtoSelecionado) {
+                showAlert(`Produto com ID ${id_produto} não encontrado nos dados locais.`, 'danger');
+                row.querySelector('.price-cell').textContent = 'Erro';
+                row.querySelector('.preco-item').value = 0;
+                UIManager.updateAll();
+                return;
+            }
+
+            const precoBaseDoProduto = parseFloat(produtoSelecionado.preco_compra || 0);
+
+            const fillData = (dataDoLote) => {
                 const priceCell = row.querySelector('.price-cell');
                 const loteInput = row.querySelector('.lote-id');
                 const precoInput = row.querySelector('.preco-item');
-                const precoFinal = parseFloat(data.preco_final ?? data.preco_produto ?? 0);
+
+                const precoFinal = precoBaseDoProduto;
 
                 priceCell.textContent = `R$ ${UIManager.formatCurrency(precoFinal)}`;
-                loteInput.value = data.id_lote || '';
+                loteInput.value = dataDoLote.id_lote || '';
                 precoInput.value = precoFinal.toFixed(2);
                 UIManager.updateAll();
             };

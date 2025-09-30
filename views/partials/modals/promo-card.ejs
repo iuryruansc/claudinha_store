@@ -2,14 +2,14 @@
     <div class="card shadow-sm h-100 promo-card">
         <div class="card-body">
             <% const produto=promo.lote.produto; const lote=promo.lote; const
-                precoOriginal=parseFloat(lote.preco_produto); let precoPromocional=precoOriginal;
+                precoOriginal=parseFloat(produto.preco_compra); let precoPromocional=precoOriginal;
                 if(promo.tipo==='porcentagem' ) { precoPromocional *=(1 - parseFloat(promo.valor) / 100); } else {
                 precoPromocional -=parseFloat(promo.valor); } %>
                 <h5 class="card-title">
                     <%= produto.nome %>
                 </h5>
                 <p class="card-text text-muted mb-2">
-                    Lote: <%= lote.id_lote %> | Val: <%= formatDate(lote.data_validade) %>
+                    Lote: <%= lote.numero_lote %> | Val: <%= formatDate(lote.data_validade) %>
                 </p>
                 <p class="card-text">
                     <span class="text-muted text-decoration-line-through me-2">

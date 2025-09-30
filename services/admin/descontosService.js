@@ -30,7 +30,7 @@ const getPromocoes = async (options = {}) => {
 
         const produto = promo.lote.produto;
         const lote = promo.lote;
-        const precoOriginal = parseFloat(lote.preco_produto);
+        const precoOriginal = parseFloat(produto.preco_compra);
         let precoPromocional = precoOriginal;
 
         if (promo.tipo === 'porcentagem') {
@@ -41,7 +41,7 @@ const getPromocoes = async (options = {}) => {
 
         return {
             nome: produto.nome,
-            lote: lote.id_lote,
+            lote: lote.numero_lote,
             precoOriginal: precoOriginal.toFixed(2),
             precoPromocional: precoPromocional.toFixed(2),
             dataInicio: promo.data_inicio,

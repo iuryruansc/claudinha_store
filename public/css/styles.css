@@ -232,3 +232,73 @@
 #mes-select-div{
   flex-wrap: nowrap;
 }
+
+.dashboard-card-body-scrollable {
+  max-height: 300px;
+
+  overflow-y: auto;
+
+  -webkit-overflow-scrolling: touch;
+  
+  scrollbar-width: thin;
+  scrollbar-color: #aaa #f1f1f1;
+}
+
+.dashboard-card-body-scrollable::-webkit-scrollbar {
+  width: 8px;
+}
+
+.dashboard-card-body-scrollable::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+
+.dashboard-card-body-scrollable::-webkit-scrollbar-thumb {
+  background: #aaa;
+  border-radius: 10px;
+}
+
+.dashboard-card-body-scrollable::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+.item-hidden {
+    display: none !important;
+}
+
+#table-data tbody tr {
+    transition: background-color 0.2s ease-in-out;
+    border-left: 5px solid transparent;
+}
+
+#table-data tbody tr[data-validade="vencido"] {
+    border-left-color: #dc3545;
+    background-color: #f8d7da40;
+}
+#table-data tbody tr[data-validade="vencido"] td {
+    opacity: 0.8;
+}
+
+#table-data tbody tr[data-validade="critico"] {
+    border-left-color: #fd7e14;
+}
+
+#table-data tbody tr[data-validade="atencao"] {
+    border-left-color: #ffc107;
+}
+
+#table-data tbody tr td:nth-child(4) {
+    font-size: 1.05rem;
+}
+
+#table-data tbody tr[data-quantidade="zerado"] td:nth-child(4) {
+    color: #dc3545;
+}
+
+#table-data tbody tr[data-quantidade="critico"] td:nth-child(4) {
+    color: #fd7e14;
+}
+
+#table-data tbody tr[data-quantidade="baixo"] td:nth-child(4) {
+    color: #a08203;
+}

@@ -115,46 +115,38 @@ document.addEventListener('DOMContentLoaded', function () {
         editLoteForm.action = '';
     });
 
-    function updateLoteRowStyle(tableRow, lote) {
-        // 1. Lógica para o status da validade (copiada do EJS)
-        const hoje = new Date();
-        const dataValidade = new Date(lote.data_validade);
-        const diffDias = Math.ceil((dataValidade - hoje) / (1000 * 60 * 60 * 24));
+    const btnFiltrar = document.getElementById('filtrar-estoque-baixo');
+    const btnLimpar = document.getElementById('limpar-filtro-estoque');
+    const todasAsLinhas = document.querySelectorAll('#lotes-table-body tr');
 
-        let rowClass = '';
-        let statusTexto = `Válido até ${dataValidade.toLocaleDateString('pt-BR')}`;
-
-        if (diffDias < 0) {
-            rowClass = 'table-danger';
-            statusTexto = `Vencido há ${Math.abs(diffDias)} dia(s)`;
-        } else if (diffDias <= 30) {
-            rowClass = 'table-warning';
-            statusTexto = `Vence em ${diffDias} dia(s)`;
-        }
-
-        // Remove classes antigas e adiciona a nova
-        tableRow.classList.remove('table-danger', 'table-warning');
-        if (rowClass) {
-            tableRow.classList.add(rowClass);
-        }
-        // Atualiza o texto da validade (5ª célula, índice 4)
-        tableRow.cells[4].textContent = statusTexto;
-
-        // 2. Lógica para a quantidade
-        const qtd = lote.quantidade;
-        let qtdClass = '';
-        if (qtd === 0) {
-            qtdClass = 'text-danger fw-bold';
-        } else if (qtd <= 10) { // Lembre-se de usar o mesmo limite do seu EJS
-            qtdClass = 'text-warning fw-bold';
-        }
-
-        // Atualiza a célula da quantidade (3ª célula, índice 2)
-        const qtdCell = tableRow.cells[2];
-        qtdCell.textContent = qtd;
-        qtdCell.className = 'text-center'; // Reseta as classes
-        if (qtdClass) {
-            qtdCell.classList.add(...qtdClass.split(' '));
-        }
+    if (!btnFiltrar) {
+        return;
     }
+
+    btnFiltrar.addEventListener('click', (e) => {
+        e.preventDefault();
+
+        todasAsLinhas.forEach(linha => {
+            const statusQtd = linha.dataset.quantidade;
+            if (statusQtd === 'ok') {
+                linha.style.display = 'none';
+            } else {
+                linha.style.display = '';
+            }
+        });
+
+        btnFiltrar.style.display = 'none';
+        btnLimpar.style.display = 'inline-block';
+    });
+
+    btnLimpar.addEventListener('click', (e) => {
+        e.preventDefault();
+
+        todasAsLinhas.forEach(linha => {
+            linha.style.display = '';
+        });
+
+        btnLimpar.style.display = 'none';
+        btnFiltrar.style.display = 'inline-block';
+    });
 });

@@ -60,7 +60,42 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Limpa o formulário quando o modal é fechado
+     promoForm.addEventListener('submit', async (event) => {
+        event.preventDefault(); 
+        
+        const isUpdate = !!promoIdInput.value;
+
+        if (!isUpdate) {
+            promoForm.submit();
+            return;
+        }
+
+        const url = promoForm.action;
+        const formData = new FormData(promoForm);
+        const data = Object.fromEntries(formData.entries());
+
+        try {
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data),
+            });
+
+            const result = await response.json();
+
+            if (response.ok) {
+                window.location.reload();
+            } else {
+                throw new Error(result.message || 'Erro ao atualizar a promoção.');
+            }
+        } catch (error) {
+            console.error('Erro ao enviar o formulário:', error);
+            alert(error.message);
+        }
+    });
+
     promoModalEl.addEventListener('hidden.bs.modal', () => {
         promoForm.reset();
     });

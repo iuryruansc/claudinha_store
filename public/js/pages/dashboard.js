@@ -3,6 +3,100 @@ import { showErrorPopup } from '/js/lib/show-error-popup.js';
 import { initModalTrigger } from "/js/lib/modal-trigger.js";
 
 document.addEventListener('DOMContentLoaded', () => {
+
+    function initStockFilter() {
+        const filterButtons = document.getElementById('stock-filter-buttons');
+        const stockList = document.getElementById('stock-list');
+
+        if (!filterButtons || !stockList) {
+            console.error('Elementos do filtro de estoque não encontrados.');
+            return;
+        }
+
+        filterButtons.addEventListener('change', (event) => {
+            const selectedStatus = event.target.value;
+            const items = stockList.querySelectorAll('li.list-group-item');
+
+            items.forEach(item => {
+                if (selectedStatus === 'all' || item.dataset.status === selectedStatus) {
+                    item.classList.remove('item-hidden');
+                } else {
+                    item.classList.add('item-hidden');
+                }
+            });
+        });
+    }
+
+    function ordenarPromocoes() {
+        const wrapper = document.getElementById('promo-items-wrapper');
+        if (!wrapper) return;
+
+        const cards = Array.from(wrapper.children);
+        if (cards.length < 2) return;
+
+        cards.sort((cardA, cardB) => {
+            const promoBarA = cardA.querySelector('.promo-bar');
+            const promoBarB = cardB.querySelector('.promo-bar');
+
+            if (!promoBarA || !promoBarB) return 0;
+
+            const dataFimA = new Date(promoBarA.dataset.fim);
+            const dataFimB = new Date(promoBarB.dataset.fim);
+
+            if (isNaN(dataFimA) || isNaN(dataFimB)) return 0;
+
+            return dataFimA - dataFimB;
+        });
+
+        cards.forEach(card => wrapper.appendChild(card));
+    }
+
+    function atualizarBarrasDePromocao() {
+        const promoBars = document.querySelectorAll('.promo-bar');
+        const agora = new Date();
+
+        promoBars.forEach(bar => {
+            const inicio = new Date(bar.dataset.inicio);
+            const fim = new Date(bar.dataset.fim);
+
+            if (isNaN(inicio.getTime()) || isNaN(fim.getTime())) return;
+
+            const duracaoTotal = fim - inicio;
+            const tempoRestante = fim - agora;
+
+            let progresso = (tempoRestante / duracaoTotal) * 100;
+            progresso = Math.max(0, Math.min(100, progresso));
+
+            bar.style.width = `${progresso}%`;
+            bar.classList.remove('bg-success', 'bg-warning', 'bg-danger', 'bg-secondary');
+
+            if (tempoRestante <= 0) {
+                bar.classList.add('bg-secondary');
+            } else if (progresso <= 20) {
+                bar.classList.add('bg-danger');
+            } else if (progresso <= 50) {
+                bar.classList.add('bg-warning');
+            } else {
+                bar.classList.add('bg-success');
+            }
+
+            const remainingEl = bar.closest('.promo-card, .card').querySelector('.promo-remaining');
+            if (remainingEl) {
+                if (tempoRestante > 0) {
+                    const dias = Math.floor(tempoRestante / (1000 * 60 * 60 * 24));
+                    const horas = Math.floor((tempoRestante % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                    const minutos = Math.floor((tempoRestante % (1000 * 60 * 60)) / (1000 * 60));
+
+                    if (dias > 0) { remainingEl.textContent = `Termina em ${dias}d ${horas}h`; }
+                    else if (horas > 0) { remainingEl.textContent = `Termina em ${horas}h ${minutos}m`; }
+                    else { remainingEl.textContent = `Termina em ${minutos}m`; }
+                } else {
+                    remainingEl.textContent = 'Promoção encerrada';
+                }
+            }
+        });
+    }
+
     document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(el => new bootstrap.Tooltip(el));
 
     // Configuração Modal de Lote
@@ -110,4 +204,10 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('promocaoModal').addEventListener('hidden.bs.modal', () => {
         document.getElementById('formDesconto').reset();
     });
+
+    atualizarBarrasDePromocao();
+    ordenarPromocoes();
+    initStockFilter();
+
+    setInterval(atualizarBarrasDePromocao, 60000);
 });

@@ -87,9 +87,9 @@ router.post('/vendas/save', asyncHandler(async (req, res) => {
         return res.status(400).send('Não é possível criar uma venda sem itens.');
     }
 
-    await vendaService.createVenda(vendaData, id_funcionario, id_caixa);
+    const venda = await vendaService.createVenda(vendaData, id_funcionario, id_caixa);
 
-    req.flash('success_msg', `Venda #${novaVenda.id_venda} registrada com sucesso!`);
+    req.flash('success_msg', `Venda #${venda.id_venda} registrada com sucesso!`);
 
     res.redirect('/admin/vendas');
 }));
