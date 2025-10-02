@@ -58,7 +58,8 @@
                                                 <td class="text-center">
                                                     <fieldset class="btn-group">
                                                         <a href="/admin/pdvs/edit/<%= pdv.id_pdv %>"
-                                                            class="btn btn-sm btn-outline-primary me-2" title="Editar PDV">
+                                                            class="btn btn-sm btn-outline-primary me-2"
+                                                            title="Editar PDV">
                                                             <i class="bi bi-pencil-square"></i>
                                                         </a>
                                                         <form data-delete-form
@@ -86,7 +87,7 @@
             <%- include('../../partials/footer.ejs') %>
 
                 <script type="module">
-                    import { setupRowDelete } from '/js/delete-handler.js';
+                    import { setupRowDelete } from '/js/lib/delete-handler.js';
 
                     document.addEventListener('DOMContentLoaded', function () {
                         const deleteForms = document.querySelectorAll('[data-delete-form]');

@@ -1,32 +1,76 @@
-import { setupRowDelete } from '/js/delete-handler.js';
+import { setupRowDelete } from '/js/lib/delete-handler.js';
+import * as socket from '/js/services/socket-service.js';
+import * as updaters from '/js/ui/lotes-updaters.js';
+
+function setupWebSocketListeners() {
+    socket.on('lote:novo', (loteData) => {
+        updaters.adicionarLinhaLote(loteData);
+        Toastify({ text: `Novo lote de ${loteData.produtoNome} adicionado!`, backgroundColor: "#0d6efd" }).showToast();
+    });
+
+    socket.on('lote:atualizado', (loteData) => {
+        updaters.atualizarLinhaLote(loteData);
+    });
+
+    socket.on('lote:removido', (data) => {
+        updaters.removerLinhaLote(data);
+        Toastify({ text: `Lote #${data.id_lote} removido.`, backgroundColor: "#dc3545" }).showToast();
+    });
+}
 
 document.addEventListener('DOMContentLoaded', function () {
+    const tableBody = document.getElementById('lotes-table-body');
+    if (!tableBody) return;
+
+    new bootstrap.Tooltip(tableBody, {
+        selector: '[data-bs-toggle="tooltip"]'
+    })
+
     const deleteForms = document.querySelectorAll('[data-delete-form]');
     const toggleExcluir = document.getElementById('toggleExcluir');
-    const tableBody = document.getElementById('lotes-table-body');
-
-    const tooltipTriggerList = document.querySelectorAll('[title]');
-    const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
-
     setupRowDelete(deleteForms, toggleExcluir, tableBody);
 
-    const addQuantidadeModal = document.getElementById('addQuantidadeModal');
+    const addQuantidadeModalEl = document.getElementById('addQuantidadeModal');
     const addQuantidadeForm = document.getElementById('add-quantidade-form');
-    const modalInstanceAdd = new bootstrap.Modal(addQuantidadeModal);
+    const editLoteModalEl = document.getElementById('editLoteModal');
+    const editLoteForm = document.getElementById('edit-lote-form');
+    const editLoteModal = new bootstrap.Modal(editLoteModalEl);
 
-    addQuantidadeModal.addEventListener('show.bs.modal', function (event) {
-        const button = event.relatedTarget;
-        const loteId = button.getAttribute('data-lote-id');
-        const produtoNome = button.getAttribute('data-produto-nome');
-        const loteNumero = button.getAttribute('data-lote-numero');
+    tableBody.addEventListener('click', async function (event) {
+        const addButton = event.target.closest('button[data-bs-target="#addQuantidadeModal"]');
+        if (addButton) {
+            const produtoNome = addButton.getAttribute('data-produto-nome');
+            const loteNumero = addButton.getAttribute('data-lote-numero');
+            const loteId = addButton.getAttribute('data-lote-id');
 
-        addQuantidadeModal.querySelector('#modal-produto-nome').textContent = produtoNome;
-        addQuantidadeModal.querySelector('#modal-lote-numero').textContent = loteNumero;
+            addQuantidadeModalEl.querySelector('#modal-produto-nome').textContent = produtoNome;
+            addQuantidadeModalEl.querySelector('#modal-lote-numero').textContent = loteNumero;
+            addQuantidadeModalEl.querySelector('#add-quantidade-form').action = `/admin/lotes/add-quantidade/${loteId}`;
 
-        addQuantidadeForm.action = `/admin/lotes/add-quantidade/${loteId}`;
+            setTimeout(() => addQuantidadeModalEl.querySelector('#modal-quantidade').focus(), 500);
+        }
 
-        const quantidadeInput = addQuantidadeModal.querySelector('#modal-quantidade');
-        setTimeout(() => quantidadeInput.focus(), 500);
+        const editButton = event.target.closest('button[data-bs-target="#editLoteModal"]');
+        if (editButton) {
+            const loteId = editButton.getAttribute('data-lote-id');
+            const modalBody = editLoteModalEl.querySelector('.modal-body');
+            modalBody.classList.add('loading');
+
+            try {
+                const response = await fetch(`/admin/lotes/json/${loteId}`);
+                if (!response.ok) throw new Error('Falha ao carregar dados do lote.');
+                const lote = await response.json();
+
+                editLoteModalEl.querySelector('#edit-produto-nome').textContent = lote.produto?.nome || 'N/A';
+
+                editLoteModalEl.querySelector('#edit-lote-form').action = `/admin/lotes/update/${lote.id_lote}`;
+            } catch (error) {
+                alert(error.message);
+                editLoteModal.hide();
+            } finally {
+                modalBody.classList.remove('loading');
+            }
+        }
     });
 
     addQuantidadeForm.addEventListener('submit', async (event) => {
@@ -45,16 +89,12 @@ document.addEventListener('DOMContentLoaded', function () {
             });
 
             if (response.ok) {
-                const loteAtualizado = await response.json();
+                const loteFormatado = await response.json();
 
-                const tableRow = document.querySelector(`button[data-lote-id="${loteAtualizado.id_lote}"]`).closest('tr');
-                if (tableRow) {
-                    const qtdCell = tableRow.cells[2];
-                    qtdCell.textContent = `${loteAtualizado.quantidade} unidades`;
-                    updateLoteRowStyle(tableRow, loteAtualizado);
-                }
+                updaters.atualizarLinhaLote(loteFormatado);
 
-                modalInstanceAdd.hide();
+                const modalInstance = bootstrap.Modal.getInstance(document.getElementById('addQuantidadeModal'));
+                modalInstance.hide();
             } else {
                 const error = await response.json();
                 alert(error.message || 'Erro ao adicionar quantidade');
@@ -65,52 +105,12 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
-    addQuantidadeModal.addEventListener('hidden.bs.modal', function () {
+    addQuantidadeModalEl.addEventListener('hidden.bs.modal', function () {
         addQuantidadeForm.reset();
         addQuantidadeForm.action = '';
     });
 
-    const editLoteModal = document.getElementById('editLoteModal');
-    const editLoteForm = document.getElementById('edit-lote-form');
-
-    editLoteModal.addEventListener('show.bs.modal', async function (event) {
-        const button = event.relatedTarget;
-        const loteId = button.getAttribute('data-lote-id');
-
-        const modalBody = editLoteModal.querySelector('.modal-body');
-        modalBody.classList.add('loading');
-
-        try {
-            const response = await fetch(`/admin/lotes/json/${loteId}`);
-            if (!response.ok) {
-                throw new Error('Não foi possível carregar os dados do lote.');
-            }
-            const lote = await response.json();
-
-            editLoteModal.querySelector('#edit-produto-nome').textContent = lote.produto?.nome || 'N/A';
-            editLoteModal.querySelector('#edit-id-lote').value = lote.id_lote;
-            editLoteModal.querySelector('#edit-numero-lote').value = lote.numero_lote;
-            editLoteModal.querySelector('#edit-quantidade').value = lote.quantidade;
-            editLoteModal.querySelector('#edit-localizacao').value = lote.localizacao;
-
-            if (lote.data_validade) {
-                const data = new Date(lote.data_validade);
-                const formattedDate = data.toISOString().split('T')[0];
-                editLoteModal.querySelector('#edit-data-validade').value = formattedDate;
-            }
-
-            editLoteForm.action = `/admin/lotes/update/${lote.id_lote}`;
-
-        } catch (error) {
-            console.error(error);
-            alert(error.message);
-            bootstrap.Modal.getInstance(editLoteModal).hide();
-        } finally {
-            modalBody.classList.remove('loading');
-        }
-    });
-
-    editLoteModal.addEventListener('hidden.bs.modal', function () {
+    editLoteModalEl.addEventListener('hidden.bs.modal', function () {
         editLoteForm.reset();
         editLoteForm.action = '';
     });
@@ -149,4 +149,6 @@ document.addEventListener('DOMContentLoaded', function () {
         btnLimpar.style.display = 'none';
         btnFiltrar.style.display = 'inline-block';
     });
+
+    setupWebSocketListeners()
 });

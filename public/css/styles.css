@@ -193,6 +193,14 @@
   flex-shrink: 0;
 }
 
+tr.dt-hasChild td {
+  box-shadow: inset 0 4px 8px -4px rgba(0, 0, 0, 0.1);
+}
+
+.dt-child {
+  background-color: #f8f9fa;
+}
+
 #venda-form .card {
   margin-bottom: 1.25rem;
 }

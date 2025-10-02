@@ -3,7 +3,11 @@ const router = express.Router();
 const asyncHandler = require('../../utils/handlers/async-handler');
 const { requireCaixa } = require('../../utils/handlers/auth-handler');
 const vendaService = require('../../services/admin/vendasService');
+const Venda = require('../../models/venda');
 const formatDate = require('../../utils/data/date-formatter');
+const { getDashboardData } = require('../../services/admin/dashboardService');
+const { formatarVendaParaTabela } = require('../../services/admin/vendaFormatter');
+const { formatarLoteParaTabela } = require('../../services/admin/loteFormatter');
 
 router.get('/vendas', asyncHandler(async (req, res) => {
 
@@ -20,7 +24,7 @@ router.get('/vendas/detalhes/:id', asyncHandler(async (req, res) => {
     res.render('admin/vendas/detalhes', { venda, totalPago, saldo });
 }));
 
-/* router.use(requireCaixa); */
+router.use(requireCaixa);
 
 router.get('/vendas/new', asyncHandler(async (req, res) => {
     const { clientes, produtos } = await vendaService.getViewDependencies();
@@ -59,7 +63,7 @@ router.get('/vendas/produtos/:id_produto/lote', asyncHandler(async (req, res) =>
 
         return res.json(loteProcessado);
 
-    
+
     } catch (err) {
         console.error('Erro ao buscar lote/desconto', err);
         return res.status(500).json({ error: 'Erro interno' });
@@ -89,8 +93,49 @@ router.post('/vendas/save', asyncHandler(async (req, res) => {
 
     const venda = await vendaService.createVenda(vendaData, id_funcionario, id_caixa);
 
-    req.flash('success_msg', `Venda #${venda.id_venda} registrada com sucesso!`);
+    const vendaCompleta = await Venda.findByPk(venda.id_venda, {
+        include: [
+            { model: Cliente },
+            { model: ItemVenda, include: [{ model: Produto }] }
+        ]
+    });
 
+    const produtosVendidosIds = vendaData.itens.map(item => item.id_produto);
+    const atualizacaoEstoque = await estoqueService.getNiveisEstoque(produtosVendidosIds);
+
+    const novosDadosDashboard = await getDashboardData(id_funcionario);
+
+    const lotesFormatados = await Promise.all(atualizacaoEstoque.map(lote => formatarLoteParaTabela(lote)));
+
+    const payload = {
+        novaVenda: {
+            id: venda.id_venda,
+            vendedor: req.session.user.nome,
+            cliente: vendaData.nome_cliente || 'Anônimo',
+            valor: venda.valor_total,
+            status: venda.status,
+            timestamp: new Date()
+        },
+        resumoCaixa: novosDadosDashboard.resumoCaixa,
+        resumoPendencias: novosDadosDashboard.resumoPendencias,
+        alertasEstoque: novosDadosDashboard.lotesBaixoEstoque,
+        novaAtividade: {
+            texto: `<strong>${req.session.user.nome}</strong> registrou a venda <strong>#${venda.id_venda}</strong> no valor de <strong>${venda.valor_total.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</strong>.`,
+            icone: 'bi-cart-check-fill',
+            cor: 'text-success',
+            tempoAtras: 'agora mesmo'
+        },
+        atualizacaoEstoque: atualizacaoEstoque,
+        novaVendaFormatada: formatarVendaParaTabela(vendaCompleta)
+    };
+
+    lotesFormatados.forEach(loteFormatado => {
+        req.io.emit('lote:atualizado', loteFormatado);
+    });
+
+    req.io.emit('dashboard:vendaRealizada', payload);
+
+    req.flash('success_msg', `Venda #${venda.id_venda} registrada com sucesso!`);
     res.redirect('/admin/vendas');
 }));
 

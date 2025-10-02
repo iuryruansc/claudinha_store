@@ -15,6 +15,7 @@ router.get('/login', asyncHandler(async (req, res) => {
 router.post('/login', asyncHandler(async (req, res) => {
     const { nome, senha } = req.body;
     const usuarioEncontrado = await authenticateUser(nome, senha);
+    const funcionario = await Funcionarios.findOne({ where: { nome: nome } });
 
     if (!usuarioEncontrado) {
         req.flash('error_msg', 'Usuário ou senha inválidos.');
@@ -25,12 +26,12 @@ router.post('/login', asyncHandler(async (req, res) => {
     req.session.cargo = usuarioEncontrado.cargo;
 
     if (usuarioEncontrado.cargo === 'admin') {
-        req.session.userId = '1';
+        req.session.userId = funcionario.id_funcionario;
+        req.session.user = funcionario;
         return req.session.save(() => res.redirect('/admin/dashboard'));
     }
 
     if (usuarioEncontrado.cargo === 'funcionario') {
-        const funcionario = await Funcionarios.findOne({ where: { nome: nome } });
         req.session.userId = funcionario.id_funcionario;
         req.session.user = funcionario;
         return req.session.save(() => res.redirect('/funcionario/dashboard'));

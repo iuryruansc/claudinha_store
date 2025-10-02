@@ -70,8 +70,8 @@
                                                         <%= produto.nome %>
                                                     </strong></td>
                                                 <td>
-                                                    <%= produto.preco_compra.toLocaleString('pt-BR', { style: 'currency' ,
-                                                        currency: 'BRL' }) %>
+                                                    <%= produto.preco_compra.toLocaleString('pt-BR', { style: 'currency'
+                                                        , currency: 'BRL' }) %>
                                                 </td>
                                                 <td><span class="font-monospace">
                                                         <%= produto.codigo_barras %>
@@ -143,7 +143,7 @@
             <%- include('../../partials/footer.ejs') %>
 
                 <script type="module">
-                    import { setupRowDelete } from '/js/delete-handler.js';
+                    import { setupRowDelete } from '/js/lib/delete-handler.js';
 
                     document.addEventListener('DOMContentLoaded', function () {
                         const deleteForms = document.querySelectorAll('[data-delete-form]');

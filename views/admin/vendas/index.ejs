@@ -107,39 +107,7 @@
 
             <%- include('../../partials/footer.ejs') %>
 
-                <script>
-                    $(document).ready(function () {
-                        const table = $('#table-data').DataTable();
-
-
-                        $('#table-data tbody').on('click', 'button.expand-btn', function () {
-                            const tr = $(this).closest('tr');
-                            const row = table.row(tr);
-                            const icon = $(this).find('i');
-
-                            if (row.child.isShown()) {
-                                row.child.hide();
-                                tr.removeClass('dt-hasChild');
-                                icon.removeClass('bi-chevron-up').addClass('bi-chevron-down');
-                            } else {
-                                const detailsHtml = decodeURIComponent(tr.data('details'));
-                                row.child(detailsHtml).show();
-                                tr.addClass('dt-hasChild');
-                                icon.removeClass('bi-chevron-down').addClass('bi-chevron-up');
-                            }
-                        });
-                    });
-                </script>
-
-                <style>
-                    tr.dt-hasChild td {
-                        box-shadow: inset 0 4px 8px -4px rgba(0, 0, 0, 0.1);
-                    }
-
-                    .dt-child {
-                        background-color: #f8f9fa;
-                    }
-                </style>
+            <script src="/js/pages/vendas.js" type="module"></script>
         </body>
 
         </html>

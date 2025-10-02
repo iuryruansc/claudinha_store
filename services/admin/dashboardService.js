@@ -3,6 +3,7 @@ const Venda = require('../../models/venda');
 const Cliente = require('../../models/cliente');
 const Caixa = require('../../models/caixa')
 const Lote = require('../../models/lote');
+const Funcionario = require('../../models/funcionario');
 const Produto = require('../../models/produto');
 const Pagamento = require('../../models/pagamento');
 const PagamentoParcial = require('../../models/pagamentoParcial');
@@ -14,10 +15,14 @@ const { getPdvsAtivos } = require('../../services/admin/pdvsService');
 const { getPromocoes } = require('../../services/admin/descontosService');
 
 const getFeed = async () => {
+
     const ultimasVendas = await Venda.findAll({
         limit: 4,
         order: [['data_hora', 'DESC']],
-        include: [{ model: Cliente, as: 'cliente' }]
+        include: [
+            { model: Cliente, as: 'cliente' },
+            { model: Funcionario, as: 'funcionario' }
+        ]
     });
 
     const ultimasMovimentacoes = await MovimentacaoEstoque.findAll({
@@ -29,11 +34,12 @@ const getFeed = async () => {
     let atividades = [];
 
     ultimasVendas.forEach(v => {
+        const nomeFuncionario = v.funcionario?.nome || 'Funcionário Desconhecido';
         atividades.push({
             tipo: 'venda',
             icone: 'bi-cart-check-fill',
             cor: 'text-success',
-            texto: `Nova Venda <a href="/admin/vendas/detalhes/${v.id_venda}" class="fw-semibold">#${v.id_venda}</a> para <strong>${v.cliente?.nome || 'Anônimo'}</strong>.`,
+            texto: `<strong>${nomeFuncionario}</strong> registrou a venda <strong>#${v.id_venda}</strong> no valor de <strong>${v.valor_total.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</strong>.`,
             data: v.data_hora
         });
     });
@@ -58,8 +64,6 @@ const getFeed = async () => {
     atividades.forEach(a => {
         a.tempoAtras = calcularTempoAtras(a.data);
     });
-
-
 
     return atividades;
 }

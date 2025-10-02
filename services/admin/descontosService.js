@@ -81,7 +81,7 @@ const createDescontoParaLoteMaisProximo = async (data) => {
             observacao: data.observacao
         }, { transaction: t });
 
-        return novoDesconto;
+        return { loteAfetado: lote, novoDesconto: novoDesconto };
     });
 };
 

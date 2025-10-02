@@ -30,6 +30,8 @@ O sistema oferece um conjunto completo de ferramentas para a gestão da loja, in
 * **👥 Gestão de Pessoas:**
     * Cadastro e gerenciamento de Clientes.
     * Cadastro e gerenciamento de Funcionários.
+* **🔐 Segurança:**
+    * Bloqueio de múltiplas sessões por usuário, garantindo que cada conta seja acessada de um único local por vez.
 * **⚙️ Configurações:**
     * Configuração de Pontos de Venda (PDVs).
 
@@ -42,6 +44,7 @@ Este projeto foi construído com um ecossistema moderno baseado em JavaScript e 
 * **Backend:** Node.js, Express.js
 * **Frontend:** EJS (Embedded JavaScript templates), Bootstrap 5
 * **Banco de Dados:** MySQL com o ORM Sequelize
+* **Comunicação em Tempo Real:** Socket.IO
 
 Para uma lista completa e detalhada de todas as dependências do projeto, suas versões e o papel de cada uma, por favor, consulte o nosso arquivo **[TECH_STACK.md](./TECH_STACK.md)**.
 

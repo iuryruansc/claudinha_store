@@ -2,6 +2,58 @@ import { setupMultiFieldNew } from '/js/lib/multi-field-new.js';
 import { showErrorPopup } from '/js/lib/show-error-popup.js';
 import { initModalTrigger } from "/js/lib/modal-trigger.js";
 
+import * as socket from '/js/services/socket-service.js';
+import * as updaters from '/js/ui/dashboard-updaters.js';
+
+function setupWebSocketListeners() {
+    socket.on('dashboard:vendaRealizada', (data) => {
+        console.log('Dashboard deve ser atualizado!', data);
+
+        if (data.resumoCaixa) {
+            updaters.updateCaixaCard(data.resumoCaixa);
+        }
+        if (data.novaAtividade) {
+            updaters.updateFeedAtividade(data.novaAtividade);
+        }
+        if (data.novaVenda) {
+            updaters.updatePagamentosRecentes(data.novaVenda);
+        }
+        if (data.atualizacaoEstoque) {
+            updaters.updateAlertasEstoque(data.atualizacaoEstoque);
+        }
+
+        Toastify({
+            text: `Nova venda de ${formatCurrency(data.novaVenda.valor)} por ${data.novaVenda.vendedor}!`,
+            duration: 5000,
+            gravity: "top",
+            position: "right",
+            backgroundColor: "linear-gradient(to right, #00b09b, #96c93d)",
+        }).showToast();
+    });
+
+    socket.on('dashboard:novaPromocao', (data) => {
+        console.log('Nova promoção recebida!', data);
+
+        updaters.updatePromocoesCard(data);
+
+        ordenarPromocoes();
+        atualizarBarrasDePromocao();
+
+        Toastify({
+            text: `Nova promoção para ${data.nome}!`,
+            duration: 5000,
+            gravity: "top",
+            position: "right",
+            backgroundColor: "linear-gradient(to right, #0d6efd, #6f42c1)",
+        }).showToast();
+    });
+}
+
+function formatCurrency(value) {
+    return (value || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+}
+
+
 document.addEventListener('DOMContentLoaded', () => {
 
     function initStockFilter() {
@@ -208,6 +260,7 @@ document.addEventListener('DOMContentLoaded', () => {
     atualizarBarrasDePromocao();
     ordenarPromocoes();
     initStockFilter();
-
     setInterval(atualizarBarrasDePromocao, 60000);
+
+    setupWebSocketListeners();
 });

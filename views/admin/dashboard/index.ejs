@@ -353,7 +353,8 @@
                         <ul class="list-group list-group-flush" id="stock-list">
                             <% if (lotesBaixoEstoque && lotesBaixoEstoque.length > 0) { %>
                                 <% lotesBaixoEstoque.forEach(lote => { %>
-                                    <li class="list-group-item d-flex justify-content-between align-items-center" data-status="<%= lote.statusEstoque %>">
+                                    <li class="list-group-item d-flex justify-content-between align-items-center" data-produto-id="<%= lote.produto.id_produto %>" 
+                data-lote-id="<%= lote.id_lote %>"  data-status="<%= lote.statusEstoque %>">
                                         <div class="d-flex align-items-center">
                                             <% if (lote.statusEstoque === 'critico' ) { %>
                                                 <i class="bi bi-exclamation-triangle-fill text-danger me-2"></i>
@@ -370,7 +371,7 @@
                                                 </span>
                                             <% } %>
                                         </div>
-                                        <span class="badge rounded-pill <%= lote.statusEstoque === 'critico' ? 'bg-danger' : 'bg-warning text-dark' %>">
+                                        <span class="badge rounded-pill <%= lote.statusEstoque === 'critico' ? 'bg-danger' : 'bg-warning text-dark' %>" id="estoque-badge-lote-<%= lote.id_lote %>" >
                                             <%= lote.quantidade %> un.
                                         </span>
                                     </li>

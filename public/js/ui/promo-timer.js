@@ -1,8 +1,8 @@
 document.addEventListener('DOMContentLoaded', () => {
-    
+
     function updatePromoTimers() {
         const promoCards = document.querySelectorAll('.promo-card');
-        
+
         promoCards.forEach(card => {
             const progressBar = card.querySelector('.promo-bar');
             const remainingEl = card.querySelector('.promo-remaining');
@@ -16,16 +16,25 @@ document.addEventListener('DOMContentLoaded', () => {
             if (isNaN(inicio.getTime()) || isNaN(fim.getTime())) return;
 
             const duracaoTotal = fim - inicio;
-            const tempoDecorrido = agora - inicio;
-            
-            let porcentagem = (tempoDecorrido / duracaoTotal) * 100;
-            porcentagem = Math.max(0, Math.min(100, porcentagem));
-
-            progressBar.style.width = porcentagem + '%';
-
             const tempoRestanteMs = fim - agora;
 
+            progressBar.classList.remove('bg-success', 'bg-info', 'bg-warning', 'bg-danger', 'bg-secondary');
+
             if (tempoRestanteMs > 0 && agora >= inicio) {
+
+                let porcentagemRestante = (tempoRestanteMs / duracaoTotal) * 100;
+                porcentagemRestante = Math.max(0, Math.min(100, porcentagemRestante));
+
+                progressBar.style.width = porcentagemRestante + '%';
+
+                if (porcentagemRestante <= 20) {
+                    progressBar.classList.add('bg-danger');
+                } else if (porcentagemRestante <= 50) {
+                    progressBar.classList.add('bg-warning');
+                } else {
+                    progressBar.classList.add('bg-success');
+                }
+
                 const dias = Math.floor(tempoRestanteMs / (1000 * 60 * 60 * 24));
                 const horas = Math.floor((tempoRestanteMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
                 
@@ -39,22 +48,22 @@ document.addEventListener('DOMContentLoaded', () => {
                     textoRestante += `${minutos} min`;
                 }
                 remainingEl.textContent = textoRestante;
-                progressBar.classList.remove('bg-secondary', 'bg-info');
-                progressBar.classList.add('bg-success');
+
             } else if (agora < inicio) {
+                // 3. Promoção AGENDADA
                 remainingEl.textContent = 'Agendada';
                 progressBar.style.width = '100%';
-                progressBar.classList.remove('bg-success', 'bg-secondary');
-                progressBar.classList.add('bg-info');
+                progressBar.classList.add('bg-info'); 
+
             } else {
+                // 4. Promoção ENCERRADA
                 remainingEl.textContent = 'Encerrada';
-                progressBar.style.width = '100%';
-                progressBar.classList.remove('bg-success', 'bg-info');
+                progressBar.style.width = '0%';
                 progressBar.classList.add('bg-secondary');
             }
         });
     }
 
     updatePromoTimers();
-    setInterval(updatePromoTimers, 60000); // Atualiza a cada minuto
+    setInterval(updatePromoTimers, 60000);
 });

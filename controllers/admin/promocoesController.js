@@ -7,6 +7,7 @@ const Lote = require('../../models/lote')
 const { Op } = require('sequelize');
 const formatDate = require('../../utils/data/date-formatter');
 const { createDescontoParaLoteMaisProximo } = require('../../services/admin/descontosService');
+const { formatarPromocaoParaExibicao } = require('../../public/js/promo-formatter');
 
 router.post('/promocoes/save', asyncHandler(async (req, res) => {
     const dadosDesconto = {
@@ -18,11 +19,19 @@ router.post('/promocoes/save', asyncHandler(async (req, res) => {
         observacao: req.body.observacao
     };
 
-    await createDescontoParaLoteMaisProximo(dadosDesconto);
+    const { loteAfetado, novoDesconto } = await createDescontoParaLoteMaisProximo(dadosDesconto);
+
+    if (!loteAfetado || !novoDesconto) {
+        return res.status(500).json({ success: false, message: 'Não foi possível criar a promoção.' });
+    }
+
+    const promocaoParaDashboard = await formatarPromocaoParaExibicao(loteAfetado, novoDesconto);
+
+    req.io.emit('dashboard:novaPromocao', promocaoParaDashboard);
 
     res.status(200).json({
         success: true,
-        message: 'Nova promoção cadastrado e estoque atualizado!',
+        message: 'Nova promoção cadastrada!',
     });
 }));
 

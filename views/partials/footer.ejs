@@ -1,4 +1,8 @@
+<script src="/socket.io/socket.io.js"></script>
+
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
 <script src="/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+<script src="/js/app.js" type="module"></script>
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <script src="https://cdn.datatables.net/2.3.4/js/dataTables.min.js"></script>
 
@@ -10,7 +14,7 @@
         $('#table-data thead th').each(function (index) {
             if ($(this).text().trim().includes('Ações')) {
                 actionsColumnIndex = index;
-                return false; 
+                return false;
             }
         });
 
@@ -23,7 +27,7 @@
             columnDefs: [
                 {
                     orderable: false,
-                    targets: actionsColumnIndex 
+                    targets: actionsColumnIndex
                 }
             ]
         });

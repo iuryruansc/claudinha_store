@@ -4,6 +4,7 @@ const asyncHandler = require('../../utils/handlers/async-handler');
 const vendaService = require('../../services/admin/vendasService');
 const Caixa = require('../../models/caixa');
 const Pdv = require('../../models/pdv');
+const { getDashboardData } = require('../../services/admin/dashboardService');
 
 const verificarCaixaAberto = asyncHandler(async (req, res, next) => {
     const caixaAtivo = await Caixa.findOne({
@@ -23,18 +24,18 @@ const verificarCaixaAberto = asyncHandler(async (req, res, next) => {
 
 router.get('/vendas/new', verificarCaixaAberto, asyncHandler(async (req, res) => {
     const viewData = await vendaService.getViewDependencies();
-        const { clientes, produtos } = await vendaService.getViewDependencies();
-        const formasPagamento = [
-            { id_forma_pagamento: 'dinheiro', nome: 'Dinheiro' },
-            { id_forma_pagamento: 'cartao_credito', nome: 'Cartão de Crédito' },
-            { id_forma_pagamento: 'cartao_debito', nome: 'Cartão de Débito' },
-            { id_forma_pagamento: 'pix', nome: 'PIX' },
-            { id_forma_pagamento: 'outro', nome: 'Outro' }
-        ];
+    const { clientes, produtos } = await vendaService.getViewDependencies();
+    const formasPagamento = [
+        { id_forma_pagamento: 'dinheiro', nome: 'Dinheiro' },
+        { id_forma_pagamento: 'cartao_credito', nome: 'Cartão de Crédito' },
+        { id_forma_pagamento: 'cartao_debito', nome: 'Cartão de Débito' },
+        { id_forma_pagamento: 'pix', nome: 'PIX' },
+        { id_forma_pagamento: 'outro', nome: 'Outro' }
+    ];
 
     viewData.modal = 'partials/modals/venda-modal.ejs';
 
-    res.render('funcionario/vendas/new', {viewData, formasPagamento, clientes, produtos});
+    res.render('funcionario/vendas/new', { viewData, formasPagamento, clientes, produtos });
 }));
 
 router.post('/vendas/save', verificarCaixaAberto, asyncHandler(async (req, res) => {
@@ -55,10 +56,34 @@ router.post('/vendas/save', verificarCaixaAberto, asyncHandler(async (req, res) 
         return res.redirect('/admin/vendas/new');
     }
 
-    const novaVenda = await vendaService.createVenda(vendaData, id_funcionario, id_caixa);
+    const venda = await vendaService.createVenda(vendaData, id_funcionario, id_caixa);
 
-    req.flash('success_msg', `Venda #${novaVenda.id_venda} registrada com sucesso!`);
+    const novosDadosDashboard = await getDashboardData(id_funcionario);
 
+    const payload = {
+        novaVenda: {
+            id: venda.id_venda,
+            vendedor: req.session.user.nome,
+            cliente: vendaData.nome_cliente || 'Anônimo',
+            valor: venda.valor_total,
+            status: venda.status,
+            timestamp: new Date()
+        },
+
+        resumoCaixa: novosDadosDashboard.resumoCaixa,
+        resumoPendencias: novosDadosDashboard.resumoPendencias,
+        alertasEstoque: novosDadosDashboard.lotesBaixoEstoque,
+        novaAtividade: {
+            texto: `<strong>${req.session.user.nome}</strong> registrou a venda <strong>#${venda.id_venda}</strong> no valor de <strong>${venda.valor_total.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</strong>.`,
+            icone: 'bi-cart-check-fill',
+            cor: 'text-success',
+            tempoAtras: 'agora mesmo'
+        }
+    };
+
+    req.io.emit('dashboard:vendaRealizada', payload);
+
+    req.flash('success_msg', `Venda #${venda.id_venda} registrada com sucesso!`);
     res.redirect('/funcionario/vendas/new');
 }));
 
@@ -86,7 +111,7 @@ router.get('/vendas/produtos/:id_produto/lote', asyncHandler(async (req, res) =>
 
         return res.json(loteProcessado);
 
-    
+
     } catch (err) {
         console.error('Erro ao buscar lote/desconto', err);
         return res.status(500).json({ error: 'Erro interno' });

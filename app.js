@@ -1,6 +1,7 @@
 require('dotenv').config();
 
 //Imports
+const { Server } = require("socket.io");
 const express = require('express');
 const path = require('path');
 const flash = require('connect-flash');
@@ -11,7 +12,7 @@ const fs = require('fs')
 const helmet = require('helmet');
 const connection = require('./database/database');
 const syncDatabase = require('./utils/data/data-sync');
-
+const activeUserSockets = new Map();
 
 //Utils
 const navLinks = require('./utils/navigation/nav-links');
@@ -65,13 +66,14 @@ app.use(helmet({
       connectSrc: [
         "'self'",
         "https://cdn.jsdelivr.net",
-        "https://cdn.datatables.net"
+        "https://cdn.datatables.net",
+        "wss:"
       ],
     },
   },
 }));
 
-app.use(session({
+const sessionMiddleware = session({
   secret: process.env.SESSION_SECRET,
   resave: true,
   saveUninitialized: true,
@@ -79,7 +81,9 @@ app.use(session({
     secure: 'auto',
     maxAge: 1000 * 60 * 60 * 10
   }
-}));
+});
+
+app.use(sessionMiddleware);
 
 app.use(
   '/vendor/bootstrap',
@@ -109,9 +113,14 @@ app.use((req, res, next) => {
 app.use(flash());
 
 app.use((req, res, next) => {
-    res.locals.success_msg = req.flash('success_msg');
-    res.locals.error_msg = req.flash('error_msg');
-    next();
+  res.locals.success_msg = req.flash('success_msg');
+  res.locals.error_msg = req.flash('error_msg');
+  next();
+});
+
+app.use((req, res, next) => {
+  req.io = io;
+  next();
 });
 
 //Main Routes
@@ -128,7 +137,60 @@ tokenCleanUp();
 //Cleaning Promos
 startPromoCleanup();
 
+const httpsServer = https.createServer(options, app);
+const io = new Server(httpsServer);
+
+io.use((socket, next) => {
+  sessionMiddleware(socket.request, {}, (err) => {
+    if (err) {
+      console.error('Socket.IO: Erro no middleware de sessão.');
+      return next(new Error('Erro de sessão'));
+    }
+
+    const session = socket.request.session;
+    if (!session || !session.user) {
+      console.error('Socket.IO: Conexão não autorizada. Sessão ou usuário inválidos.');
+      return next(new Error('Não autorizado'));
+    }
+
+    const userId = session.user.id_funcionario;
+    if (activeUserSockets.has(userId)) {
+      const oldSocketId = activeUserSockets.get(userId);
+
+      if (oldSocketId !== socket.id) {
+        const oldSocket = io.sockets.sockets.get(oldSocketId);
+        if (oldSocket) {
+          console.log(`Forçando desconexão do socket antigo ${oldSocketId} para o usuário ${userId}`);
+          oldSocket.emit('forceDisconnect', 'Detectamos que sua conta foi acessada em uma nova aba ou dispositivo. Para sua segurança, apenas uma sessão pode permanecer ativa. Feche essa aba ou clique em entendido para desativar outras abas e utilizar esta.');
+          oldSocket.disconnect(true);
+        }
+      }
+    }
+
+    next();
+  });
+});
+
+io.on('connection', (socket) => {
+  const userInfo = socket.request.session.user;
+  const userId = userInfo.id_funcionario;
+
+  console.log(`✅ ${userInfo.nome} se conectou. Socket ID: ${socket.id}`);
+
+  activeUserSockets.set(userId, socket.id);
+
+  socket.join(userId.toString());
+
+  socket.on('disconnect', () => {
+    console.log(`❌ ${userInfo.nome} se desconectou. Socket ID: ${socket.id}`);
+
+    if (activeUserSockets.get(userId) === socket.id) {
+      activeUserSockets.delete(userId);
+    }
+  });
+});
+
 //Server Listen
-https.createServer(options, app).listen(port, () => {
+httpsServer.listen(port, () => {
   console.log(`HTTPS server running on https://localhost:${port}`);
 });

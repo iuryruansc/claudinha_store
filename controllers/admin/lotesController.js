@@ -7,6 +7,7 @@ const Produto = require('../../models/produto')
 const { stringValidation, numberValidation, dateValidation } = require('../../utils/data/data-validation');
 const { parseIntValue, parseDateValue } = require('../../utils/data/data-parsers');
 const { getAllLotes, updateLote, deleteLote, adicionarQuantidadeAoLote, createLoteWithMovimentacao } = require('../../services/admin/lotesService');
+const { formatarLoteParaTabela } = require('../../services/admin/loteFormatter');
 
 router.get('/lotes', asyncHandler(async (req, res) => {
     const { lotes } = await getAllLotes();
@@ -24,15 +25,13 @@ router.post('/lotes/save', asyncHandler(async (req, res) => {
     const { localizacao } = req.body;
     const [parsedId, parsedNumLote, parsedQuant, parsedPreco] = parseIntValue(req.body.id_produto, req.body.numero_lote, req.body.quantidade, req.body.preco_produto);
     const parsedValidade = parseDateValue(req.body.data_validade);
-    const isAdmin = req.session.cargo === 'admin';
-
-    const id_funcionario = isAdmin ? 1 : req.session.userId;
+    const id_funcionario = req.session.userId;
 
     numberValidation(parsedId, parsedQuant, parsedNumLote, parsedPreco);
     stringValidation(localizacao);
     dateValidation(parsedValidade);
 
-    await createLoteWithMovimentacao({
+    const novoLote = await createLoteWithMovimentacao({
         id_produto: parsedId,
         preco_produto: parsedPreco,
         numero_lote: parsedNumLote,
@@ -41,22 +40,36 @@ router.post('/lotes/save', asyncHandler(async (req, res) => {
         localizacao
     }, id_funcionario);
 
+    const loteCompleto = await Lote.findByPk(novoLote.id_lote, {
+        include: [{ model: Produto, as: 'produto' }]
+    });
+
+    try {
+        const loteParaTabela = await formatarLoteParaTabela(loteCompleto);
+
+        req.io.emit('lote:novo', loteParaTabela);
+    } catch (wsError) {
+        console.error("Falha ao emitir evento de WebSocket para novo lote:", wsError);
+    }
+
     res.status(200).json({
         success: true,
-        message: 'Novo lote cadastrado e estoque atualizado!', // Pass the message here
+        message: 'Novo lote cadastrado e estoque atualizado!',
     });
 }));
 
 router.post('/lotes/delete/:id_lote', asyncHandler(async (req, res) => {
     const [parsedId] = parseIntValue(req.params.id_lote);
-
     numberValidation(parsedId);
 
     await deleteLote(parsedId);
 
-    req.flash('success_msg', 'Lote removido com sucesso!');
+    req.io.emit('lote:removido', { id_lote: parsedId });
 
-    res.redirect('/admin/lotes');
+    res.status(200).json({
+        success: true,
+        message: 'Lote removido com sucesso!'
+    });
 }));
 
 router.post('/lotes/update/:id_lote', asyncHandler(async (req, res) => {
@@ -70,12 +83,16 @@ router.post('/lotes/update/:id_lote', asyncHandler(async (req, res) => {
     stringValidation(localizacao);
     dateValidation(parsedValidade);
 
-    await updateLote(parsedId, ({
+    const loteAtualizado = await updateLote(parsedId, ({
         quantidade: parsedQuant,
         localizacao,
         numero_lote: parsedNumLote,
         data_validade: parsedValidade
     }), id_funcionario);
+
+    const loteParaTabela = await formatarLoteParaTabela(loteAtualizado);
+
+    req.io.emit('lote:atualizado', loteParaTabela);
 
     req.flash('success_msg', 'Lote atualizado com sucesso!');
 
@@ -92,7 +109,11 @@ router.post('/lotes/add-quantidade/:id_lote', asyncHandler(async (req, res) => {
 
     const loteAtualizado = await adicionarQuantidadeAoLote(id_lote, quantidade, id_funcionario, observacao);
 
-    res.status(200).json(loteAtualizado);
+    const loteParaTabela = await formatarLoteParaTabela(loteAtualizado);
+
+    req.io.emit('lote:atualizado', loteParaTabela);
+
+    res.status(200).json(loteParaTabela);
 }));
 
 router.get('/lotes/json/:id', asyncHandler(async (req, res) => {
