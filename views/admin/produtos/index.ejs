@@ -37,6 +37,8 @@
                                         <tr>
                                             <th>Produto</th>
                                             <th>Preço de Compra</th>
+                                            <th>Preço de Venda</th>
+                                            <th>Quantidade</th>
                                             <th>Código de Barras</th>
                                             <% if (!categoria_nome) { %>
                                                 <th>Categoria</th>
@@ -73,6 +75,11 @@
                                                     <%= produto.preco_compra.toLocaleString('pt-BR', { style: 'currency'
                                                         , currency: 'BRL' }) %>
                                                 </td>
+                                                <td>
+                                                    <%= produto.preco_venda.toLocaleString('pt-BR', { style: 'currency'
+                                                        , currency: 'BRL' }) %>
+                                                </td>
+                                                <td><%= quant %></td>
                                                 <td><span class="font-monospace">
                                                         <%= produto.codigo_barras %>
                                                     </span></td>

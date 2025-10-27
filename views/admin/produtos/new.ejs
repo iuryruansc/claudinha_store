@@ -19,7 +19,7 @@
                         <div class="card-body">
                             <form method="POST" action="/admin/produtos/save" id="product-form">
                                 <div class="row g-4">
-                                    <div class="col-md-6">
+                                    <div class="col-md-4">
                                         <div class="form-floating">
                                             <input class="form-control" type="text" name="nome"
                                                 placeholder="Nome do produto" id="produto-name-input" required>
@@ -28,14 +28,25 @@
                                         </div>
                                     </div>
 
-                                    <div class="col-md-6">
+                                    <div class="col-md-4">
                                         <div class="input-group">
                                             <span class="input-group-text"><i class="bi bi-currency-dollar"></i></span>
                                             <div class="form-floating">
                                                 <input class="form-control" type="number" step="0.01"
-                                                    name="preco_compra" placeholder="Preço do produto"
-                                                    id="produto-preco-input" required>
-                                                <label for="produto-preco-input">Preço de compra</label>
+                                                    name="preco_compra" placeholder="Preço de Compra"
+                                                    id="produto-preco_compra-input" required>
+                                                <label for="produto-preco_compra-input">Preço de compra</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="input-group">
+                                            <span class="input-group-text"><i class="bi bi-currency-dollar"></i></span>
+                                            <div class="form-floating">
+                                                <input class="form-control" type="number" step="0.01"
+                                                    name="preco_venda" placeholder="Preço de Venda"
+                                                    id="produto-preco_venda-input" required>
+                                                <label for="produto-preco_venda-input">Preço de venda</label>
                                             </div>
                                         </div>
                                     </div>
@@ -112,7 +123,8 @@
                             formSelector: '#product-form',
                             inputFields: [
                                 '#produto-name-input',
-                                '#produto-preco-input',
+                                '#produto-preco_compra-input',
+                                '#produto-preco_venda-input',
                                 '#produto-code-input'
                             ],
                             selectFields: [
@@ -123,13 +135,14 @@
                             redirectUrl: '/admin/produtos',
                             fieldMap: {
                                 nome: '#produto-name-input',
-                                preco: '#produto-preco-input',
+                                precocompra: '#produto-preco_compra-input',
+                                preco_venda: '#produto-preco_venda-input',
                                 codigo_barras: '#produto-code-input',
                                 id_categoria: '#produto-categoria-select',
                                 id_fornecedor: '#produto-fornecedor-select',
                                 id_marca: '#produto-marca-select'
                             },
-                            requiredFields: ['nome', 'preco', 'codigo_barras', 'id_categoria', 'id_fornecedor', 'id_marca']
+                            requiredFields: ['nome', 'preco_compra','preco_venda', 'codigo_barras', 'id_categoria', 'id_fornecedor', 'id_marca']
                         });
                     });
                 </script>

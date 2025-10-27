@@ -13,6 +13,10 @@ const Produto = connection.define('produto', {
     },
     preco_compra: {
         type: Sequelize.FLOAT,
+        allowNull: true
+    },
+    preco_venda: {
+        type: Sequelize.FLOAT,
         allowNull: false
     },
     id_categoria: {

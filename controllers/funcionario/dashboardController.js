@@ -1,10 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const asyncHandler = require('../../utils/handlers/async-handler');
-const Venda = require('../../models/venda');
-const Pagamento = require('../../models/pagamento');
-const PagamentoParcial = require('../../models/pagamentoParcial');
-const Pdv = require('../../models/pdv');
+const Venda = require('../../models/Venda');
+const Pagamento = require('../../models/Pagamento');
+const PagamentoParcial = require('../../models/PagamentoParcial');
+const Pdv = require('../../models/Pdv');
 const Caixa = require('../../models/caixa')
 const { Op } = require('sequelize');
 const { openCaixa, closeCaixa } = require('../../services/admin/caixasService');

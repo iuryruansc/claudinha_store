@@ -1,12 +1,12 @@
 const connection = require('../../database/database');
 const { Op, where } = require('sequelize');
-const Cliente = require('../../models/cliente');
-const ItemVenda = require('../../models/itemVenda');
-const Produto = require('../../models/produto');
-const Pagamento = require('../../models/pagamento');
-const Venda = require('../../models/venda');
-const PagamentoParcial = require('../../models/pagamentoParcial');
-const ParcelaPagamento = require('../../models/parcelaPagamento');
+const Cliente = require('../../models/Cliente');
+const ItemVenda = require('../../models/ItemVenda');
+const Produto = require('../../models/Produto');
+const Pagamento = require('../../models/Pagamento');
+const Venda = require('../../models/Venda');
+const PagamentoParcial = require('../../models/PagamentoParcial');
+const ParcelaPagamento = require('../../models/ParcelaPagamento');
 const { modelValidation } = require('../../utils/data/data-validation');
 
 const _mapVendaData = (venda) => {

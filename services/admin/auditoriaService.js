@@ -1,9 +1,9 @@
-const Funcionario = require('../../models/funcionario')
-const Venda = require('../../models/venda');
-const Cliente = require('../../models/cliente');
-const Lote = require('../../models/lote');
-const Produto = require('../../models/produto');
-const MovimentacaoEstoque = require('../../models/movimentacaoEstoque');
+const Funcionario = require('../../models/Funcionario')
+const Venda = require('../../models/Venda');
+const Cliente = require('../../models/Cliente');
+const Lote = require('../../models/Lote');
+const Produto = require('../../models/Produto');
+const MovimentacaoEstoque = require('../../models/MovimentacaoEstoque');
 
 const getAuditLog = async (options = {}) => {
     const page = parseInt(options.page, 10) || 1;

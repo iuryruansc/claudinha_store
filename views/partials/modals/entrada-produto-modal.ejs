@@ -19,16 +19,23 @@
 
           <!-- Valor do Produto -->
           <div class="form-floating mb-3">
-            <input type="number" step="0.01" class="form-control" id="produtoPreco" name="preco_produto"
-              data-field="produtoValor" placeholder="Valor do Produto" required>
-            <label for="produtoPreco">Valor do Produto</label>
+            <input type="number" step="0.01" class="form-control" id="produtoPrecoCompra" name="preco_produto_compra"
+              data-field="produtoValorCompra" placeholder="Valor de Compra" required>
+            <label for="produtoPreco">Valor de Compra</label>
+          </div>
+
+          <!-- Valor do Produto -->
+          <div class="form-floating mb-3">
+            <input type="number" step="0.01" class="form-control" id="produtoPrecoVenda" name="preco_produto_venda"
+              data-field="produtoValorVenda" placeholder="Valor de Venda" required>
+            <label for="produtoPreco">Valor de Venda</label>
           </div>
 
           <!-- Número do Lote -->
           <div class="form-floating mb-3">
-            <input type="number" class="form-control" id="numeroLote" placeholder="Número do Lote" name="numero_lote"
+            <input type="text" class="form-control" id="numeroLote" placeholder="Lote" name="numero_lote"
               required>
-            <label for="numeroLote">Número do Lote</label>
+            <label for="numeroLote">Lote</label>
           </div>
 
           <!-- Quantidade -->
@@ -40,15 +47,14 @@
 
           <!-- Data de Validade -->
           <div class="form-floating mb-3">
-            <input type="datetime-local" class="form-control" id="dataValidade" placeholder="Data de Validade"
+            <input type="date" class="form-control" id="dataValidade" placeholder="Validade"
               name="data_validade" required>
-            <label for="dataValidade">Data de Validade</label>
+            <label for="dataValidade">Validade</label>
           </div>
 
           <!-- Localização -->
           <div class="form-floating mb-3">
-            <input type="text" class="form-control" id="localizacao" placeholder="Localização" name="localizacao"
-              required>
+            <input type="text" class="form-control" id="localizacao" placeholder="Localização" name="localizacao">
             <label for="localizacao">Localização</label>
           </div>
 

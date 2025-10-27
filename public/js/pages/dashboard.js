@@ -161,7 +161,8 @@ document.addEventListener('DOMContentLoaded', () => {
         onSuccess: (data, modalEl) => {
             modalEl.querySelector("[data-field=produtoId]").value = data.id_produto;
             modalEl.querySelector("[data-field=produtoNome]").value = data.nome;
-            modalEl.querySelector("[data-field=produtoValor]").value = data.preco;
+            modalEl.querySelector("[data-field=produtoValorCompra]").value = data.preco_compra;
+            modalEl.querySelector("[data-field=produtoValorVenda]").value = data.preco_venda;
         },
     });
 
@@ -175,7 +176,8 @@ document.addEventListener('DOMContentLoaded', () => {
         onSuccess: (data, modalEl) => {
             modalEl.querySelector("#modalDescProdutoId").value = data.id_produto;
             modalEl.querySelector("#modalDescProdutoNome").value = data.nome;
-            modalEl.querySelector("[data-field=produtoValor]").value = data.preco;
+            modalEl.querySelector("[data-field=produtoValorCompra]").value = data.preco_compra;
+            modalEl.querySelector("[data-field=produtoValorVenda]").value = data.preco_venda;
         },
     });
 
@@ -185,7 +187,8 @@ document.addEventListener('DOMContentLoaded', () => {
         inputFields: [
             '#modalProdutoId',
             '#numeroLote',
-            '#produtoPreco',
+            '#produtoPrecoCompra',
+            '#produtoPrecoVenda',
             '#quantidade',
             '#dataValidade',
             '#localizacao'
@@ -194,15 +197,16 @@ document.addEventListener('DOMContentLoaded', () => {
         requiredFields: [
             'id_produto',
             'numero_lote',
-            'preco_produto',
+            'preco_produto_compra',
+            'preco_produto_venda',
             'quantidade',
             'data_validade',
-            'localizacao'
         ],
         redirectUrl: '/admin/dashboard',
         fieldMap: {
             id_produto: '#modalProdutoId',
-            preco_produto: '#produtoPreco',
+            preco_produto_compra: '#produtoPrecoCompra',
+            preco_produto_venda: '#produtoPrecoVenda',
             numero_lote: '#numeroLote',
             quantidade: '#quantidade',
             data_validade: '#dataValidade',

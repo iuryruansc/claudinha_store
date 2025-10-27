@@ -1,6 +1,7 @@
 const connection = require('../../database/database');
-const Funcionario = require('../../models/funcionario');
-const Usuario = require('../../models/usuario');
+const Funcionario = require('../../models/Funcionario');
+const Usuario = require('../../models/Usuario');
+const Cargo = require('../../models/Cargo');
 const { modelValidation } = require('../../utils/data/data-validation');
 
 const findFuncionarioById = async (id) => {
@@ -10,7 +11,7 @@ const findFuncionarioById = async (id) => {
 };
 
 const getAllFuncionarios = async () => {
-    const funcionario = await Funcionario.findAll();
+    const funcionario = await Funcionario.findAll({ include: [{ model: Cargo }] });
     return funcionario;
 };
 

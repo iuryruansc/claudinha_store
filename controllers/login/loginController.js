@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const Funcionarios = require('../../models/funcionario');
-const Usuarios = require('../../models/usuario');
+const Funcionarios = require('../../models/Funcionario');
+const Usuarios = require('../../models/Usuario');
 const asyncHandler = require('../../utils/handlers/async-handler');
 const { logoutUser, authenticateUser } = require('../../services/login/loginService');
 

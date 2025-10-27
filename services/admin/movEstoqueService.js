@@ -1,7 +1,7 @@
-const Funcionario = require('../../models/funcionario');
-const Lote = require('../../models/lote');
-const Produto = require('../../models/produto');
-const MovimentacaoEstoque = require('../../models/movimentacaoEstoque');
+const Funcionario = require('../../models/Funcionario');
+const Lote = require('../../models/Lote');
+const Produto = require('../../models/Produto');
+const MovimentacaoEstoque = require('../../models/MovimentacaoEstoque');
 
 const getAllMovs = async () => {
     const movsPromise = MovimentacaoEstoque.findAll({

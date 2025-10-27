@@ -1,4 +1,4 @@
-const Category = require('../../models/category');
+const Category = require('../../models/Category');
 const { modelValidation } = require('../../utils/data/data-validation');
 
 const findCategoryById = async (id) => {

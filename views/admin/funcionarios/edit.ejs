@@ -26,6 +26,20 @@
                                     <label for="func-name-input">Nome do Funcionário</label>
                                 </div>
 
+                                <div class="col-md-4">
+                                        <div class="form-floating">
+                                            <select name="id_cargo" class="form-select" id="cargo-select"
+                                                required>
+                                                <% cargos.forEach(cargo=> { %>
+                                                    <option value="<%= cargo.id_cargo %>">
+                                                        <%= cargo.nome_cargo %>
+                                                    </option>
+                                                <% }) %>
+                                            </select>
+                                        <label for="cargo-select">Cargo</label>
+                                    </div>
+                                </div>
+
                                 <input type="hidden" name="id_funcionario" value="<%= funcionario.id_funcionario %>">
 
                                 <div class="d-flex justify-content-between mt-4">

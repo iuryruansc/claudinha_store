@@ -7,15 +7,12 @@
                     <div id="error-popup-container"></div>
                     <div class="d-flex justify-content-between align-items-center my-4">
                         <h2 class="mb-0 h4">
-                            <i class="bi bi-person-badge me-2"></i>
-                            Gerenciamento de Funcionários
+                            <i class="bi bi-bookmark-star-fill me-2"></i>
+                            Gerenciamento de Cargos
                         </h2>
-                        <div class="d-flex align-items-center">
-                            <a href="/admin/funcionarios/new" class="btn btn-primary">
-                                <i class="bi bi-person-plus me-2"></i>
-                                Cadastrar Funcionário
-                            </a>
-                        </div>
+                        <a href="/admin/cargos/new" class="btn btn-primary">
+                            <i class="bi bi-plus-circle me-2"></i>Novo Cargo
+                        </a>
                     </div>
 
                     <div class="card shadow-sm">
@@ -24,8 +21,7 @@
                                 <table id="table-data" class="table table-striped table-hover align-middle">
                                     <thead class="table-dark">
                                         <tr>
-                                            <th>Nome</th>
-                                            <th>Cargo</th>
+                                            <th>Marcas</th>
                                             <th class="text-center">
                                                 <div class="d-flex align-items-center justify-content-center">
                                                     <span>Ações</span>
@@ -38,33 +34,35 @@
                                             </th>
                                         </tr>
                                     </thead>
-                                    <tbody id="funcionario-table-body">
-                                        <% funcionarios.forEach(funcionario=> { %>
+                                    <tbody id="cargo-table-body">
+                                        <% cargos.forEach(cargo=> { %>
                                             <tr>
-                                                <td class="text-capitalize">
-                                                    <%= funcionario.nome %>
-                                                </td>
-                                                <td class="text-capitalize">
-                                                    <%= funcionario.cargo.nome_cargo %>
-                                                </td>
+                                                <td><strong>
+                                                        <%= cargo.nome_cargo %>
+                                                    </strong></td>
                                                 <td class="text-center">
-                                                    <fieldset class="btn-group">
-                                                        <a href="/admin/funcionarios/edit/<%= funcionario.id_funcionario %>"
-                                                            class="btn btn-sm btn-outline-primary me-2" title="Editar">
+                                                    <div class="btn-group" role="group" aria-label="Ações do cargo">
+                                                        <a href="/admin/cargos/edit/<%= cargo.id_cargo %>"
+                                                            class="btn btn-sm btn-outline-primary" title="Editar cargo">
                                                             <i class="bi bi-pencil-square"></i>
                                                         </a>
+                                                        <a href="/admin/funcionarios/cargo/<%= cargo.id_cargo %>"
+                                                            class="btn btn-sm btn-outline-info"
+                                                            title="Ver funcionários com este cargo">
+                                                            <i class="bi bi-box-seam"></i>
+                                                        </a>
                                                         <form data-delete-form
-                                                            action="/admin/funcionarios/delete/<%= funcionario.id_funcionario %>"
-                                                            method="POST" style="display: inline;">
-                                                            <input type="hidden" name="id_funcionario"
-                                                                value="<%= funcionario.id_funcionario %>">
+                                                            action="/admin/cargos/delete/<%= cargo.id_cargo %>"
+                                                            method="POST" class="d-inline-block">
+                                                            <input type="hidden" name="id_cargo"
+                                                                value="<%= cargo.id_cargo %>">
                                                             <button type="submit"
                                                                 class="btn btn-sm btn-outline-danger excluir-btn"
-                                                                style="display: none;" title="Excluir">
+                                                                title="Excluir cargo" style="display: none;">
                                                                 <i class="bi bi-trash"></i>
                                                             </button>
                                                         </form>
-                                                    </fieldset>
+                                                    </div>
                                                 </td>
                                             </tr>
                                             <% }) %>
@@ -75,6 +73,7 @@
                     </div>
                 </div>
             </main>
+
             <%- include('../../partials/footer.ejs') %>
 
                 <script type="module">
@@ -83,7 +82,7 @@
                     document.addEventListener('DOMContentLoaded', function () {
                         const deleteForms = document.querySelectorAll('[data-delete-form]');
                         const toggleExcluir = document.getElementById('toggleExcluir');
-                        const tableBody = document.getElementById('funcionario-table-body');
+                        const tableBody = document.getElementById('cargo-table-body');
 
                         const tooltipTriggerList = document.querySelectorAll('[title]');
                         const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));

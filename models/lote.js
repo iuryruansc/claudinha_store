@@ -11,12 +11,18 @@ const Lote = connection.define('lote', {
         type: Sequelize.INTEGER,
         allowNull: false,
     },
-    preco_produto: {
+    //inclusoes do novo campo
+    preco_compra:{
+        type: Sequelize.FLOAT,
+        allowNull: false
+    },
+    //altracão do campo existente
+    preco_venda: {
         type: Sequelize.FLOAT,
         allowNull: false
     },
     numero_lote: {
-        type: Sequelize.INTEGER,
+        type: Sequelize.STRING,
         allowNull: false
     },
     quantidade: {

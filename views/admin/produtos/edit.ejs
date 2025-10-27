@@ -57,11 +57,10 @@
                                                 class="form-select" required>
                                                 <% categorias.forEach(categoria=> { %>
                                                     <option value="<%= categoria.id_categoria %>"
-                                                        <%=categoria.id_categoria==produto.id_categoria ? 'selected'
-                                                        : '' %>>
+                                                        <%=categoria.id_categoria==produto.id_categoria ? 'selected' : '' %>>
                                                         <%= categoria.nome %>
                                                     </option>
-                                                    <% }) %>
+                                                <% }) %>
                                             </select>
                                             <label for="produto-categoria-select">Categoria</label>
                                         </div>

@@ -1,4 +1,4 @@
-const Produto = require('../../models/produto');
+const Produto = require('../../models/Produto');
 
 async function formatarLoteParaTabela(lote) {
     if (!lote.produto) {
@@ -30,7 +30,8 @@ async function formatarLoteParaTabela(lote) {
     return {
         id_lote: lote.id_lote,
         produtoNome: lote.produto ? lote.produto.nome : 'N/A',
-        precoCompraFormatado: parseFloat(lote.preco_produto).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }),
+        precoCompraFormatado: parseFloat(lote.preco_compra).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }),
+        precoVendaFormatado: parseFloat(lote.preco_venda).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }),
         numero_lote: lote.numero_lote,
         quantidade: lote.quantidade,
         localizacao: lote.localizacao,

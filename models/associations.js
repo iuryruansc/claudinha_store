@@ -1,21 +1,22 @@
-const Caixa = require('./caixa');
-const Category = require('./category');
-const Cliente = require('./cliente');
-const Desconto = require('./desconto');
-const Lote = require('./lote');
-const Funcionario = require('./funcionario');
-const ItemVenda = require('./itemVenda');
-const MovimentacaoEstoque = require('./movimentacaoEstoque');
-const Pagamento = require('./pagamento');
-const PagamentoParcial = require('./pagamentoParcial');
-const ParcelaPagamento = require('./parcelaPagamento');
-const Pdv = require('./pdv');
-const Produto = require('./produto');
-const Venda = require('./venda');
-const Usuario = require('./usuario');
-const UserMeta = require('./userMeta');
-const Marca = require('./marca');
-const Fornecedor = require('./fornecedor');
+const Caixa = require('./Caixa');
+const Category = require('./Category');
+const Cliente = require('./Cliente');
+const Desconto = require('./Desconto');
+const Lote = require('./Lote');
+const Funcionario = require('./Funcionario');
+const ItemVenda = require('./ItemVenda');
+const MovimentacaoEstoque = require('./MovimentacaoEstoque');
+const Pagamento = require('./Pagamento');
+const PagamentoParcial = require('./PagamentoParcial');
+const ParcelaPagamento = require('./ParcelaPagamento');
+const Pdv = require('./Pdv');
+const Produto = require('./Produto');
+const Venda = require('./Venda');
+const Usuario = require('./Usuario');
+const UserMeta = require('./UserMeta');
+const Marca = require('./Marca');
+const Fornecedor = require('./Fornecedor');
+const Cargo = require('./Cargo');
 
 // Venda -> ItemVenda
 Venda.hasMany(ItemVenda, { foreignKey: 'id_venda' });
@@ -87,6 +88,10 @@ Produto.belongsTo(Fornecedor, { foreignKey: 'id_fornecedor' });
 Marca.hasMany(Produto, { foreignKey: 'id_marca' });
 Produto.belongsTo(Marca, { foreignKey: 'id_marca' });
 
+//Cargo -> Funcionario
+Cargo.hasMany(Funcionario, { foreignKey: 'id_cargo' });
+Funcionario.belongsTo(Cargo, { foreignKey: 'id_cargo' });
+
 // Export all models and their associations
 module.exports = {
   Caixa,
@@ -106,5 +111,6 @@ module.exports = {
   Usuario,
   UserMeta,
   Marca,
-  Fornecedor
+  Fornecedor,
+  Cargo
 };

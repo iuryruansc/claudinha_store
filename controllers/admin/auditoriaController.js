@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const asyncHandler = require('../../utils/handlers/async-handler');
 const auditoriaService = require('../../services/admin/auditoriaService');
-const Funcionario = require('../../models/funcionario');
+const Funcionario = require('../../models/Funcionario');
 
 router.get('/auditoria', asyncHandler(async (req, res) => {
     const options = {

@@ -2,10 +2,10 @@ const express = require('express');
 const router = express.Router();
 const asyncHandler = require('../../utils/handlers/async-handler');
 const formatDate = require('../../utils/data/date-formatter');
-const Lote = require('../../models/lote')
-const Produto = require('../../models/produto')
+const Lote = require('../../models/Lote')
+const Produto = require('../../models/Produto')
 const { stringValidation, numberValidation, dateValidation } = require('../../utils/data/data-validation');
-const { parseIntValue, parseDateValue } = require('../../utils/data/data-parsers');
+const { parseIntValue, parseDateValue, parseFloatValue } = require('../../utils/data/data-parsers');
 const { getAllLotes, updateLote, deleteLote, adicionarQuantidadeAoLote, createLoteWithMovimentacao } = require('../../services/admin/lotesService');
 const { formatarLoteParaTabela } = require('../../services/admin/loteFormatter');
 
@@ -22,19 +22,26 @@ router.get('/lotes', asyncHandler(async (req, res) => {
 }));
 
 router.post('/lotes/save', asyncHandler(async (req, res) => {
-    const { localizacao } = req.body;
-    const [parsedId, parsedNumLote, parsedQuant, parsedPreco] = parseIntValue(req.body.id_produto, req.body.numero_lote, req.body.quantidade, req.body.preco_produto);
+    const { localizacao, numero_lote} = req.body;
+    console.log(req.body);
+
+    const [parsedId, parsedQuant, ] = parseIntValue(req.body.id_produto, req.body.quantidade);
+    const [parsedPrecoCompra, parsedPrecoVenda] = parseFloatValue(req.body.preco_produto_compra, req.body.preco_produto_venda);
     const parsedValidade = parseDateValue(req.body.data_validade);
     const id_funcionario = req.session.userId;
 
-    numberValidation(parsedId, parsedQuant, parsedNumLote, parsedPreco);
-    stringValidation(localizacao);
+    numberValidation(parsedId, parsedQuant, parsedPrecoCompra,parsedPrecoVenda);
+    stringValidation(localizacao, numero_lote);
     dateValidation(parsedValidade);
+
+    console.log(parsedPrecoVenda);
+    
 
     const novoLote = await createLoteWithMovimentacao({
         id_produto: parsedId,
-        preco_produto: parsedPreco,
-        numero_lote: parsedNumLote,
+        preco_compra: parsedPrecoCompra,
+        preco_venda: parsedPrecoVenda,
+        numero_lote: numero_lote,
         quantidade: parsedQuant,
         data_validade: parsedValidade,
         localizacao

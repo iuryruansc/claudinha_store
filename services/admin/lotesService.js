@@ -1,8 +1,8 @@
 const { Op } = require('sequelize');
 const connection = require('../../database/database');
-const Lote = require('../../models/lote');
-const Produto = require('../../models/produto');
-const MovimentacaoEstoque = require('../../models/movimentacaoEstoque');
+const Lote = require('../../models/Lote');
+const Produto = require('../../models/Produto');
+const MovimentacaoEstoque = require('../../models/MovimentacaoEstoque');
 const { modelValidation } = require('../../utils/data/data-validation');
 
 const findLoteById = async (id) => {
@@ -217,7 +217,8 @@ const createLoteWithMovimentacao = async (data, id_funcionario) => {
 
         const novoLote = await Lote.create({
             id_produto: data.id_produto,
-            preco_produto: data.preco_produto,
+            preco_compra: data.preco_compra,
+            preco_venda: data.preco_venda,
             numero_lote: data.numero_lote,
             quantidade: data.quantidade,
             data_validade: data.data_validade,
@@ -233,11 +234,11 @@ const createLoteWithMovimentacao = async (data, id_funcionario) => {
             observacao: 'Entrada via cadastro de lote'
         }, { transaction: t });
 
-        const precoAntigo = parseFloat(produto.preco_compra);
-        const precoNovo = parseFloat(data.preco_produto);
+        const precoAntigo = parseFloat(produto.preco_venda);
+        const precoNovo = parseFloat(data.preco_venda);
 
         if (precoNovo != precoAntigo) {
-            await produto.update({ preco_compra: data.preco_produto }, { transaction: t })
+            await produto.update({ preco_venda: data.preco_venda }, { transaction: t })
         }
 
         return novoLote;

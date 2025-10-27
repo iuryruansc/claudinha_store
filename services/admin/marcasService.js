@@ -1,4 +1,4 @@
-const Marca = require('../../models/marca');
+const Marca = require('../../models/Marca');
 const { modelValidation } = require('../../utils/data/data-validation');
 
 const findMarcaById = async (id) => {

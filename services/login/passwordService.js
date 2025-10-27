@@ -1,8 +1,8 @@
 const crypto = require('crypto');
 const { Op } = require('sequelize')
 const { modelValidation } = require('../../utils/data/data-validation');
-const Usuario = require('../../models/usuario');
-const UserMeta = require('../../models/userMeta');
+const Usuario = require('../../models/Usuario');
+const UserMeta = require('../../models/UserMeta');
 const nodemailer = require('nodemailer');
 
 const sendEmail = async (email) => {

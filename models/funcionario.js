@@ -18,10 +18,14 @@ const Funcionario = connection.define('funcionario', {
         allowNull: false,
         unique: true
     },
-    cargo: {
-        type: Sequelize.STRING,
+    //cargo: {
+    //   type: Sequelize.STRING,
+     //  allowNull: false
+    //},
+    id_cargo: {
+        type: Sequelize.INTEGER,
         allowNull: false
-    }
+    },
 }, {
     tableName: 'funcionario',
     timestamps: true,

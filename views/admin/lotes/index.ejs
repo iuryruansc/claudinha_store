@@ -42,6 +42,7 @@
                                                     <tr>
                                                         <th>Produto</th>
                                                         <th>Preço de Compra</th>
+                                                        <th>Preço de Venda</th>
                                                         <th>Lote</th>
                                                         <th class="text-center">Quantidade</th>
                                                         <th>Localização</th>
@@ -76,7 +77,11 @@
                                                                         : 'Produto não encontrado' %>
                                                                 </td>
                                                                 <td>
-                                                                    <%= lote.preco_produto.toLocaleString('pt-BR', {
+                                                                    <%= lote.preco_compra.toLocaleString('pt-BR', {
+                                                                        style: 'currency' , currency: 'BRL' }) %>
+                                                                </td>
+                                                                <td>
+                                                                    <%= lote.preco_venda.toLocaleString('pt-BR', {
                                                                         style: 'currency' , currency: 'BRL' }) %>
                                                                 </td>
                                                                 <td class="text-center">

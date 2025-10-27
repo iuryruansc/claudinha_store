@@ -1,11 +1,11 @@
 const connection = require('../../database/database');
-const Caixa = require('../../models/caixa');
-const Pdv = require('../../models/pdv');
-const Venda = require('../../models/venda');
-const Cliente = require('../../models/cliente');
-const Pagamento = require('../../models/pagamento');
-const PagamentoParcial = require('../../models/pagamentoParcial');
-const Funcionario = require('../../models/funcionario');
+const Caixa = require('../../models/Caixa');
+const Pdv = require('../../models/Pdv');
+const Venda = require('../../models/Venda');
+const Cliente = require('../../models/Cliente');
+const Pagamento = require('../../models/Pagamento');
+const PagamentoParcial = require('../../models/PagamentoParcial');
+const Funcionario = require('../../models/Funcionario');
 const { modelValidation } = require('../../utils/data/data-validation');
 
 const findCaixaById = async (id) => {

@@ -1,8 +1,8 @@
 const { Op, fn, col } = require('sequelize');
 const connection = require('../../database/database');
-const Desconto = require('../../models/desconto');
-const Produto = require('../../models/produto');
-const Lote = require('../../models/lote');
+const Desconto = require('../../models/Desconto');
+const Produto = require('../../models/Produto');
+const Lote = require('../../models/Lote');
 
 const getPromocoes = async (options = {}) => {
     const hoje = new Date();

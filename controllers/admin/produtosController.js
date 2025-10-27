@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const asyncHandler = require('../../utils/handlers/async-handler');
+const Lote = require('../../models/Lote');
 const { numberValidation, stringValidation } = require('../../utils/data/data-validation');
 const { parseIntValue, parseFloatValue } = require('../../utils/data/data-parsers');
 const { getAllProdutos, getViewDependencies, getProdutosByCategoria, getEditData, createProduto, deleteProduto, updateProduto, getProdutosByFornecedor, getProdutosByMarca } = require('../../services/admin/produtosService');
@@ -12,7 +13,7 @@ router.get('/produtos/new', asyncHandler(async (req, res) => {
 }));
 
 router.get('/produtos', asyncHandler(async (req, res) => {
-    const { produtos, categorias, fornecedores, marcas } = await getAllProdutos();
+    const { produtos, categorias, fornecedores, marcas, quant } = await getAllProdutos();
 
     res.render('admin/produtos/index', {
         produtos,
@@ -21,7 +22,8 @@ router.get('/produtos', asyncHandler(async (req, res) => {
         marcas,
         categoria_nome: null,
         fornecedor_nome: null,
-        marca_nome: null
+        marca_nome: null,
+        quant
     });
 }));
 
@@ -105,6 +107,7 @@ router.post('/produtos/save', asyncHandler(async (req, res) => {
     await createProduto({
         nome,
         preco_compra: preco,
+        preco_venda,
         codigo_barras,
         id_categoria,
         id_fornecedor,

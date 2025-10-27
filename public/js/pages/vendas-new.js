@@ -70,7 +70,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
-            const precoBaseDoProduto = parseFloat(produtoSelecionado.preco_compra || 0);
+            const precoBaseDoProduto = parseFloat(produtoSelecionado.preco_venda || 0);
 
             const fillData = (dataDoLote) => {
                 const priceCell = row.querySelector('.price-cell');

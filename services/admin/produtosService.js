@@ -1,7 +1,8 @@
-const Produto = require('../../models/produto');
-const Category = require('../../models/category');
-const Fornecedor = require('../../models/fornecedor');
-const Marca = require('../../models/marca');
+const Produto = require('../../models/Produto');
+const Category = require('../../models/Category');
+const Fornecedor = require('../../models/Fornecedor');
+const Marca = require('../../models/Marca');
+const Lote = require('../../models/Lote');
 const { modelValidation } = require('../../utils/data/data-validation');
 
 const findProdutoById = async (id) => {
@@ -66,7 +67,16 @@ const getAllProdutos = async () => {
         dependenciesPromise
     ]);
 
-    return { produtos, categorias, fornecedores, marcas };
+   let quant = 0;
+
+    for (const produto of produtos) {
+        const lotes = await Lote.findAll({ where: { id_produto: produto.id_produto }});
+        for (const lote of lotes) {
+            quant += Number(lote.quantidade || 0);
+        }
+    }
+
+    return { produtos, categorias, fornecedores, marcas, quant };
 };
 
 const getEditData = async (id) => {

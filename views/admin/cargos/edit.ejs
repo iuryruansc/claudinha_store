@@ -1,0 +1,53 @@
+<%- include('../../partials/header.ejs') %>
+    <%- include('../../partials/navbar.ejs') %>
+
+        <body>
+            <main class="main-content">
+                <div class="container">
+                    <div id="error-popup-container"></div>
+                    <div class="d-flex justify-content-between align-items-center my-4">
+                        <h2 class="mb-0 h4">
+                            <i class="bi bi-tags-fill me-2"></i>
+                            Editar Cargo
+                        </h2>
+                        <a href="/admin/cargos" class="btn btn-secondary">
+                            <i class="bi bi-arrow-left me-2"></i>Voltar
+                        </a>
+                    </div>
+
+                    <div class="card shadow-sm">
+                        <div class="card-body">
+                            <form id="cargo-form" method="POST" action="/admin/cargos/update/<%= cargo.id_cargo %>">
+                                <div class="mb-3">
+                                    <label for="cargoName" class="form-label">Nome da Cargo</label>
+                                    <input class="form-control" type="text" id="cargoName" name="nome_cargo"
+                                        placeholder="Defina o nome dao cargo" value="<%= cargo.nome_cargo %>" required>
+                                </div>
+                                <input type="hidden" name="id_cargo" value="<%= cargo.id_cargo %>">
+                                <button type="submit" class="btn btn-success" disabled>
+                                    <i class="bi bi-arrow-clockwise me-2"></i>Salvar Alterações
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+            </main>
+
+            <%- include('../../partials/footer.ejs') %>
+
+                <script type="module">
+                    import { setupSingleFieldEdit } from '/js/lib/single-field-edit.js';
+
+                    document.addEventListener('DOMContentLoaded', function () {
+                        setupSingleFieldEdit({
+                            formSelector: '#cargo-form',
+                            inputName: 'nome_cargo',
+                            redirectUrl: '/admin/cargos',
+                            fieldKey: 'nome_cargo'
+                        });
+                    });
+                </script>
+        </body>
+
+        </html>

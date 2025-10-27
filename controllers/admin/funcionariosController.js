@@ -4,9 +4,11 @@ const asyncHandler = require('../../utils/handlers/async-handler');
 const { stringValidation, numberValidation } = require('../../utils/data/data-validation');
 const { parseIntValue } = require('../../utils/data/data-parsers');
 const { getAllFuncionarios, findFuncionarioById, createFuncionario, deleteFuncionario, updateFuncionario } = require('../../services/admin/funcionariosService');
+const { getAllCargos } = require('../../services/admin/cargosService');
 
 router.get('/funcionarios/new', asyncHandler(async (req, res) => {
-    res.render('admin/funcionarios/new', { title: 'Novo Funcionario' });
+    const cargos = await getAllCargos();
+    res.render('admin/funcionarios/new', { cargos });
 }));
 
 router.get('/funcionarios', asyncHandler(async (req, res) => {
@@ -17,20 +19,21 @@ router.get('/funcionarios', asyncHandler(async (req, res) => {
 
 router.get('/funcionarios/edit/:id_funcionario', asyncHandler(async (req, res) => {
     const [parsedId] = parseIntValue(req.params.id_funcionario);
+    const cargos = await getAllCargos();
 
     numberValidation(parsedId);
 
     const funcionario = await findFuncionarioById(parsedId);
 
-    res.render('admin/funcionarios/edit', { funcionario })
+    res.render('admin/funcionarios/edit', { funcionario, cargos })
 }));
 
 router.post('/funcionarios/save', asyncHandler(async (req, res) => {
-    const { nome, cpf } = req.body;
+    const { nome, cpf, id_cargo } = req.body;
 
     stringValidation(nome, cpf);
 
-    await createFuncionario({ nome, cpf, cargo: 'funcionario' });
+    await createFuncionario({ nome, cpf, id_cargo });
 
     res.status(200).json({
         message: 'Funcionario registrado com sucesso!',

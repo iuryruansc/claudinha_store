@@ -22,7 +22,7 @@ router.get('/dashboard/entrada/iniciar', asyncHandler(async (req, res) => {
 
     const produto = await getProdutoByCodigoBarras(codigo_barras);
 
-    res.json({ id_produto: produto.id_produto, nome: produto.nome, preco: produto.preco_compra });
+    res.json({ id_produto: produto.id_produto, nome: produto.nome, preco_compra: produto.preco_compra, preco_venda: produto.preco_venda });
 }));
 
 module.exports = router;

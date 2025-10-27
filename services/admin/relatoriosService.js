@@ -1,9 +1,9 @@
 const { Op } = require('sequelize');
-const Venda = require('../../models/venda');
-const Funcionario = require('../../models/funcionario')
-const Cliente = require('../../models/cliente');
-const ItemVenda = require('../../models/itemVenda');
-const Produto = require('../../models/produto');
+const Venda = require('../../models/Venda');
+const Funcionario = require('../../models/Funcionario')
+const Cliente = require('../../models/Cliente');
+const ItemVenda = require('../../models/ItemVenda');
+const Produto = require('../../models/Produto');
 
 const getRelatorioVendas = async (options = {}) => {
     const whereClause = {};

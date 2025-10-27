@@ -1,4 +1,4 @@
-const Fornecedor = require('../../models/fornecedor');
+const Fornecedor = require('../../models/Fornecedor');
 const { modelValidation } = require('../../utils/data/data-validation');
 
 const findFornecedorById = async (id) => {

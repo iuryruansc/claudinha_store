@@ -31,6 +31,21 @@
                                     <label for="func-cpf-input">CPF</label>
                                 </div>
 
+                                <div class="col-md-4">
+                                        <div class="form-floating">
+                                            <select name="id_cargo" class="form-select" id="cargo-select"
+                                                required>
+                                                <option value="" selected disabled>Selecione...</option>
+                                                <% cargos.forEach(cargo=> { %>
+                                                    <option value="<%= cargo.id_cargo %>">
+                                                        <%= cargo.nome_cargo %>
+                                                    </option>
+                                                <% }) %>
+                                            </select>
+                                        <label for="cargo-select">Cargo</label>
+                                    </div>
+                                </div>
+
                                 <div class="d-flex justify-content-between mt-4">
                                     <button type="submit" class="btn btn-success">
                                         <i class="bi bi-check-circle me-2"></i>Cadastrar

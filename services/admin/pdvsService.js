@@ -1,4 +1,4 @@
-const Pdv = require('../../models/pdv');
+const Pdv = require('../../models/Pdv');
 const { modelValidation } = require('../../utils/data/data-validation');
 
 const findPdvById = async (id) => {

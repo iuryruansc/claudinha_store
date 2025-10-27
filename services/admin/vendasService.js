@@ -1,16 +1,16 @@
 const connection = require('../../database/database');
 const { Op } = require('sequelize');
-const Venda = require('../../models/venda');
-const Funcionario = require('../../models/funcionario')
-const Cliente = require('../../models/cliente');
-const ItemVenda = require('../../models/itemVenda');
-const Lote = require('../../models/lote');
-const Desconto = require('../../models/desconto');
-const Produto = require('../../models/produto');
-const Pagamento = require('../../models/pagamento');
-const PagamentoParcial = require('../../models/pagamentoParcial');
-const ParcelaPagamento = require('../../models/parcelaPagamento');
-const MovimentacaoEstoque = require('../../models/movimentacaoEstoque');
+const Venda = require('../../models/Venda');
+const Funcionario = require('../../models/Funcionario')
+const Cliente = require('../../models/Cliente');
+const ItemVenda = require('../../models/ItemVenda');
+const Lote = require('../../models/Lote');
+const Desconto = require('../../models/Desconto');
+const Produto = require('../../models/Produto');
+const Pagamento = require('../../models/Pagamento');
+const PagamentoParcial = require('../../models/PagamentoParcial');
+const ParcelaPagamento = require('../../models/ParcelaPagamento');
+const MovimentacaoEstoque = require('../../models/MovimentacaoEstoque');
 const { modelValidation } = require('../../utils/data/data-validation');
 
 const findVendaById = async (id) => {
@@ -98,7 +98,7 @@ const findLoteParaVenda = async (id_produto) => {
         return null;
     }
 
-    const precoOriginal = parseFloat(lote.preco_produto) || 0;
+    const precoOriginal = parseFloat(lote.preco_venda) || 0;
     let precoFinal = precoOriginal;
     let descontoAplicado = null;
 
@@ -169,7 +169,7 @@ const createVenda = async (vendaData, id_funcionario, id_caixa) => {
                     throw new Error(`Estoque insuficiente para ${produto.nome}`);
                 }
 
-                const precoOriginal = parseFloat(lote.preco_produto);
+                const precoOriginal = parseFloat(lote.preco_venda);
                 let precoUnitarioCorreto = precoOriginal;
                 const descontoAtivo = lote.descontos?.find(d =>
                     d.ativo && new Date(d.data_inicio) <= new Date() && new Date(d.data_fim) >= new Date()
