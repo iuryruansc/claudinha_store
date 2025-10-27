@@ -28,7 +28,7 @@ router.get('/vendas/detalhes/:id', asyncHandler(async (req, res) => {
     res.render('admin/vendas/detalhes', { venda, totalPago, saldo });
 }));
 
-router.use(requireCaixa);
+//router.use(requireCaixa);
 
 router.get('/vendas/new', asyncHandler(async (req, res) => {
     const { clientes, produtos } = await vendaService.getViewDependencies();

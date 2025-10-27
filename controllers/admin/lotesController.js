@@ -31,7 +31,7 @@ router.post('/lotes/save', asyncHandler(async (req, res) => {
     const id_funcionario = req.session.userId;
 
     numberValidation(parsedId, parsedQuant, parsedPrecoCompra,parsedPrecoVenda);
-    stringValidation(localizacao, numero_lote);
+    stringValidation(numero_lote);
     dateValidation(parsedValidade);
 
     console.log(parsedPrecoVenda);

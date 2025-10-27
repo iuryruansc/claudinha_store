@@ -35,7 +35,7 @@ const Lote = connection.define('lote', {
     },
     localizacao: {
         type: Sequelize.STRING,
-        allowNull: false
+        allowNull: true
     }
 }, {
     tableName: 'lote',
