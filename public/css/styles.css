@@ -52,16 +52,20 @@ body[data-sidebar-collapsed="true"] .main-content {
   flex: 1;
   overflow-y: auto;
 }
+
 #adminSidebar .accordion-button {
   box-shadow: none;
 }
+
 #adminSidebar .accordion-body {
   padding: 0;
   margin-left: 15px;
 }
+
 #adminSidebar .accordion-button::after {
   display: none;
 }
+
 #adminSidebar .bi {
   font-size: 1.15rem;
 }
@@ -88,7 +92,7 @@ body[data-sidebar-collapsed="true"] .main-content {
   display: none !important;
 }
 #adminSidebar[data-collapsed="true"] .accordion-button {
-  pointer-events: none;
+  pointer-events: auto;
 }
 
 #adminSidebar .btn.active,
@@ -103,6 +107,20 @@ body[data-sidebar-collapsed="true"] .main-content {
 
 #adminSidebar .overflow-auto {
   overflow: auto;
+}
+
+#sidebarFlyout {
+  position: fixed;
+  background-color: #212529;
+  color: white;
+  padding: 1rem;
+  border-left: 1px solid #444;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+  z-index: 1050;
+  width: 250px;
+  max-height: 80vh;
+  overflow-y: auto;
+  display: none;
 }
 
 /* Forms, cards e containers */
