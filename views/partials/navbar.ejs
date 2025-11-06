@@ -1,4 +1,5 @@
-<nav id="adminSidebar" class="d-flex flex-column bg-dark text-white vh-100 p-3 position-fixed" data-collapsed="false" data-init="true">
+<nav id="adminSidebar" class="d-flex flex-column bg-dark text-white vh-100 p-3 position-fixed" data-collapsed="false"
+    data-init="true">
     <% function renderSidebar(items, accordionId='sidebarAccordion' , level=0) { let html='' ; items.forEach((item,
         idx)=> {
         const id = `${accordionId}-${idx}`;
@@ -32,7 +33,7 @@
                 </button>
             </h2>
             <div id="${collapseId}" class="accordion-collapse collapse ${showClass}" data-bs-parent="#${accordionId}"
-                aria-labelledby="${headingId}" >
+                aria-labelledby="${headingId}">
                 <div class="accordion-body ps-${level * 3}">
                     <div class="accordion accordion-flush bg-dark" id="${childAcc}">
                         ${renderSidebar(item.dropdown, childAcc, level + 1)}
@@ -54,16 +55,18 @@
         }
         %>
 
-        <button id="sidebarToggle" class="btn btn-sm btn-outline-light me-2" type="button"
-            aria-label="Alternar barra lateral">
-            <i class="bi bi-chevron-left"></i>
-        </button>
-
         <div class="d-flex align-items-center justify-content-between mb-3">
-            <a href="/admin/dashboard" class="navbar-brand text-white">
-                <i class="bi bi-shop ms-3 me-2"></i>
-                <span class="brand-label">Claudinha Store</span>
-            </a>
+            <div class="d-flex align-items-center">
+                <button id="sidebarToggle" class="btn btn-sm btn-outline-light me-2" type="button"
+                    aria-label="Alternar barra lateral">
+                    <i class="bi bi-chevron-left"></i>
+                </button>
+
+                <a href="/admin/dashboard" class="navbar-brand text-white d-flex align-items-center">
+                    <i class="bi bi-shop ms-3 me-2"></i>
+                    <span class="brand-label">Claudinha Store</span>
+                </a>
+            </div>
         </div>
 
         <div class="flex-grow-1 overflow-auto">

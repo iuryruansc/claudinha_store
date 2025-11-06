@@ -141,6 +141,7 @@ const getLowStockLotes = async () => {
     const lotesGeral = await Lote.findAll({
         attributes: [
             'id_produto',
+            'numero_lote',
             [connection.fn('SUM', connection.col('quantidade')), 'quantidade_total']
         ],
         where: {
@@ -153,7 +154,7 @@ const getLowStockLotes = async () => {
             as: 'produto',
             required: true
         }],
-        group: ['id_produto', 'produto.id_produto', 'produto.nome'],
+        group: ['id_produto', 'numero_lote', 'produto.id_produto', 'produto.nome'],
         having: connection.where(
             connection.fn('SUM', connection.col('quantidade')),
             {
@@ -176,7 +177,8 @@ const getLowStockLotes = async () => {
             id_produto: lote.id_produto,
             produto: lote.produto,
             quantidade_total: qtd,
-            statusEstoque: statusEstoque
+            statusEstoque: statusEstoque,
+            numero_lote: lote.numero_lote
         };
     });
 
@@ -192,6 +194,7 @@ const getLotesProximosVencimento = async () => {
         attributes: [
             'id_produto',
             'data_validade',
+            'numero_lote',
             [connection.fn('SUM', connection.col('quantidade')), 'quantidade_total']
         ],
         where: {
@@ -205,11 +208,12 @@ const getLotesProximosVencimento = async () => {
             as: 'produto',
             required: true
         }],
-        group: ['id_produto', 'data_validade', 'produto.id_produto', 'produto.nome'],
+        group: ['id_produto', 'data_validade', 'numero_lote', 'produto.id_produto', 'produto.nome'],
         order: [['data_validade', 'ASC']]
     });
 
     const lotesProximosVencimento = lotesGeral.map(lote => {
+
         const dataValidade = new Date(lote.data_validade);
         const qtd = parseInt(lote.get('quantidade_total'));
         const diasParaVencer = Math.ceil((dataValidade - hoje) / (1000 * 60 * 60 * 24));
@@ -227,7 +231,8 @@ const getLotesProximosVencimento = async () => {
             quantidade_total: qtd,
             data_validade: lote.data_validade,
             diasParaVencer: diasParaVencer,
-            statusEstoque: statusEstoque
+            statusEstoque: statusEstoque,
+            numero_lote: lote.numero_lote
         };
     });
 

@@ -10,16 +10,31 @@
 
 <script>
     (function () {
+        document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(el => {
+            new bootstrap.Tooltip(el);
+        });
+
         const sidebar = document.getElementById('adminSidebar');
         const toggle = document.getElementById('sidebarToggle');
-        if (!sidebar || !toggle) return;
+        const icon = toggle?.querySelector('i');
 
-        const saved = localStorage.getItem('sidebarCollapsed') === 'true';
-        sidebar.setAttribute('data-collapsed', saved ? 'true' : 'false');
-        const icon = toggle.querySelector('i');
-        if (saved) {
-            icon.classList.remove('bi-chevron-left');
-            icon.classList.add('bi-chevron-right');
+        if (!sidebar || !toggle || !icon) return;
+
+        const collapsed = localStorage.getItem('sidebarCollapsed') === 'true';
+
+        sidebar.setAttribute('data-collapsed', collapsed ? 'true' : 'false');
+        document.body.setAttribute('data-sidebar-collapsed', collapsed ? 'true' : 'false');
+
+        icon.classList.remove('bi-chevron-left', 'bi-chevron-right');
+        icon.classList.add(collapsed ? 'bi-chevron-right' : 'bi-chevron-left');
+
+        if (collapsed) {
+            document.querySelectorAll('#sidebarAccordion .accordion-collapse.show').forEach(c => {
+                try {
+                    const inst = bootstrap.Collapse.getInstance(c) || new bootstrap.Collapse(c, { toggle: false });
+                    inst.hide();
+                } catch (e) { }
+            });
         }
 
         setTimeout(() => {
@@ -27,17 +42,17 @@
         }, 50);
 
         toggle.addEventListener('click', () => {
-            const collapsed = sidebar.getAttribute('data-collapsed') === 'true';
-            const next = !collapsed;
+            const isCollapsed = sidebar.getAttribute('data-collapsed') === 'true';
+            const nextState = !isCollapsed;
 
-            sidebar.setAttribute('data-collapsed', next ? 'true' : 'false');
-            document.body.setAttribute('data-sidebar-collapsed', next ? 'true' : 'false');
-            localStorage.setItem('sidebarCollapsed', next ? 'true' : 'false');
+            sidebar.setAttribute('data-collapsed', nextState ? 'true' : 'false');
+            document.body.setAttribute('data-sidebar-collapsed', nextState ? 'true' : 'false');
+            localStorage.setItem('sidebarCollapsed', nextState ? 'true' : 'false');
 
             icon.classList.toggle('bi-chevron-left');
             icon.classList.toggle('bi-chevron-right');
 
-            if (next) {
+            if (nextState) {
                 document.querySelectorAll('#sidebarAccordion .accordion-collapse.show').forEach(c => {
                     try {
                         const inst = bootstrap.Collapse.getInstance(c) || new bootstrap.Collapse(c, { toggle: false });

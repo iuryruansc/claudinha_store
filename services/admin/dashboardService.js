@@ -118,8 +118,6 @@ const getResumoPendencias = async () => {
 const getDashboardData = async (userId) => {
     const [
         atividades,
-        lotesBaixoEstoque,
-        lotesProximosVencimento,
         ultimasVendas,
         pdvs,
         promoList,
@@ -128,8 +126,6 @@ const getDashboardData = async (userId) => {
         lotesParaModal
     ] = await Promise.all([
         getFeed(),
-        getLowStockLotes(),
-        getLotesProximosVencimento(),
         getUltimasVendasStatus(5),
         getPdvsAtivos(),
         getPromocoes({ omitSemLote: true }),
@@ -179,8 +175,6 @@ const getDashboardData = async (userId) => {
 
     return {
         atividades,
-        lotesBaixoEstoque,
-        lotesProximosVencimento,
         ultimasVendas,
         pdvs,
         promoList,
