@@ -4,7 +4,8 @@ const asyncHandler = require('../../utils/handlers/async-handler');
 const { numberValidation } = require('../../utils/data/data-validation');
 const { parseIntValue, parseFloatValue } = require('../../utils/data/data-parsers');
 const formatDate = require('../../utils/data/date-formatter');
-const {  getAllCaixas, deleteCaixa, findCaixaById, openCaixa, closeCaixa, findCaixaDetailsById } = require('../../services/admin/caixasService');
+const { getAllCaixas, deleteCaixa, findCaixaById, openCaixa, closeCaixa, findCaixaDetailsById } = require('../../services/admin/caixasService');
+const { parse } = require('dotenv');
 
 router.get('/caixas', asyncHandler(async (req, res) => {
     const { caixas } = await getAllCaixas();
@@ -32,9 +33,16 @@ router.post('/caixas/delete/:id_caixa', asyncHandler(async (req, res) => {
 
 router.post('/caixa/abrir', asyncHandler(async (req, res) => {
     const [parsedIdPdv] = parseIntValue(req.body.id_pdv);
-    const [parsedSaldoInicial] = parseFloatValue(req.body.saldo_inicial);
+    let saldo_inicial = req.body.saldo_inicial;
+    let parsedSaldoInicial = 0;
+    if (saldo_inicial == null || saldo_inicial === '') {
+        parsedSaldoInicial = 0;
+    } else {
+        const [parsedSaldoInicial] = parseFloatValue(saldo_inicial);
+        numberValidation(parsedSaldoInicial);
+    }
 
-    numberValidation(parsedIdPdv, parsedSaldoInicial);
+    numberValidation(parsedIdPdv);
 
     const caixa = await openCaixa({
         id_pdv: parsedIdPdv,

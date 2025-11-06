@@ -8,8 +8,9 @@ const Cargos = require('../../models/Cargo');
 router.post('/register', asyncHandler(async (req, res) => {
     const { nome, email, senha, confirmarSenha } = req.body;
     const funcionario = await Funcionario.findOne({ where: { nome } });
+    id_cargo = funcionario.id_cargo;
     const cargo = await Cargos.findOne({ where: { id_cargo } });
-    
+
     if (!nome || !email || !senha || !confirmarSenha) {
         return res.status(400).json({
             error: {

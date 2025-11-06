@@ -9,12 +9,67 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
+    (function () {
+        const sidebar = document.getElementById('adminSidebar');
+        const toggle = document.getElementById('sidebarToggle');
+        if (!sidebar || !toggle) return;
+
+        const saved = localStorage.getItem('sidebarCollapsed') === 'true';
+        sidebar.setAttribute('data-collapsed', saved ? 'true' : 'false');
+        const icon = toggle.querySelector('i');
+        if (saved) {
+            icon.classList.remove('bi-chevron-left');
+            icon.classList.add('bi-chevron-right');
+        }
+
+        setTimeout(() => {
+            sidebar.removeAttribute('data-init');
+        }, 50);
+
+        toggle.addEventListener('click', () => {
+            const collapsed = sidebar.getAttribute('data-collapsed') === 'true';
+            const next = !collapsed;
+
+            sidebar.setAttribute('data-collapsed', next ? 'true' : 'false');
+            document.body.setAttribute('data-sidebar-collapsed', next ? 'true' : 'false');
+            localStorage.setItem('sidebarCollapsed', next ? 'true' : 'false');
+
+            icon.classList.toggle('bi-chevron-left');
+            icon.classList.toggle('bi-chevron-right');
+
+            if (next) {
+                document.querySelectorAll('#sidebarAccordion .accordion-collapse.show').forEach(c => {
+                    try {
+                        const inst = bootstrap.Collapse.getInstance(c) || new bootstrap.Collapse(c, { toggle: false });
+                        inst.hide();
+                    } catch (e) { }
+                });
+            }
+        });
+    })();
+
+    const saved = localStorage.getItem('sidebarCollapsed') === 'true';
+    document.body.setAttribute('data-sidebar-collapsed', saved ? 'true' : 'false');
+</script>
+
+<script>
     $(document).ready(function () {
         let actionsColumnIndex = -1;
+        let colunasPrecoIndexes = [];
+        let codigoBarrasIndex = -1;
         $('#table-data thead th').each(function (index) {
-            if ($(this).text().trim().includes('Ações')) {
+            let headerText = $(this).text().trim();
+
+            if (headerText.includes('Ações')) {
                 actionsColumnIndex = index;
-                return false;
+            }
+
+            if (headerText.includes('Preço de Compra') || headerText.includes('Preço de Venda')) {
+                colunasPrecoIndexes.push(index);
+            }
+
+            if (headerText.includes('Código de Barras')) {
+                codigoBarrasIndex = index;
             }
         });
 
@@ -24,10 +79,22 @@
             },
             pageLength: 10,
             order: [],
+            autoWidth: false,
+            scrollX: true,
             columnDefs: [
                 {
                     orderable: false,
                     targets: actionsColumnIndex
+                },
+                {
+                    width: '120px',
+                    targets: colunasPrecoIndexes,
+                    className: 'text-nowrap'
+                },
+                {
+                    width: '170px',
+                    targets: codigoBarrasIndex,
+                    className: 'text-nowrap'
                 }
             ]
         });

@@ -67,16 +67,16 @@ const getAllProdutos = async () => {
         dependenciesPromise
     ]);
 
-   let quant = 0;
-
     for (const produto of produtos) {
-        const lotes = await Lote.findAll({ where: { id_produto: produto.id_produto }});
+        let quant = 0
+        const lotes = await Lote.findAll({ where: { id_produto: produto.id_produto } });
         for (const lote of lotes) {
             quant += Number(lote.quantidade || 0);
         }
+        produto.setDataValue('quantidade_estoque', quant);
     }
 
-    return { produtos, categorias, fornecedores, marcas, quant };
+    return { produtos, categorias, fornecedores, marcas};
 };
 
 const getEditData = async (id) => {

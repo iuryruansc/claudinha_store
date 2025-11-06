@@ -39,24 +39,139 @@ document.addEventListener('DOMContentLoaded', () => {
         addProductRow(produto, lote) {
             const row = document.createElement('tr');
             row.classList.add('item-row');
-            let options = produtos.map(p => `<option value="${p.id_produto}">${p.nome}</option>`).join('');
 
             row.innerHTML = `
-                <td><select name="itens[${AppState.itemIndex}][id_produto]" class="form-select produto-select"><option value="">Selecione...</option>${options}</select></td>
-                <td><input type="number" name="itens[${AppState.itemIndex}][quantidade]" class="form-control quantidade-input" value="1" min="1"></td>
-                <td class="price-cell">R$ 0,00</td>
-                <td class="text-end"><i class="bi bi-trash icon-action remove-item-btn" title="Remover Item" style="cursor: pointer;"></i></td>
-                <input type="hidden" name="itens[${AppState.itemIndex}][id_lote]" class="lote-id"><input type="hidden" name="itens[${AppState.itemIndex}][preco]" class="preco-item">
-            `;
+        <td>
+            <div class="produto-search-wrapper position-relative autocomplete-fix">
+                <input type="text" 
+                       class="form-control produto-search" 
+                       placeholder="Digite para buscar produto..."
+                       autocomplete="off">
+                <div class="produto-search-results position-absolute w-100 d-none" 
+                     style="max-height: 200px; overflow-y: auto; z-index: 1000;">
+                </div>
+                <input type="hidden" 
+                       name="itens[${AppState.itemIndex}][id_produto]" 
+                       class="produto-id-input">
+            </div>
+        </td>
+        <td>
+            <input type="number" 
+                   name="itens[${AppState.itemIndex}][quantidade]" 
+                   class="form-control quantidade-input" 
+                   value="1" min="1">
+        </td>
+        <td class="price-cell">R$ 0,00</td>
+        <td class="text-end">
+            <i class="bi bi-trash icon-action remove-item-btn" 
+               title="Remover Item" 
+               style="cursor: pointer;">
+            </i>
+        </td>
+        <input type="hidden" 
+               name="itens[${AppState.itemIndex}][id_lote]" 
+               class="lote-id">
+        <input type="hidden" 
+               name="itens[${AppState.itemIndex}][preco]" 
+               class="preco-item">
+    `;
+
             AppState.elementos.itemsContainer.appendChild(row);
+            this.setupProdutoSearch(row);
 
             if (produto && lote) {
-                const sel = row.querySelector('.produto-select');
-                sel.value = produto.id_produto;
+                const searchInput = row.querySelector('.produto-search');
+                const idInput = row.querySelector('.produto-id-input');
+                searchInput.value = produto.nome;
+                idInput.value = produto.id_produto;
                 this.fetchAndFillLote(row, produto.id_produto, lote);
             }
+
             AppState.itemIndex++;
             UIManager.updateAll();
+        },
+
+        setupProdutoSearch(row) {
+            const searchInput = row.querySelector('.produto-search');
+            const idInput = row.querySelector('.produto-id-input');
+
+            const portal = document.createElement('div');
+            portal.className = 'produto-search-portal';
+            portal.style.position = 'absolute';
+            portal.style.zIndex = '9999';
+            portal.style.display = 'none';
+            document.body.appendChild(portal);
+
+            function openPortal(html) {
+                portal.innerHTML = html;
+                portal.style.display = 'block';
+                positionPortal();
+            }
+
+            function closePortal() {
+                portal.style.display = 'none';
+            }
+
+            function positionPortal() {
+                const rect = searchInput.getBoundingClientRect();
+                portal.style.width = rect.width + 'px';
+                portal.style.left = rect.left + window.scrollX + 'px';
+                portal.style.top = rect.bottom + window.scrollY + 'px';
+                portal.style.maxHeight = '300px';
+                portal.style.overflowY = 'auto';
+                portal.style.background = '#fff';
+                portal.style.boxShadow = '0 6px 18px rgba(0,0,0,0.12)';
+                portal.style.border = '1px solid #dee2e6';
+                portal.style.borderRadius = '4px';
+            }
+
+            let debounceTimer;
+
+            searchInput.addEventListener('input', () => {
+                clearTimeout(debounceTimer);
+                debounceTimer = setTimeout(() => {
+                    const searchTerm = searchInput.value.toLowerCase().trim();
+                    if (searchTerm.length < 2) { closePortal(); return; }
+
+                    const matches = produtos.filter(p =>
+                        p.nome.toLowerCase().includes(searchTerm) ||
+                        (p.codigo_barras && p.codigo_barras.includes(searchTerm))
+                    ).slice(0, 10);
+
+                    if (matches.length) {
+                        const html = matches.map(p => `
+          <div class="p-2 border-bottom search-result" data-id="${p.id_produto}" style="cursor:pointer;">
+            <div class="fw-bold">${p.nome}</div>
+            <small class="text-muted">Código: ${p.codigo_barras || 'N/A'}</small>
+          </div>
+        `).join('');
+                        openPortal(html);
+                    } else {
+                        openPortal('<div class="p-2 text-muted">Nenhum produto encontrado</div>');
+                    }
+                }, 300);
+            });
+
+            // Clique fora fecha o portal
+            document.addEventListener('click', (e) => {
+                if (e.target === searchInput) return;
+                if (!portal.contains(e.target)) closePortal();
+            });
+
+            // Seleção de item no portal
+            portal.addEventListener('click', (e) => {
+                const resultEl = e.target.closest('.search-result');
+                if (!resultEl) return;
+                const id = resultEl.dataset.id;
+                const produto = produtos.find(p => p.id_produto == id);
+                searchInput.value = produto.nome;
+                idInput.value = id;
+                closePortal();
+                this.fetchAndFillLote(row, id);
+            });
+
+            window.addEventListener('scroll', positionPortal, true);
+            window.addEventListener('resize', positionPortal);
         },
 
         fetchAndFillLote(row, id_produto, preFetchedLote = null) {

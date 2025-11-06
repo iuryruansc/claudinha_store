@@ -36,7 +36,19 @@
                                                 <input id="produto-preco-input" class="form-control" type="number"
                                                     step="0.01" name="preco_compra" placeholder="Preço do produto"
                                                     value="<%= produto.preco_compra %>" required>
-                                                <label for="produto-preco-input">Preço do produto</label>
+                                                <label for="produto-preco-input">Preço de Compra</label>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-3">
+                                        <div class="input-group">
+                                            <span class="input-group-text"><i class="bi bi-tag"></i></span>
+                                            <div class="form-floating">
+                                                <input id="produto-preco-venda-input" class="form-control" type="number"
+                                                    step="0.01" name="preco_venda" placeholder="Preço de venda"
+                                                    value="<%= produto.preco_venda %>" required>
+                                                <label for="produto-preco-venda-input">Preço de venda</label>
                                             </div>
                                         </div>
                                     </div>
@@ -57,10 +69,11 @@
                                                 class="form-select" required>
                                                 <% categorias.forEach(categoria=> { %>
                                                     <option value="<%= categoria.id_categoria %>"
-                                                        <%=categoria.id_categoria==produto.id_categoria ? 'selected' : '' %>>
+                                                        <%=categoria.id_categoria==produto.id_categoria ? 'selected'
+                                                        : '' %>>
                                                         <%= categoria.nome %>
                                                     </option>
-                                                <% }) %>
+                                                    <% }) %>
                                             </select>
                                             <label for="produto-categoria-select">Categoria</label>
                                         </div>
@@ -120,6 +133,7 @@
                             inputFields: [
                                 '#produto-name-input',
                                 '#produto-preco-input',
+                                '#produto-preco-venda-input',
                                 '#produto-code-input',
                             ],
                             selectFields: [
@@ -127,10 +141,11 @@
                                 '#produto-fornecedor-select',
                                 '#produto-marca-select'
                             ],
-                            requiredFields: ['nome', 'preco', 'codigo_barras', 'id_categoria', 'id_fornecedor', 'id_marca'],
+                            requiredFields: ['nome', 'preco_compra', 'preco_venda', 'codigo_barras', 'id_categoria', 'id_fornecedor', 'id_marca'],
                             fieldMap: {
                                 nome: '#produto-name-input',
-                                preco: '#produto-preco-input',
+                                preco_compra: '#produto-preco-input',
+                                preco_venda: '#produto-preco-venda-input',
                                 codigo_barras: '#produto-code-input',
                                 id_categoria: '#produto-categoria-select',
                                 id_fornecedor: '#produto-fornecedor-select',

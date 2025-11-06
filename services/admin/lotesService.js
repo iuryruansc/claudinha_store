@@ -28,11 +28,22 @@ const getAllLotes = async () => {
         ]
     });
 
+    const totaisPorProdutoId = {};
+
+    for (const lote of lotesGeral) {
+        const produtoId = lote.id_produto;
+
+        if (!totaisPorProdutoId[produtoId]) {
+            totaisPorProdutoId[produtoId] = 0;
+        }
+        
+        totaisPorProdutoId[produtoId] += lote.quantidade;
+    }
+
     const hoje = new Date();
     const lotes = lotesGeral.map(lote => {
         const dataValidade = new Date(lote.data_validade);
         const diffDias = Math.ceil((dataValidade - hoje) / (1000 * 60 * 60 * 24));
-        const qtd = lote.quantidade;
 
         let statusValidade = 'ok';
         if (diffDias < 0) {
@@ -43,12 +54,14 @@ const getAllLotes = async () => {
             statusValidade = 'atencao';
         }
 
+        const qtdTotalProduto = totaisPorProdutoId[lote.produtoId];
+
         let statusQuantidade = 'ok';
-        if (qtd === 0) {
+        if (qtdTotalProduto === 0) {
             statusQuantidade = 'zerado';
-        } else if (qtd <= 5) {
+        } else if (qtdTotalProduto <= 5) { 
             statusQuantidade = 'critico';
-        } else if (qtd <= 10) {
+        } else if (qtdTotalProduto <= 10) {
             statusQuantidade = 'baixo';
         }
 
@@ -126,10 +139,13 @@ const getLowStockLotes = async () => {
     const limiteBaixoEstoque = 10;
 
     const lotesGeral = await Lote.findAll({
+        attributes: [
+            'id_produto',
+            [connection.fn('SUM', connection.col('quantidade')), 'quantidade_total']
+        ],
         where: {
             quantidade: {
-                [Op.gt]: 0,
-                [Op.lte]: limiteBaixoEstoque
+                [Op.gt]: 0
             }
         },
         include: [{
@@ -137,17 +153,17 @@ const getLowStockLotes = async () => {
             as: 'produto',
             required: true
         }],
-        order: [['quantidade', 'ASC']]
+        group: ['id_produto', 'produto.id_produto', 'produto.nome'],
+        having: connection.where(
+            connection.fn('SUM', connection.col('quantidade')),
+            {
+                [Op.lte]: limiteBaixoEstoque
+            }
+        )
     });
 
     const lotesBaixoEstoque = lotesGeral.map(lote => {
-        const hoje = new Date();
-        const dataValidade = lote.data_validade ? new Date(lote.data_validade) : null;
-        const qtd = lote.quantidade;
-
-        const diasParaVencer = (dataValidade && dataValidade > hoje)
-            ? Math.ceil((dataValidade - hoje) / (1000 * 60 * 60 * 24))
-            : null;
+        const qtd = parseInt(lote.get('quantidade_total'));
 
         let statusEstoque = 'saudavel';
         if (qtd <= 5) {
@@ -157,8 +173,9 @@ const getLowStockLotes = async () => {
         }
 
         return {
-            ...lote.get({ plain: true }),
-            diasParaVencer: (diasParaVencer !== null && diasParaVencer <= 30) ? diasParaVencer : null,
+            id_produto: lote.id_produto,
+            produto: lote.produto,
+            quantidade_total: qtd,
             statusEstoque: statusEstoque
         };
     });
@@ -172,6 +189,11 @@ const getLotesProximosVencimento = async () => {
     dataLimite.setDate(hoje.getDate() + 30);
 
     const lotesGeral = await Lote.findAll({
+        attributes: [
+            'id_produto',
+            'data_validade',
+            [connection.fn('SUM', connection.col('quantidade')), 'quantidade_total']
+        ],
         where: {
             quantidade: { [Op.gt]: 0 },
             data_validade: {
@@ -183,13 +205,13 @@ const getLotesProximosVencimento = async () => {
             as: 'produto',
             required: true
         }],
+        group: ['id_produto', 'data_validade', 'produto.id_produto', 'produto.nome'],
         order: [['data_validade', 'ASC']]
     });
 
     const lotesProximosVencimento = lotesGeral.map(lote => {
         const dataValidade = new Date(lote.data_validade);
-        const qtd = lote.quantidade;
-
+        const qtd = parseInt(lote.get('quantidade_total'));
         const diasParaVencer = Math.ceil((dataValidade - hoje) / (1000 * 60 * 60 * 24));
 
         let statusEstoque = 'saudavel';
@@ -200,7 +222,10 @@ const getLotesProximosVencimento = async () => {
         }
 
         return {
-            ...lote.get({ plain: true }),
+            id_produto: lote.id_produto,
+            produto: lote.produto,
+            quantidade_total: qtd,
+            data_validade: lote.data_validade,
             diasParaVencer: diasParaVencer,
             statusEstoque: statusEstoque
         };

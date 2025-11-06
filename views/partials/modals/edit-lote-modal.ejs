@@ -17,6 +17,23 @@
                         <label for="edit-numero-lote">Número do Lote</label>
                     </div>
 
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3 form-floating">
+                                <input class="form-control" type="number" step="0.01" name="preco_compra"
+                                    id="edit-preco-compra" placeholder="Preço de Compra" required>
+                                <label for="edit-preco-compra">Preço de Compra</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3 form-floating">
+                                <input class="form-control" type="number" step="0.01" name="preco_venda"
+                                    id="edit-preco-venda" placeholder="Preço de Venda" required>
+                                <label for="edit-preco-venda">Preço de Venda</label>
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="mb-3 form-floating">
                         <input class="form-control" type="number" name="quantidade" id="edit-quantidade"
                             placeholder="Quantidade" required>
@@ -30,9 +47,9 @@
                     </div>
 
                     <div class="mb-3 form-floating">
-                        <input class="form-control" type="date" name="data_validade" id="edit-data-validade"
+                        <input class="form-control" type="month" name="data_validade" id="edit-data-validade"
                             placeholder="Data de validade">
-                        <label for="edit-data-validade">Data de Validade</label>
+                        <label for="edit-data-validade">Validade</label>
                     </div>
                 </div>
                 <div class="modal-footer">

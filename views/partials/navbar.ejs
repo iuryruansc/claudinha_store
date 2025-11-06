@@ -1,71 +1,81 @@
-<nav id="adminSidebar" class="d-flex flex-column bg-dark text-white vh-100 p-3 position-fixed" style="width: 250px;">
-        <% function renderSidebar(items, accordionId='sidebarAccordion' , level=0) { let html='' ; items.forEach((item,
-            idx)=> {
-            const id = `${accordionId}-${idx}`;
-            const headingId = `heading-${id}`;
-            const collapseId = `collapse-${id}`;
-            const childAcc = `accordion-${id}`;
+<nav id="adminSidebar" class="d-flex flex-column bg-dark text-white vh-100 p-3 position-fixed" data-collapsed="false" data-init="true">
+    <% function renderSidebar(items, accordionId='sidebarAccordion' , level=0) { let html='' ; items.forEach((item,
+        idx)=> {
+        const id = `${accordionId}-${idx}`;
+        const headingId = `heading-${id}`;
+        const collapseId = `collapse-${id}`;
+        const childAcc = `accordion-${id}`;
 
-            const isItemActive = item.href && currentPath === item.href;
-            const isChildActive = item.dropdown && item.dropdown.some(sub => {
-            return sub.href
-            ? currentPath.startsWith(sub.href)
-            : sub.dropdown && sub.dropdown.some(subsub => currentPath.startsWith(subsub.href));
-            });
-            const isActive = isItemActive || isChildActive;
+        const isItemActive = item.href && currentPath === item.href;
+        const isChildActive = item.dropdown && item.dropdown.some(sub => {
+        return sub.href
+        ? currentPath.startsWith(sub.href)
+        : sub.dropdown && sub.dropdown.some(subsub => currentPath.startsWith(subsub.href));
+        });
+        const isActive = isItemActive || isChildActive;
 
-            const showClass = isActive ? 'show' : '';
-            const collapsedClass = isActive ? '' : 'collapsed';
-            const iconClass = item.icon || '';
-            const iconMarkup = iconClass ? `<i class="bi ${iconClass} me-2"></i>` : '';
+        const showClass = isActive ? 'show' : '';
+        const collapsedClass = isActive ? '' : 'collapsed';
+        const iconClass = item.icon || '';
+        const iconMarkup = iconClass ? `<i class="bi ${iconClass} me-2"></i>` : '';
 
-            if (item.dropdown) {
-            html += `
-            <div class="accordion-item bg-dark border-0">
-                <h2 class="accordion-header" id="${headingId}">
-                    <button class="accordion-button ${collapsedClass} bg-dark text-white" type="button"
-                        data-bs-toggle="collapse" data-bs-target="#${collapseId}" aria-expanded="${isActive}"
-                        aria-controls="${collapseId}">
-                        ${iconMarkup}
-                        <span>${item.label}</span>
-                        <i class="bi bi-chevron-down ms-auto"></i> 
-                    </button>
-                </h2>
-                <div id="${collapseId}" class="accordion-collapse collapse ${showClass}"
-                    data-bs-parent="#${accordionId}" aria-labelledby="${headingId}">
-                    <div class="accordion-body ps-${level * 3}">
-                        <div class="accordion accordion-flush bg-dark" id="${childAcc}">
-                            ${renderSidebar(item.dropdown, childAcc, level + 1)}
-                        </div>
+        if (item.dropdown) {
+        html += `
+        <div class="accordion-item bg-dark border-0">
+            <h2 class="accordion-header" id="${headingId}">
+                <button class="accordion-button ${collapsedClass} bg-dark text-white" type="button"
+                    data-bs-toggle="collapse" data-bs-target="#${collapseId}" data-bs-placement="right"
+                    title="${item.label}" aria-expanded="${isActive}" aria-controls="${collapseId}">
+                    ${iconMarkup}
+                    <span class="nav-label">${item.label}</span>
+                    <i class="bi bi-chevron-down ms-auto"></i>
+                </button>
+            </h2>
+            <div id="${collapseId}" class="accordion-collapse collapse ${showClass}" data-bs-parent="#${accordionId}"
+                aria-labelledby="${headingId}" >
+                <div class="accordion-body ps-${level * 3}">
+                    <div class="accordion accordion-flush bg-dark" id="${childAcc}">
+                        ${renderSidebar(item.dropdown, childAcc, level + 1)}
                     </div>
                 </div>
-            </div>`;
-            } else {
-            html += `
-            <a href="${item.href}" class="btn btn-dark text-start w-100 mb-1 ${isItemActive ? 'active' : ''}">
-                ${iconMarkup}
-                ${item.label}
-            </a>`;
-            }
-            });
-
-            return html;
-            }
-            %>
-
-            <a href="/admin/dashboard" class="navbar-brand text-white mb-4">
-                <i class="bi bi-shop ms-3 me-2"></i> Claudinha Store
-            </a>
-
-            <div class="flex-grow-1 overflow-auto">
-                <div class="accordion accordion-flush sidebar" id="sidebarAccordion">
-                    <%- renderSidebar(navLinks) %>
-                </div>
             </div>
+        </div>`;
+        } else {
+        html += `
+        <a href="${item.href}" class="btn btn-dark text-start w-100 mb-1 ${isItemActive ? 'active' : ''}"
+            data-bs-toggle="tooltip" data-bs-placement="right" title="${item.label}" // <-- ADICIONE ISSO>
+            ${iconMarkup}
+            <span class="nav-label">${item.label}</span>
+        </a>`;
+        }
+        });
 
-            <form id="logoutForm" method="POST" class="mt-auto">
-                <button type="submit" class="btn btn-outline-light w-100">
-                    </i>Logout</button>
-            </form>
+        return html;
+        }
+        %>
 
+        <button id="sidebarToggle" class="btn btn-sm btn-outline-light me-2" type="button"
+            aria-label="Alternar barra lateral">
+            <i class="bi bi-chevron-left"></i>
+        </button>
+
+        <div class="d-flex align-items-center justify-content-between mb-3">
+            <a href="/admin/dashboard" class="navbar-brand text-white">
+                <i class="bi bi-shop ms-3 me-2"></i>
+                <span class="brand-label">Claudinha Store</span>
+            </a>
+        </div>
+
+        <div class="flex-grow-1 overflow-auto">
+            <div class="accordion accordion-flush sidebar" id="sidebarAccordion">
+                <%- renderSidebar(navLinks) %>
+            </div>
+        </div>
+
+        <form id="logoutForm" method="POST" action="/logout" class="mt-auto">
+            <button type="submit" class="btn btn-outline-light w-100">
+                <i class="bi bi-box-arrow-right me-2"></i>
+                <span class="nav-label">Logout</span>
+            </button>
+        </form>
 </nav>

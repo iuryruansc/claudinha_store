@@ -62,6 +62,13 @@ document.addEventListener('DOMContentLoaded', function () {
                 const lote = await response.json();
 
                 editLoteModalEl.querySelector('#edit-produto-nome').textContent = lote.produto?.nome || 'N/A';
+                editLoteModalEl.querySelector('#edit-id-lote').value = lote.id_lote;
+                editLoteModalEl.querySelector('#edit-numero-lote').value = lote.numero_lote;
+                editLoteModalEl.querySelector('#edit-quantidade').value = lote.quantidade;
+                editLoteModalEl.querySelector('#edit-localizacao').value = lote.localizacao;
+                editLoteModalEl.querySelector('#edit-data-validade').value = lote.data_validade?.substring(0, 7);
+                editLoteModalEl.querySelector('#edit-preco-compra').value = lote.preco_compra;
+                editLoteModalEl.querySelector('#edit-preco-venda').value = lote.preco_venda;
 
                 editLoteModalEl.querySelector('#edit-lote-form').action = `/admin/lotes/update/${lote.id_lote}`;
             } catch (error) {

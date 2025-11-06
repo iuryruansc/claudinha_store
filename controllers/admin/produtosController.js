@@ -13,7 +13,7 @@ router.get('/produtos/new', asyncHandler(async (req, res) => {
 }));
 
 router.get('/produtos', asyncHandler(async (req, res) => {
-    const { produtos, categorias, fornecedores, marcas, quant } = await getAllProdutos();
+    const { produtos, categorias, fornecedores, marcas} = await getAllProdutos();
 
     res.render('admin/produtos/index', {
         produtos,
@@ -23,7 +23,6 @@ router.get('/produtos', asyncHandler(async (req, res) => {
         categoria_nome: null,
         fornecedor_nome: null,
         marca_nome: null,
-        quant
     });
 }));
 
