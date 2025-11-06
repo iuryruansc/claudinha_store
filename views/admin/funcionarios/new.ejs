@@ -5,6 +5,7 @@
             <main class="main-content">
                 <div class="container">
                     <div id="error-popup-container"></div>
+
                     <div class="d-flex justify-content-between align-items-center my-4">
                         <h2 class="mb-0 h4">
                             <i class="bi bi-person-plus me-2"></i>
@@ -18,37 +19,46 @@
 
                     <div class="card shadow-sm">
                         <div class="card-body">
-                            <form id="func-form" method="POST" action="/admin/funcionarios/save">
-                                <div class="form-floating mb-3">
-                                    <input id="func-name-input" class="form-control" type="text" name="nome"
-                                        placeholder="Nome do Funcionário" required>
-                                    <label for="func-name-input">Nome do Funcionário</label>
-                                </div>
+                            <form id="func-form" method="POST" action="/admin/funcionarios/save" novalidate>
+                                <div class="row g-3">
+                                    <div class="col-12">
+                                        <div class="form-floating mb-3">
+                                            <input id="func-name-input" class="form-control" type="text" name="nome"
+                                                placeholder="Nome do Funcionário" required autocomplete="name">
+                                            <label for="func-name-input">Nome do Funcionário</label>
+                                        </div>
+                                    </div>
 
-                                <div class="form-floating mb-3">
-                                    <input id="func-cpf-input" class="form-control" type="text" name="cpf"
-                                        placeholder="CPF do Funcionário" required>
-                                    <label for="func-cpf-input">CPF</label>
-                                </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <div class="input-group">
+                                                <span class="input-group-text"><i class="bi bi-person-badge"></i></span>
+                                                <input id="func-cpf-input" class="form-control" type="text" name="cpf"
+                                                    placeholder="000.000.000-00" maxlength="14" inputmode="numeric"
+                                                    autocomplete="off" required>
+                                            </div>
+                                            <div class="form-text small">Apenas números. Formato: 000.000.000-00</div>
+                                        </div>
+                                    </div>
 
-                                <div class="col-md-4">
+                                    <div class="col-md-6">
                                         <div class="form-floating">
-                                            <select name="id_cargo" class="form-select" id="cargo-select"
-                                                required>
+                                            <select name="id_cargo" class="form-select" id="cargo-select" required>
                                                 <option value="" selected disabled>Selecione...</option>
                                                 <% cargos.forEach(cargo=> { %>
                                                     <option value="<%= cargo.id_cargo %>">
                                                         <%= cargo.nome_cargo %>
                                                     </option>
-                                                <% }) %>
+                                                    <% }) %>
                                             </select>
-                                        <label for="cargo-select">Cargo</label>
+                                            <label for="cargo-select">Cargo</label>
+                                        </div>
                                     </div>
                                 </div>
 
                                 <div class="d-flex justify-content-between mt-4">
                                     <button type="submit" class="btn btn-success">
-                                        <i class="bi bi-check-circle me-2"></i>Cadastrar
+                                        <i class="bi bi-check-circle me-2"></i> Cadastrar
                                     </button>
                                 </div>
                             </form>
@@ -56,6 +66,7 @@
                     </div>
                 </div>
             </main>
+
             <%- include('../../partials/footer.ejs') %>
 
                 <script type="module">
@@ -68,12 +79,180 @@
                                 '#func-name-input',
                                 '#func-cpf-input'
                             ],
-                            selectFields: [],
-                            requiredFields: ['nome', 'cpf'],
+                            selectFields: ['#cargo-select'],
+                            requiredFields: ['nome', 'cpf', 'id_cargo'],
                             redirectUrl: '/admin/funcionarios',
                             fieldMap: {
                                 nome: '#func-name-input',
-                                cpf: '#func-cpf-input'
+                                cpf: '#func-cpf-input',
+                                id_cargo: '#cargo-select'
+                            }
+                        });
+                    });
+                </script>
+
+                <script>
+                    document.addEventListener('DOMContentLoaded', () => {
+                        const form = document.getElementById('func-form');
+                        const cpfInput = document.getElementById('func-cpf-input');
+                        const nameInput = document.getElementById('func-name-input');
+                        const cargoSelect = document.getElementById('cargo-select');
+
+                        const onlyDigits = s => (s || '').toString().replace(/\D/g, '');
+
+                        const createStatusIcon = (type) => {
+                            const span = document.createElement('span');
+                            span.className = 'input-status ms-2';
+                            span.style.display = 'inline-flex';
+                            span.style.alignItems = 'center';
+                            span.style.gap = '6px';
+                            span.innerHTML = type === 'ok'
+                                ? '<i class="bi bi-check-circle-fill text-success" aria-hidden="true"></i>'
+                                : '<i class="bi bi-x-circle-fill text-danger" aria-hidden="true"></i>';
+                            return span;
+                        };
+
+                        const showFieldSuccess = (el) => {
+                            removeFieldError(el);
+                            el.classList.remove('is-invalid');
+                            el.classList.add('is-valid');
+                            removeStatusIcon(el);
+                            const wrapper = el.closest('.mb-3') || el.parentNode;
+                            const icon = createStatusIcon('ok');
+                            icon.dataset.validation = 'status';
+                            wrapper.appendChild(icon);
+                        };
+
+                        const showFieldError = (el, msg) => {
+                            removeFieldError(el);
+                            el.classList.remove('is-valid');
+                            el.classList.add('is-invalid');
+                            removeStatusIcon(el);
+                            const div = document.createElement('div');
+                            div.className = 'invalid-feedback d-block';
+                            div.dataset.validation = 'true';
+                            div.textContent = msg;
+                            const wrapper = el.closest('.mb-3') || el.parentNode;
+                            wrapper.appendChild(div);
+                            const icon = createStatusIcon('err');
+                            icon.dataset.validation = 'status';
+                            wrapper.appendChild(icon);
+                        };
+
+                        const removeFieldError = el => {
+                            el.classList.remove('is-invalid');
+                            const wrapper = el.closest('.mb-3') || el.parentNode;
+                            const existing = wrapper.querySelector('[data-validation="true"]');
+                            if (existing) existing.remove();
+                        };
+
+                        const removeStatusIcon = el => {
+                            const wrapper = el.closest('.mb-3') || el.parentNode;
+                            const old = wrapper.querySelector('[data-validation="status"]');
+                            if (old) old.remove();
+                        };
+
+                        // CPF máscara: 000.000.000-00
+                        cpfInput.addEventListener('input', () => {
+                            const d = onlyDigits(cpfInput.value).slice(0, 11);
+                            if (d.length <= 3) cpfInput.value = d;
+                            else if (d.length <= 6) cpfInput.value = d.replace(/^(\d{3})(\d+)/, '$1.$2');
+                            else if (d.length <= 9) cpfInput.value = d.replace(/^(\d{3})(\d{3})(\d+)/, '$1.$2.$3');
+                            else cpfInput.value = d.replace(/^(\d{3})(\d{3})(\d{3})(\d{0,2}).*/, '$1.$2.$3-$4');
+                            removeFieldError(cpfInput);
+                            removeStatusIcon(cpfInput);
+                            cpfInput.classList.remove('is-valid');
+                        });
+
+                        // Validação CPF completa (dígitos verificadores)
+                        function isValidCPF(input) {
+                            const cpf = onlyDigits(input);
+                            if (cpf.length !== 11) return false;
+                            if (/^(\d)\1{10}$/.test(cpf)) return false;
+                            const calcDigit = (str) => {
+                                let sum = 0;
+                                for (let i = 0; i < str.length; i++) sum += parseInt(str.charAt(i), 10) * (str.length + 1 - i);
+                                const mod = sum % 11;
+                                return (mod < 2) ? 0 : 11 - mod;
+                            };
+                            const base = cpf.slice(0, 9);
+                            const d1 = calcDigit(base);
+                            const d2 = calcDigit(base + String(d1));
+                            return cpf === (base + String(d1) + String(d2));
+                        }
+
+                        // onBlur validations with success feedback
+                        cpfInput.addEventListener('blur', () => {
+                            const raw = onlyDigits(cpfInput.value);
+                            if (!raw) {
+                                removeFieldError(cpfInput);
+                                removeStatusIcon(cpfInput);
+                                cpfInput.classList.remove('is-valid');
+                                return;
+                            }
+                            if (!isValidCPF(raw)) showFieldError(cpfInput, 'CPF inválido. Verifique os dígitos.');
+                            else { cpfInput.value = raw; showFieldSuccess(cpfInput); }
+                        });
+
+                        nameInput.addEventListener('blur', () => {
+                            const v = (nameInput.value || '').trim();
+                            if (!v) showFieldError(nameInput, 'Nome é obrigatório.');
+                            else showFieldSuccess(nameInput);
+                        });
+
+                        cargoSelect.addEventListener('change', () => {
+                            if (!cargoSelect.value) {
+                                showFieldError(cargoSelect, 'Selecione um cargo.');
+                            } else {
+                                removeFieldError(cargoSelect);
+                                removeStatusIcon(cargoSelect);
+                                const wrapper = cargoSelect.closest('.form-floating') || cargoSelect.parentNode;
+                                const icon = createStatusIcon('ok');
+                                icon.dataset.validation = 'status';
+                                wrapper.appendChild(icon);
+                            }
+                        });
+
+                        // Submit: normaliza CPF and final validation
+                        form.addEventListener('submit', (e) => {
+                            let ok = true;
+
+                            // Nome
+                            const nameVal = (nameInput.value || '').trim();
+                            if (!nameVal) {
+                                showFieldError(nameInput, 'Nome é obrigatório.');
+                                ok = false;
+                            } else {
+                                showFieldSuccess(nameInput);
+                            }
+
+                            // CPF
+                            const cpfRaw = onlyDigits(cpfInput.value);
+                            if (!isValidCPF(cpfRaw)) {
+                                showFieldError(cpfInput, 'CPF inválido. Verifique os dígitos.');
+                                ok = false;
+                            } else {
+                                cpfInput.value = cpfRaw; // normalize for backend
+                                showFieldSuccess(cpfInput);
+                            }
+
+                            // Cargo
+                            if (!cargoSelect.value) {
+                                showFieldError(cargoSelect, 'Selecione um cargo.');
+                                ok = false;
+                            } else {
+                                removeFieldError(cargoSelect);
+                                removeStatusIcon(cargoSelect);
+                                const wrapper = cargoSelect.closest('.form-floating') || cargoSelect.parentNode;
+                                const icon = createStatusIcon('ok');
+                                icon.dataset.validation = 'status';
+                                wrapper.appendChild(icon);
+                            }
+
+                            if (!ok) {
+                                e.preventDefault();
+                                const firstInvalid = form.querySelector('.is-invalid');
+                                if (firstInvalid) firstInvalid.scrollIntoView({ behavior: 'smooth', block: 'center' });
                             }
                         });
                     });

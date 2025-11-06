@@ -21,7 +21,7 @@
                                 <table id="table-data" class="table table-striped table-hover align-middle">
                                     <thead class="table-dark">
                                         <tr>
-                                            <th>Marcas</th>
+                                            <th>Cargos</th>
                                             <th class="text-center">
                                                 <div class="d-flex align-items-center justify-content-center">
                                                     <span>Ações</span>
@@ -37,7 +37,7 @@
                                     <tbody id="cargo-table-body">
                                         <% cargos.forEach(cargo=> { %>
                                             <tr>
-                                                <td><strong>
+                                                <td class="text-capitalize"><strong>
                                                         <%= cargo.nome_cargo %>
                                                     </strong></td>
                                                 <td class="text-center">
@@ -46,7 +46,7 @@
                                                             class="btn btn-sm btn-outline-primary" title="Editar cargo">
                                                             <i class="bi bi-pencil-square"></i>
                                                         </a>
-                                                        <a href="/admin/funcionarios/cargo/<%= cargo.id_cargo %>"
+                                                        <a href="/admin/cargos/<%= cargo.id_cargo %>/funcionarios"
                                                             class="btn btn-sm btn-outline-info"
                                                             title="Ver funcionários com este cargo">
                                                             <i class="bi bi-box-seam"></i>

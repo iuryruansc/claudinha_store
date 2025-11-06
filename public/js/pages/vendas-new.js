@@ -23,6 +23,10 @@ document.addEventListener('DOMContentLoaded', () => {
             // Modal de confirmação
             finalizarVendaModal: new bootstrap.Modal(document.getElementById('finalizarVendaModal')),
             btnConfirmarEnvio: document.getElementById('confirmar-envio-btn'),
+            // CLIENTE: campo de busca e hidden id (adicionar inputs no EJS)
+            clienteSearchInput: document.getElementById('cliente-search'),
+            clienteIdInput: document.getElementById('cliente-id'),
+            addClienteBtn: document.getElementById('add-client-btn')
         }
     };
 
@@ -455,12 +459,114 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
+    // MÓDULO DE CLIENTES (autocomplete + validação)
+    const ClientManager = {
+        clients: window.clientes || [],
+
+        DEFAULT_ID() {
+            // tenta primeiro o hidden input no DOM; depois window.clienteDefaultId; por fim 1
+            const hid = AppState.elementos.clienteIdInput;
+            if (hid && hid.value) return String(hid.value);
+            if (typeof window.clienteDefaultId !== 'undefined') return String(window.clienteDefaultId);
+            return '1';
+        },
+
+        init() {
+            if (!AppState.elementos.clienteSearchInput) return;
+            this.setupClienteSearch();
+
+            // validação ao submeter: garante cliente padrão (anônimo)
+            if (AppState.elementos.form) {
+                AppState.elementos.form.addEventListener('submit', () => {
+                    const id = AppState.elementos.clienteIdInput?.value || '';
+                    const valid = this.clients.some(c => String(c.id_cliente) === String(id));
+                    if (!valid && AppState.elementos.clienteIdInput) {
+                        AppState.elementos.clienteIdInput.value = this.DEFAULT_ID();
+                    }
+                });
+            }
+        },
+
+        setupClienteSearch() {
+            const input = AppState.elementos.clienteSearchInput;
+            const idInput = AppState.elementos.clienteIdInput;
+            const portal = document.createElement('div');
+            portal.className = 'cliente-search-portal';
+            portal.style.position = 'absolute';
+            portal.style.zIndex = '9999';
+            portal.style.display = 'none';
+            document.body.appendChild(portal);
+
+            const positionPortal = () => {
+                const rect = input.getBoundingClientRect();
+                portal.style.width = rect.width + 'px';
+                portal.style.left = rect.left + window.scrollX + 'px';
+                portal.style.top = rect.bottom + window.scrollY + 'px';
+                portal.style.maxHeight = '300px';
+                portal.style.overflowY = 'auto';
+                portal.style.background = '#fff';
+                portal.style.boxShadow = '0 6px 18px rgba(0,0,0,0.12)';
+                portal.style.border = '1px solid #dee2e6';
+                portal.style.borderRadius = '4px';
+            };
+
+            let debounceTimer;
+            input.addEventListener('input', () => {
+                clearTimeout(debounceTimer);
+                debounceTimer = setTimeout(() => {
+                    const q = (input.value || '').trim().toLowerCase();
+                    if (q.length < 2) { portal.style.display = 'none'; return; }
+
+                    const matches = this.clients.filter(c =>
+                        (c.nome || '').toLowerCase().includes(q) ||
+                        (c.cpf || '').replace(/\D/g, '').includes(q.replace(/\D/g, '')) ||
+                        (c.email || '').toLowerCase().includes(q)
+                    ).slice(0, 10);
+
+                    if (!matches.length) {
+                        portal.innerHTML = '<div class="p-2 text-muted">Nenhum cliente encontrado</div>';
+                    } else {
+                        portal.innerHTML = matches.map(c => `
+                        <div class="p-2 border-bottom cliente-search-result" data-id="${c.id_cliente}" style="cursor:pointer; background:#fff;">
+                            <div class="fw-bold">${c.nome}</div>
+                            <small class="text-muted">${c.cpf || c.email || ''}</small>
+                        </div>
+                    `).join('');
+                    }
+                    positionPortal();
+                    portal.style.display = 'block';
+                }, 200);
+            });
+
+            document.addEventListener('click', (e) => {
+                if (e.target === input) return;
+                if (!portal.contains(e.target)) portal.style.display = 'none';
+            });
+
+            portal.addEventListener('click', (e) => {
+                const el = e.target.closest('.cliente-search-result');
+                if (!el) return;
+                const id = el.dataset.id;
+                const cliente = this.clients.find(c => String(c.id_cliente) === String(id));
+                if (!cliente) return;
+                input.value = cliente.nome;
+                if (idInput) idInput.value = cliente.id_cliente;
+                portal.style.display = 'none';
+            });
+
+            window.addEventListener('scroll', positionPortal, true);
+            window.addEventListener('resize', positionPortal);
+            input.addEventListener('focus', positionPortal);
+        }
+    };
+
     // INICIALIZAÇÃO
     function init() {
         AppState.elementos.barcodeInput.focus();
         VendaItemsManager.init();
         PagamentoManager.init();
         UIManager.init();
+        ClientManager.init();
 
         PagamentoManager.addPagamentoRow();
         UIManager.updateAll();

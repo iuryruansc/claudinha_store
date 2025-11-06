@@ -6,12 +6,12 @@ const { stringValidation, checkAssociations, numberValidation } = require('../..
 const { parseIntValue } = require('../../utils/data/data-parsers');
 const { getAllCargos, findCargoById, createCargo, deleteCargo, updateCargo } = require('../../services/admin/cargosService');
 
-router.get('/cargo/new', (req, res) => {
+router.get('/cargos/new', (req, res) => {
     res.render('admin/cargos/new', { title: 'Novo Cargo' });
 });
 
 router.get('/cargos', asyncHandler(async (req, res) => {
-    const marcas = await getAllCargos();
+    const cargos = await getAllCargos();
 
     res.render('admin/cargos', { cargos })
 }));
@@ -21,7 +21,7 @@ router.get('/cargos/edit/:id_cargo', asyncHandler(async (req, res) => {
 
     numberValidation(parsedId);
 
-    const marca = await findCargoById(parsedId);
+    const cargo = await findCargoById(parsedId);
 
     res.render('admin/cargos/edit', { cargo })
 }));
@@ -67,6 +67,22 @@ router.post('/cargos/update/:id_cargo', asyncHandler(async (req, res) => {
     res.status(200).json({
         message: 'Cargo atualizado com sucesso!',
         redirectUrl: '/admin/cargos'
+    });
+}));
+
+router.get('/cargos/:id_cargo/funcionarios', asyncHandler(async (req, res) => {
+    const [parsedId] = parseIntValue(req.params.id_cargo);
+    numberValidation(parsedId);
+
+    const funcionarios = await Funcionarios.findAll({
+        where: { id_cargo: parsedId }
+    });
+
+    const cargo = await findCargoById(parsedId);
+
+    res.render('admin/funcionarios/func-cargos', {
+        funcionarios,
+        cargo_nome: cargo.nome_cargo
     });
 }));
 

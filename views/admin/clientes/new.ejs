@@ -5,6 +5,7 @@
             <main class="main-content">
                 <div class="container">
                     <div id="error-popup-container"></div>
+
                     <div class="d-flex justify-content-between align-items-center my-4">
                         <h2 class="mb-0 h4">
                             <i class="bi bi-person-plus me-2"></i>
@@ -18,34 +19,57 @@
 
                     <div class="card shadow-sm">
                         <div class="card-body">
-                            <form id="cliente-form" method="POST" action="/admin/clientes/save">
-                                <div class="form-floating mb-3">
-                                    <input id="cliente-nome-input" class="form-control" type="text" name="nome"
-                                        placeholder="Nome do Cliente" required>
-                                    <label for="cliente-nome-input">Nome do Cliente</label>
+                            <form id="cliente-form" method="POST" action="/admin/clientes/save" novalidate>
+                                <div class="row g-3">
+                                    <div class="col-12">
+                                        <div class="form-floating mb-3">
+                                            <input id="cliente-nome-input" class="form-control" type="text" name="nome"
+                                                placeholder="Nome do Cliente" required autocomplete="name" />
+                                            <label for="cliente-nome-input">Nome do Cliente</label>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <div class="form-floating mb-3">
+                                            <input id="cliente-email-input" class="form-control" type="email"
+                                                name="email" placeholder="email@exemplo.com" required
+                                                autocomplete="email" />
+                                            <label for="cliente-email-input">E‑mail</label>
+                                            <div class="form-text small">Ex: contato@empresa.com</div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="cliente-telefone-input"
+                                                class="form-label d-none">Telefone</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text"><i class="bi bi-telephone"></i></span>
+                                                <input id="cliente-telefone-input" class="form-control" type="tel"
+                                                    name="telefone" placeholder="(DD) 9XXXX-XXXX" maxlength="16"
+                                                    inputmode="tel" autocomplete="tel" required />
+                                            </div>
+                                            <div class="form-text small">Inclua DDD. Ex: (11) 99999-0000</div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="cliente-cpf-input" class="form-label">CPF</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text"><i class="bi bi-person-badge"></i></span>
+                                                <input id="cliente-cpf-input" class="form-control" type="text"
+                                                    name="cpf" placeholder="000.000.000-00" maxlength="14"
+                                                    inputmode="numeric" autocomplete="off" required />
+                                            </div>
+                                            <div class="form-text small">Apenas números. Formato: 000.000.000-00</div>
+                                        </div>
+                                    </div>
                                 </div>
 
-                                <div class="form-floating mb-3">
-                                    <input id="cliente-email-input" class="form-control" type="text" name="email"
-                                        placeholder="Email do Cliente" required>
-                                    <label for="cliente-email-input">Email</label>
-                                </div>
-
-                                <div class="form-floating mb-3">
-                                    <input id="cliente-telefone-input" class="form-control" type="text" name="telefone"
-                                        placeholder="Telefone do Cliente" required>
-                                    <label for="cliente-telefone-input">Telefone</label>
-                                </div>
-
-                                <div class="form-floating mb-3">
-                                    <input id="cliente-cpf-input" class="form-control" type="text" name="cpf"
-                                        placeholder="CPF do Cliente" required>
-                                    <label for="cliente-cpf-input">CPF</label>
-                                </div>
-
-                                <div class="d-flex justify-content-between mt-4">
+                                <div class="d-flex justify-content-end mt-4">
                                     <button type="submit" class="btn btn-success">
-                                        <i class="bi bi-check-circle me-2"></i>Cadastrar
+                                        <i class="bi bi-check-circle me-2"></i> Cadastrar
                                     </button>
                                 </div>
                             </form>
@@ -76,6 +100,169 @@
                                 email: '#cliente-email-input',
                                 telefone: '#cliente-telefone-input',
                                 cpf: '#cliente-cpf-input'
+                            }
+                        });
+                    });
+                </script>
+
+                <script>
+                    document.addEventListener('DOMContentLoaded', () => {
+                        const form = document.getElementById('cliente-form');
+                        const cpfInput = document.getElementById('cliente-cpf-input');
+                        const telInput = document.getElementById('cliente-telefone-input');
+                        const emailInput = document.getElementById('cliente-email-input');
+
+                        const onlyDigits = s => (s || '').toString().replace(/\D/g, '');
+
+                        const createStatusIcon = (type) => {
+                            const span = document.createElement('span');
+                            span.className = 'input-status ms-2';
+                            span.style.display = 'inline-flex';
+                            span.style.alignItems = 'center';
+                            span.style.gap = '6px';
+                            span.innerHTML = type === 'ok'
+                                ? '<i class="bi bi-check-circle-fill text-success" aria-hidden="true"></i>'
+                                : '<i class="bi bi-x-circle-fill text-danger" aria-hidden="true"></i>';
+                            return span;
+                        };
+
+                        const showFieldSuccess = (el) => {
+                            removeFieldError(el);
+                            el.classList.remove('is-invalid');
+                            el.classList.add('is-valid');
+                            removeStatusIcon(el);
+                            const wrapper = el.closest('.mb-3') || el.parentNode;
+                            const icon = createStatusIcon('ok');
+                            icon.dataset.validation = 'status';
+                            wrapper.appendChild(icon);
+                        };
+
+                        const showFieldError = (el, msg) => {
+                            removeFieldError(el);
+                            el.classList.remove('is-valid');
+                            el.classList.add('is-invalid');
+                            removeStatusIcon(el);
+                            const div = document.createElement('div');
+                            div.className = 'invalid-feedback d-block';
+                            div.dataset.validation = 'true';
+                            div.textContent = msg;
+                            const wrapper = el.closest('.mb-3') || el.parentNode;
+                            wrapper.appendChild(div);
+                            const icon = createStatusIcon('err');
+                            icon.dataset.validation = 'status';
+                            wrapper.appendChild(icon);
+                        };
+
+                        const removeFieldError = el => {
+                            el.classList.remove('is-invalid');
+                            const wrapper = el.closest('.mb-3') || el.parentNode;
+                            const existing = wrapper.querySelector('[data-validation="true"]');
+                            if (existing) existing.remove();
+                        };
+
+                        const removeStatusIcon = el => {
+                            const wrapper = el.closest('.mb-3') || el.parentNode;
+                            const old = wrapper.querySelector('[data-validation="status"]');
+                            if (old) old.remove();
+                        };
+
+                        // Máscaras
+                        cpfInput.addEventListener('input', () => {
+                            const d = onlyDigits(cpfInput.value).slice(0, 11);
+                            if (d.length <= 3) cpfInput.value = d;
+                            else if (d.length <= 6) cpfInput.value = d.replace(/^(\d{3})(\d+)/, '$1.$2');
+                            else if (d.length <= 9) cpfInput.value = d.replace(/^(\d{3})(\d{3})(\d+)/, '$1.$2.$3');
+                            else cpfInput.value = d.replace(/^(\d{3})(\d{3})(\d{3})(\d{0,2}).*/, '$1.$2.$3-$4');
+                            removeFieldError(cpfInput);
+                            removeStatusIcon(cpfInput);
+                        });
+
+                        telInput.addEventListener('input', () => {
+                            const d = onlyDigits(telInput.value).slice(0, 11);
+                            if (d.length <= 2) telInput.value = d;
+                            else if (d.length <= 6) telInput.value = `(${d.slice(0, 2)}) ${d.slice(2)}`;
+                            else if (d.length <= 10) telInput.value = `(${d.slice(0, 2)}) ${d.slice(2, 6)}-${d.slice(6)}`;
+                            else telInput.value = `(${d.slice(0, 2)}) ${d.slice(2, 7)}-${d.slice(7, 11)}`;
+                            removeFieldError(telInput);
+                            removeStatusIcon(telInput);
+                        });
+
+                        // Validação CPF completa
+                        function isValidCPF(input) {
+                            const cpf = onlyDigits(input);
+                            if (cpf.length !== 11) return false;
+                            if (/^(\d)\1{10}$/.test(cpf)) return false;
+                            const calcDigit = (str) => {
+                                let sum = 0;
+                                for (let i = 0; i < str.length; i++) sum += parseInt(str.charAt(i), 10) * (str.length + 1 - i);
+                                const mod = sum % 11;
+                                return (mod < 2) ? 0 : 11 - mod;
+                            };
+                            const base = cpf.slice(0, 9);
+                            const d1 = calcDigit(base);
+                            const d2 = calcDigit(base + String(d1));
+                            return cpf === (base + String(d1) + String(d2));
+                        }
+
+                        const validatePhone = raw => {
+                            const d = onlyDigits(raw);
+                            return d.length === 10 || d.length === 11;
+                        };
+
+                        const validateEmailSimple = s => !!(s && s.trim());
+
+                        // onBlur validations with success feedback
+                        cpfInput.addEventListener('blur', () => {
+                            const raw = onlyDigits(cpfInput.value);
+                            if (!raw) { removeFieldError(cpfInput); removeStatusIcon(cpfInput); cpfInput.classList.remove('is-valid'); return; }
+                            if (!isValidCPF(raw)) showFieldError(cpfInput, 'CPF inválido. Verifique os dígitos.');
+                            else { cpfInput.value = raw; showFieldSuccess(cpfInput); }
+                        });
+
+                        telInput.addEventListener('blur', () => {
+                            const raw = onlyDigits(telInput.value);
+                            if (!raw) { removeFieldError(telInput); removeStatusIcon(telInput); telInput.classList.remove('is-valid'); return; }
+                            if (!validatePhone(raw)) showFieldError(telInput, 'Telefone inválido. Inclua DDD e 8 ou 9 dígitos.');
+                            else { telInput.value = raw; showFieldSuccess(telInput); }
+                        });
+
+                        emailInput.addEventListener('blur', () => {
+                            const v = emailInput.value || '';
+                            if (!v.trim()) showFieldError(emailInput, 'E‑mail é obrigatório.');
+                            else showFieldSuccess(emailInput);
+                        });
+
+                        // Submit: normaliza valores and final validation
+                        form.addEventListener('submit', (e) => {
+                            let ok = true;
+
+                            const cpfRaw = onlyDigits(cpfInput.value);
+                            if (!isValidCPF(cpfRaw)) {
+                                showFieldError(cpfInput, 'CPF inválido. Verifique os dígitos.');
+                                ok = false;
+                            } else {
+                                cpfInput.value = cpfRaw;
+                                showFieldSuccess(cpfInput);
+                            }
+
+                            const telRaw = onlyDigits(telInput.value);
+                            if (!validatePhone(telRaw)) {
+                                showFieldError(telInput, 'Telefone inválido. Inclua DDD e 8 ou 9 dígitos (ex: 11999990000).');
+                                ok = false;
+                            } else {
+                                telInput.value = telRaw;
+                                showFieldSuccess(telInput);
+                            }
+
+                            if (!validateEmailSimple(emailInput.value)) {
+                                showFieldError(emailInput, 'E‑mail é obrigatório.');
+                                ok = false;
+                            } else showFieldSuccess(emailInput);
+
+                            if (!ok) {
+                                e.preventDefault();
+                                const firstInvalid = form.querySelector('.is-invalid');
+                                if (firstInvalid) firstInvalid.scrollIntoView({ behavior: 'smooth', block: 'center' });
                             }
                         });
                     });

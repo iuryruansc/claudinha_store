@@ -47,7 +47,8 @@ const navLinks = [
         icon: 'bi-people',
         dropdown: [
             { label: 'Clientes', href: '/admin/clientes', icon: 'bi-person-lines-fill' },
-            { label: 'Funcionários', href: '/admin/funcionarios', icon: 'bi-person-badge' }
+            { label: 'Funcionários', href: '/admin/funcionarios', icon: 'bi-person-badge' },
+            { label: 'Cargos', href: '/admin/cargos', icon: 'bi-briefcase' }
         ]
     },
     {

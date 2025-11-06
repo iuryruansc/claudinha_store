@@ -4,163 +4,195 @@
         <body>
             <main class="main-content">
                 <div class="container mb-2">
-                    <% if (error_msg && error_msg.length > 0) { %>
-        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-            <%= error_msg %>
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-    <% } %>
-    <% if (success_msg && success_msg.length > 0) { %>
-         <div class="alert alert-success alert-dismissible fade show" role="alert">
-            <%= success_msg %>
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-    <% } %>
-                    <form id="venda-form" method="POST" action="/admin/vendas/save">
-                        <div class="row g-3">
-                            <!-- 🧾 Itens da Venda -->
-                            <div class="col-12 col-lg-7">
-                                <div class="card shadow-sm">
-                                    <div class="card-header bg-light border-bottom">
-                                        <h4 class="fs-5 mb-0 fw-semibold">🧾 Itens da Venda</h4>
-                                    </div>
-                                    <div class="card-body">
-
-                                        <div id="itens-venda-placeholder" class="text-center text-muted py-4">
-                                            <p class="mb-1"><i class="bi bi-cart-x" style="font-size: 2rem;"></i></p>
-                                            <p class="mb-0">Nenhum produto adicionado.</p>
-                                            <small>Use o leitor de código de barras ou adicione manualmente.</small>
-                                        </div>
-
-                                        <div id="tabela-itens-wrapper" class="table-responsive" style="display: none;">
-                                            <table class="table table-sm table-striped table-hover align-middle mb-3">
-                                                <thead class="table-light">
-                                                    <tr>
-                                                        <th>Produto</th>
-                                                        <th style="width: 120px;">Quantidade</th>
-                                                        <th style="width: 130px;">Preço Un.</th>
-                                                        <th style="width: 50px;" class="text-end">Ação</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody id="itens-venda-container">
-                                                </tbody>
-                                            </table>
-                                        </div>
-
-                                        <button type="button" id="add-item-btn"
-                                            class="btn btn-outline-secondary btn-sm">
-                                            <i class="bi bi-plus-circle"></i> Adicionar Produto Manualmente
-                                        </button>
-                                    </div>
+                    <% if (error_msg && error_msg.length> 0) { %>
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            <%= error_msg %>
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"
+                                    aria-label="Close"></button>
+                        </div>
+                        <% } %>
+                            <% if (success_msg && success_msg.length> 0) { %>
+                                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                                    <%= success_msg %>
+                                        <button type="button" class="btn-close" data-bs-dismiss="alert"
+                                            aria-label="Close"></button>
                                 </div>
-                            </div>
+                                <% } %>
+                                    <form id="venda-form" method="POST" action="/admin/vendas/save">
+                                        <div class="row g-3">
 
-                            <!-- 💰 Resumo de Preços -->
-                            <div class="col-12 col-lg-5 d-flex flex-column gap-4">
-                                <div class="card shadow-sm">
-
-                                    <div class="card-header bg-light border-bottom">
-                                        <h4 class="fs-5 mb-0 fw-semibold">💰 Resumo de Preços</h4>
-                                    </div>
-
-                                    <div class="card-body">
-                                        <div id="lista-itens-resumo" class="mb-3">
-                                        </div>
-
-                                        <ul class="list-group list-group-flush mb-3">
-                                            <li class="list-group-item d-flex justify-content-between px-0">
-                                                <span>Sub-total</span>
-                                                <strong id="resumo-subtotal-valor">R$ 0,00</strong>
-                                            </li>
-                                            <li id="resumo-desconto-linha"
-                                                class="list-group-item d-flex justify-content-between text-danger px-0 d-none">
-                                                <span>Desconto</span>
-                                                <strong id="resumo-desconto-valor">- R$ 0,00</strong>
-                                            </li>
-                                        </ul>
-
-                                        <div id="global-discount-row">
-                                            <label class="form-label small text-muted">Aplicar desconto na venda</label>
-                                            <div class="input-group input-group-sm">
-                                                <select id="global-discount-type" class="form-select"
-                                                    style="max-width: 80px;">
-                                                    <option value="none" selected>Sem</option>
-                                                    <option value="porcentagem">%</option>
-                                                    <option value="valor_fixo">R$</option>
-                                                </select>
-                                                <input id="global-discount-value" type="number" class="form-control"
-                                                    placeholder="0" min="0" step="0.01" />
+                                            <!-- 🔍 Seleção de Cliente -->
+                                            <div class="mb-3 position-relative">
+                                                <label for="cliente-search"
+                                                    class="form-label fw-semibold">Cliente</label>
+                                                <div class="input-group">
+                                                    <input type="text" id="cliente-search" class="form-control"
+                                                        placeholder="Buscar cliente (nome, CPF, Email), Deixe em branco caso não haja"
+                                                        autocomplete="off" />
+                                                    <input type="hidden" id="cliente-id" name="id_cliente"
+                                                        value="<%= clienteDefaultId || 1 %>" />
+                                                </div>
+                                                <div class="cliente-search-results position-absolute w-100 d-none"
+                                                    style="z-index:9999; max-height:220px; overflow:auto;"></div>
                                             </div>
-                                        </div>
 
-                                    </div>
+                                            <!-- 🧾 Itens da Venda -->
+                                            <div class="col-12 col-lg-7">
+                                                <div class="card shadow-sm">
+                                                    <div class="card-header bg-light border-bottom">
+                                                        <h4 class="fs-5 mb-0 fw-semibold">🧾 Itens da Venda</h4>
+                                                    </div>
+                                                    <div class="card-body">
 
-                                    <div class="card-footer bg-white">
-                                        <div class="d-flex justify-content-between align-items-center">
-                                            <h5 class="fs-6 text-secondary mb-0">Total a Pagar</h5>
-                                            <h4 class="fs-3 mb-0 text-success fw-bold">R$
-                                                <span id="valor_total">0.00</span>
-                                            </h4>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                                                        <div id="itens-venda-placeholder"
+                                                            class="text-center text-muted py-4">
+                                                            <p class="mb-1"><i class="bi bi-cart-x"
+                                                                    style="font-size: 2rem;"></i></p>
+                                                            <p class="mb-0">Nenhum produto adicionado.</p>
+                                                            <small>Use o leitor de código de barras ou adicione
+                                                                manualmente.</small>
+                                                        </div>
 
-                            <!-- Cadastro de Produto via Código -->
-                            <div class="row mb-4">
-                                <div class="col-12">
-                                    <label for="codigo-input" class="form-label fw-semibold">Leitor de Código de
-                                        Barras</label>
-                                    <div class="input-group input-group-lg">
-                                        <span class="input-group-text" id="barcode-addon"><i
-                                                class="bi bi-upc-scan"></i></span>
-                                        <input type="text" id="codigo-input" class="form-control"
-                                            placeholder="Passe o leitor ou digite o código e pressione Enter"
-                                            autocomplete="off" aria-label="Código de Barras"
-                                            aria-describedby="barcode-addon" />
-                                    </div>
-                                </div>
-                            </div>
+                                                        <div id="tabela-itens-wrapper" class="table-responsive"
+                                                            style="display: none;">
+                                                            <table
+                                                                class="table table-sm table-striped table-hover align-middle mb-3">
+                                                                <thead class="table-light">
+                                                                    <tr>
+                                                                        <th>Produto</th>
+                                                                        <th style="width: 120px;">Quantidade</th>
+                                                                        <th style="width: 130px;">Preço Un.</th>
+                                                                        <th style="width: 50px;" class="text-end">Ação
+                                                                        </th>
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody id="itens-venda-container">
+                                                                </tbody>
+                                                            </table>
+                                                        </div>
 
-                            <!-- Informações de Pagamento -->
-                            <div class="card mb-4">
-                                <div class="card-header">
-                                    <h4 class="fs-5 mb-2">Informações de Pagamento</h4>
-                                </div>
-                                <div class="card-body">
-                                    <div id="pagamentos-container">
-                                    </div>
-                                    <button type="button" id="add-pagamento-btn"
-                                        class="btn btn-outline-info btn-sm w-auto mb-3">
-                                        <i class="bi bi-currency-dollar"></i> Adicionar Pagamento
-                                    </button>
-                                    <input type="hidden" name="desconto" id="desconto_input" value="0.00">
-                                </div>
+                                                        <button type="button" id="add-item-btn"
+                                                            class="btn btn-outline-secondary btn-sm">
+                                                            <i class="bi bi-plus-circle"></i> Adicionar Produto
+                                                            Manualmente
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
 
-                                <div class="card-footer bg-white border-top pt-3"></div>
+                                            <!-- 💰 Resumo de Preços -->
+                                            <div class="col-12 col-lg-5 d-flex flex-column gap-4">
+                                                <div class="card shadow-sm">
 
-                                <div class="card-footer bg-transparent">
-                                    <div class="d-flex justify-content-between mb-2">
-                                        <h5 class="fs-6 text-secondary">Total Pago</h5>
-                                        <h4 class="fs-5">R$ <span id="total-pago">0.00</span></h4>
-                                    </div>
-                                    <div class="d-flex justify-content-between mb-2" id="restante-row">
-                                        <h5 class="fs-6 text-secondary">Valor Restante</h5>
-                                        <h4 class="fs-5">R$ <span id="valor-restante">0.00</span></h4>
-                                    </div>
-                                    <div class="d-flex justify-content-between text-success d-none" id="troco-row">
-                                        <h5 class="fs-6 text-secondary">Troco</h5>
-                                        <h4 class="fs-5">R$ <span id="troco">0.00</span></h4>
-                                    </div>
-                                </div>
-                            </div>
+                                                    <div class="card-header bg-light border-bottom">
+                                                        <h4 class="fs-5 mb-0 fw-semibold">💰 Resumo de Preços</h4>
+                                                    </div>
 
-                            <!-- Botão de Gerar Venda -->
-                            <div class="d-grid mt-4">
-                                <button type="submit" id="finalizar-venda-btn" class="btn btn-success btn-lg">
-                                </button>
-                            </div>
-                    </form>
+                                                    <div class="card-body">
+                                                        <div id="lista-itens-resumo" class="mb-3">
+                                                        </div>
+
+                                                        <ul class="list-group list-group-flush mb-3">
+                                                            <li
+                                                                class="list-group-item d-flex justify-content-between px-0">
+                                                                <span>Sub-total</span>
+                                                                <strong id="resumo-subtotal-valor">R$ 0,00</strong>
+                                                            </li>
+                                                            <li id="resumo-desconto-linha"
+                                                                class="list-group-item d-flex justify-content-between text-danger px-0 d-none">
+                                                                <span>Desconto</span>
+                                                                <strong id="resumo-desconto-valor">- R$ 0,00</strong>
+                                                            </li>
+                                                        </ul>
+
+                                                        <div id="global-discount-row">
+                                                            <label class="form-label small text-muted">Aplicar desconto
+                                                                na venda</label>
+                                                            <div class="input-group input-group-sm">
+                                                                <select id="global-discount-type" class="form-select"
+                                                                    style="max-width: 80px;">
+                                                                    <option value="none" selected>Sem</option>
+                                                                    <option value="porcentagem">%</option>
+                                                                    <option value="valor_fixo">R$</option>
+                                                                </select>
+                                                                <input id="global-discount-value" type="number"
+                                                                    class="form-control" placeholder="0" min="0"
+                                                                    step="0.01" />
+                                                            </div>
+                                                        </div>
+
+                                                    </div>
+
+                                                    <div class="card-footer bg-white">
+                                                        <div class="d-flex justify-content-between align-items-center">
+                                                            <h5 class="fs-6 text-secondary mb-0">Total a Pagar</h5>
+                                                            <h4 class="fs-3 mb-0 text-success fw-bold">R$
+                                                                <span id="valor_total">0.00</span>
+                                                            </h4>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- Cadastro de Produto via Código -->
+                                            <div class="row mb-4">
+                                                <div class="col-12">
+                                                    <label for="codigo-input" class="form-label fw-semibold">Leitor de
+                                                        Código de
+                                                        Barras</label>
+                                                    <div class="input-group input-group-lg">
+                                                        <span class="input-group-text" id="barcode-addon"><i
+                                                                class="bi bi-upc-scan"></i></span>
+                                                        <input type="text" id="codigo-input" class="form-control"
+                                                            placeholder="Passe o leitor ou digite o código e pressione Enter"
+                                                            autocomplete="off" aria-label="Código de Barras"
+                                                            aria-describedby="barcode-addon" />
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- Informações de Pagamento -->
+                                            <div class="card mb-4">
+                                                <div class="card-header">
+                                                    <h4 class="fs-5 mb-2">Informações de Pagamento</h4>
+                                                </div>
+                                                <div class="card-body">
+                                                    <div id="pagamentos-container">
+                                                    </div>
+                                                    <button type="button" id="add-pagamento-btn"
+                                                        class="btn btn-outline-info btn-sm w-auto mb-3">
+                                                        <i class="bi bi-currency-dollar"></i> Adicionar Pagamento
+                                                    </button>
+                                                    <input type="hidden" name="desconto" id="desconto_input"
+                                                        value="0.00">
+                                                </div>
+
+                                                <div class="card-footer bg-white border-top pt-3"></div>
+
+                                                <div class="card-footer bg-transparent">
+                                                    <div class="d-flex justify-content-between mb-2">
+                                                        <h5 class="fs-6 text-secondary">Total Pago</h5>
+                                                        <h4 class="fs-5">R$ <span id="total-pago">0.00</span></h4>
+                                                    </div>
+                                                    <div class="d-flex justify-content-between mb-2" id="restante-row">
+                                                        <h5 class="fs-6 text-secondary">Valor Restante</h5>
+                                                        <h4 class="fs-5">R$ <span id="valor-restante">0.00</span></h4>
+                                                    </div>
+                                                    <div class="d-flex justify-content-between text-success d-none"
+                                                        id="troco-row">
+                                                        <h5 class="fs-6 text-secondary">Troco</h5>
+                                                        <h4 class="fs-5">R$ <span id="troco">0.00</span></h4>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- Botão de Gerar Venda -->
+                                            <div class="d-grid mt-4">
+                                                <button type="submit" id="finalizar-venda-btn"
+                                                    class="btn btn-success btn-lg">
+                                                </button>
+                                            </div>
+                                    </form>
                 </div>
             </main>
 
@@ -170,6 +202,8 @@
                     <script>
                         const produtos = <%- JSON.stringify(produtos) %>;
                         const formasPagamento = <%- JSON.stringify(formasPagamento) %>;
+                        window.clientes = <%- JSON.stringify(clientes) %>;
+                        window.clienteDefaultId = <%- JSON.stringify(clienteDefaultId) %>;
                     </script>
 
                     <script>
