@@ -63,8 +63,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
                 editLoteModalEl.querySelector('#edit-produto-nome').textContent = lote.produto?.nome || 'N/A';
                 editLoteModalEl.querySelector('#edit-id-lote').value = lote.id_lote;
+                editLoteModalEl.querySelector('#edit-id-produto').value = lote.id_produto;
                 editLoteModalEl.querySelector('#edit-numero-lote').value = lote.numero_lote;
-                editLoteModalEl.querySelector('#edit-quantidade').value = lote.quantidade;
                 editLoteModalEl.querySelector('#edit-localizacao').value = lote.localizacao;
                 editLoteModalEl.querySelector('#edit-data-validade').value = lote.data_validade?.substring(0, 7);
                 editLoteModalEl.querySelector('#edit-preco-compra').value = lote.preco_compra;

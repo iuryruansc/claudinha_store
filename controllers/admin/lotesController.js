@@ -7,6 +7,7 @@ const Produto = require('../../models/Produto')
 const { stringValidation, numberValidation, dateValidation } = require('../../utils/data/data-validation');
 const { parseIntValue, parseDateValue, parseFloatValue } = require('../../utils/data/data-parsers');
 const { getAllLotes, updateLote, deleteLote, adicionarQuantidadeAoLote, createLoteWithMovimentacao } = require('../../services/admin/lotesService');
+const { updateProduto } = require('../../services/admin/produtosService');
 const { formatarLoteParaTabela } = require('../../services/admin/loteFormatter');
 
 router.get('/lotes', asyncHandler(async (req, res) => {
@@ -22,20 +23,19 @@ router.get('/lotes', asyncHandler(async (req, res) => {
 }));
 
 router.post('/lotes/save', asyncHandler(async (req, res) => {
-    const { localizacao, numero_lote} = req.body;
-    console.log(req.body);
+    const { localizacao, numero_lote } = req.body;
 
-    const [parsedId, parsedQuant, ] = parseIntValue(req.body.id_produto, req.body.quantidade);
+    const [parsedId, parsedQuant,] = parseIntValue(req.body.id_produto, req.body.quantidade);
     const [parsedPrecoCompra, parsedPrecoVenda] = parseFloatValue(req.body.preco_produto_compra, req.body.preco_produto_venda);
     const parsedValidade = parseDateValue(req.body.data_validade);
     const id_funcionario = req.session.userId;
 
-    numberValidation(parsedId, parsedQuant, parsedPrecoCompra,parsedPrecoVenda);
+    numberValidation(parsedId, parsedQuant, parsedPrecoCompra, parsedPrecoVenda);
     stringValidation(numero_lote);
     dateValidation(parsedValidade);
 
     console.log(parsedPrecoVenda);
-    
+
 
     const novoLote = await createLoteWithMovimentacao({
         id_produto: parsedId,
@@ -81,21 +81,40 @@ router.post('/lotes/delete/:id_lote', asyncHandler(async (req, res) => {
 
 router.post('/lotes/update/:id_lote', asyncHandler(async (req, res) => {
     const [parsedId] = parseIntValue(req.params.id_lote);
-    const [parsedQuant, parsedNumLote] = parseIntValue(req.body.quantidade, req.body.numero_lote);
+    const [parsedNumLote] = parseIntValue(req.body.numero_lote);
     const { localizacao } = req.body;
     const id_funcionario = req.session.userId;
     const parsedValidade = parseDateValue(req.body.data_validade);
+    const [preco_compra, preco_venda] = parseFloatValue(req.body.preco_compra, req.body.preco_venda);
 
-    numberValidation(parsedId, parsedQuant, parsedNumLote);
-    stringValidation(localizacao);
+    numberValidation(parsedId, parsedNumLote, preco_compra, preco_venda);
     dateValidation(parsedValidade);
 
+    const loteAntigo = await Lote.findByPk(parsedId);
+    if (!loteAntigo) {
+        req.flash('error_msg', 'Lote não encontrado.');
+        return res.redirect('/admin/lotes');
+    }
+
+    const precoVendaAntigo = Number(loteAntigo.preco_venda);
+    const novoPrecoVenda = Number(preco_venda);
+    const precoMudou = !Number.isNaN(precoVendaAntigo) && !Number.isNaN(novoPrecoVenda)
+        ? precoVendaAntigo !== novoPrecoVenda
+        : String(loteAntigo.preco_venda) !== String(preco_venda);
+
     const loteAtualizado = await updateLote(parsedId, ({
-        quantidade: parsedQuant,
         localizacao,
         numero_lote: parsedNumLote,
-        data_validade: parsedValidade
+        data_validade: parsedValidade,
+        preco_compra,
     }), id_funcionario);
+
+    if (precoMudou) {
+        const idProduto = loteAntigo.id_produto;
+        if (idProduto) {
+            await updateProduto(idProduto, { preco_venda: novoPrecoVenda });
+        }
+    }
 
     const loteParaTabela = await formatarLoteParaTabela(loteAtualizado);
 

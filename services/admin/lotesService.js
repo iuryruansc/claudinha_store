@@ -36,7 +36,7 @@ const getAllLotes = async () => {
         if (!totaisPorProdutoId[produtoId]) {
             totaisPorProdutoId[produtoId] = 0;
         }
-        
+
         totaisPorProdutoId[produtoId] += lote.quantidade;
     }
 
@@ -59,7 +59,7 @@ const getAllLotes = async () => {
         let statusQuantidade = 'ok';
         if (qtdTotalProduto === 0) {
             statusQuantidade = 'zerado';
-        } else if (qtdTotalProduto <= 5) { 
+        } else if (qtdTotalProduto <= 5) {
             statusQuantidade = 'critico';
         } else if (qtdTotalProduto <= 10) {
             statusQuantidade = 'baixo';
@@ -76,8 +76,18 @@ const getAllLotes = async () => {
     return { lotes };
 };
 
-const createLote = async (clienteData) => {
-    return await Lote.create(clienteData);
+const createLote = async (loteData) => {
+    return await connection.transaction(async (t) => {
+        const lote = await Lote.create(loteData, { transaction: t });
+        const quantidade = Number(loteData.quantidade) || 0;
+        if (quantidade !== 0) {
+            await Produto.increment(
+                { quantidade_estoque: quantidade },
+                { where: { id_produto: loteData.id_produto }, transaction: t }
+            );
+        }
+        return lote;
+    });
 };
 
 const updateLote = async (id, updateData, id_funcionario) => {

@@ -1,3 +1,4 @@
+const connection = require('../../database/database');
 const Produto = require('../../models/Produto');
 const Category = require('../../models/Category');
 const Fornecedor = require('../../models/Fornecedor');
@@ -76,7 +77,7 @@ const getAllProdutos = async () => {
         produto.setDataValue('quantidade_estoque', quant);
     }
 
-    return { produtos, categorias, fornecedores, marcas};
+    return { produtos, categorias, fornecedores, marcas };
 };
 
 const getEditData = async (id) => {
@@ -96,10 +97,24 @@ const createProduto = async (clienteData) => {
 };
 
 const updateProduto = async (id, updateData) => {
-    return await Produto.update(updateData, {
-        where: {
-            id_produto: id
+    return await connection.transaction(async (t) => {
+        const produtoResult = await Produto.update(updateData, {
+            where: { id_produto: id },
+            transaction: t
+        });
+
+        if (updateData.hasOwnProperty('preco_venda')) {
+            const novoPreco = Number(updateData.preco_venda);
+            await Lote.update(
+                { preco_venda: novoPreco },
+                {
+                    where: { id_produto: id },
+                    transaction: t
+                }
+            );
         }
+
+        return produtoResult;
     });
 };
 

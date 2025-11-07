@@ -1,7 +1,6 @@
 const express = require('express');
 const router = express.Router();
 const asyncHandler = require('../../utils/handlers/async-handler');
-const Lote = require('../../models/Lote');
 const { numberValidation, stringValidation } = require('../../utils/data/data-validation');
 const { parseIntValue, parseFloatValue } = require('../../utils/data/data-parsers');
 const { getAllProdutos, getViewDependencies, getProdutosByCategoria, getEditData, createProduto, deleteProduto, updateProduto, getProdutosByFornecedor, getProdutosByMarca } = require('../../services/admin/produtosService');
@@ -98,14 +97,14 @@ router.post('/produtos/save', asyncHandler(async (req, res) => {
         req.body.id_fornecedor,
         req.body.id_marca
     );
-    const [preco] = parseFloatValue(req.body.preco);
+    const [preco_compra, preco_venda] = parseFloatValue(req.body.preco_compra, req.body.preco_venda);
 
-    numberValidation(id_categoria, id_fornecedor, id_marca, preco);
+    numberValidation(id_categoria, id_fornecedor, id_marca, preco_compra, preco_venda);
     stringValidation(nome, codigo_barras);
 
     await createProduto({
         nome,
-        preco_compra: preco,
+        preco_compra,
         preco_venda,
         codigo_barras,
         id_categoria,
@@ -136,15 +135,16 @@ router.post('/produtos/update/:id_produto', asyncHandler(async (req, res) => {
         req.body.id_fornecedor,
         req.body.id_marca
     );
-    const [preco] = parseFloatValue(req.body.preco);
+    const [preco_compra, preco_venda] = parseFloatValue(req.body.preco_compra, req.body.preco_venda);
     const { nome, codigo_barras } = req.body;
 
-    numberValidation(id_produto, id_categoria, id_fornecedor, id_marca, preco);
+    numberValidation(id_produto, id_categoria, id_fornecedor, id_marca, preco_compra, preco_venda);
     stringValidation(nome, codigo_barras);
 
     await updateProduto(id_produto, {
         nome,
-        preco_compra: preco,
+        preco_compra,
+        preco_venda,
         codigo_barras,
         id_categoria,
         id_fornecedor,

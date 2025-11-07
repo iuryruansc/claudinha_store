@@ -59,8 +59,13 @@ export function setupMultiFieldEdit({
         for (const [key, el] of Object.entries(fields)) {
             let value = el.value.trim();
 
-            if (key === 'preco') {
+            if (key === 'preco_venda' || key === 'preco_compra' || hey.toLowerCase().includes('preco')) {
                 value = value.replace(',', '.');
+
+                if (value !== '') {
+                    const n = Number.parseFloat(value);
+                    value = Number.isFinite(n) ? Number(n.toFixed(2)) : value;
+                }
             }
 
             updatedValues[key] = value;
