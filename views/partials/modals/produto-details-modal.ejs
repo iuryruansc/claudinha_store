@@ -1,0 +1,25 @@
+<div class="modal fade" id="produtoDetailsModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="produtoDetailsModalLabel">Detalhes do Produto</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+      </div>
+      <div class="modal-body">
+        <div id="produto-details-loading" class="text-center py-4">Carregando...</div>
+        <div id="produto-details-content" class="d-none">
+          <h4 id="pd-nome"></h4>
+          <p><strong>Código de Barras:</strong> <span id="pd-codigo"></span></p>
+          <p><strong>Fornecedor:</strong> <span id="pd-fornecedor"></span></p>
+          <p><strong>Marca:</strong> <span id="pd-marca"></span></p>
+          <p><strong>Preço Compra:</strong> <span id="pd-preco-compra"></span> — <strong>Preço Venda:</strong> <span id="pd-preco-venda"></span></p>
+          <p><strong>Quantidade Estoque:</strong> <span id="pd-quantidade"></span></p>
+          <hr>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Fechar</button>
+      </div>
+    </div>
+  </div>
+</div>

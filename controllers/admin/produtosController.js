@@ -1,9 +1,11 @@
 const express = require('express');
 const router = express.Router();
 const asyncHandler = require('../../utils/handlers/async-handler');
+const { Op } = require('sequelize');
+const Produto = require('../../models/Produto');
 const { numberValidation, stringValidation } = require('../../utils/data/data-validation');
 const { parseIntValue, parseFloatValue } = require('../../utils/data/data-parsers');
-const { getAllProdutos, getViewDependencies, getProdutosByCategoria, getEditData, createProduto, deleteProduto, updateProduto, getProdutosByFornecedor, getProdutosByMarca } = require('../../services/admin/produtosService');
+const { getViewDependencies, getProdutosByCategoria, getEditData, createProduto, deleteProduto, updateProduto, getProdutosByFornecedor, getProdutosByMarca, produtoDetails } = require('../../services/admin/produtosService');
 
 router.get('/produtos/new', asyncHandler(async (req, res) => {
     const { categorias, fornecedores, marcas } = await getViewDependencies();
@@ -12,17 +14,61 @@ router.get('/produtos/new', asyncHandler(async (req, res) => {
 }));
 
 router.get('/produtos', asyncHandler(async (req, res) => {
-    const { produtos, categorias, fornecedores, marcas} = await getAllProdutos();
+    const page = Math.max(parseInt(req.query.page) || 1, 1);
+    const perPage = Math.min(parseInt(req.query.perPage) || 25, 200);
+    const offset = (page - 1) * perPage;
 
-    res.render('admin/produtos/index', {
+    const search = (req.query.search || '').trim();
+    const id_categoria = req.query.id_categoria ? Number(req.query.id_categoria) : null;
+    const id_fornecedor = req.query.id_fornecedor ? Number(req.query.id_fornecedor) : null;
+    const id_marca = req.query.id_marca ? Number(req.query.id_marca) : null;
+    const order = req.query.order || 'nome:ASC';
+
+    const where = {};
+    if (search) {
+        where[Op.or] = [
+            { nome: { [Op.like]: `%${search}%` } },
+            { codigo_barras: { [Op.like]: `%${search}%` } }
+        ];
+    }
+    if (id_categoria) where.id_categoria = id_categoria;
+    if (id_fornecedor) where.id_fornecedor = id_fornecedor;
+    if (id_marca) where.id_marca = id_marca;
+
+    const [orderField, orderDir] = order.split(':');
+
+    const orderArr = [[orderField || 'nome', (orderDir || 'ASC').toUpperCase()]];
+
+    const { rows: produtos, count } = await Produto.findAndCountAll({
+        where,
+        attributes: ['id_produto', 'nome', 'preco_compra', 'preco_venda', 'quantidade_estoque', 'id_categoria', 'id_fornecedor', 'id_marca', 'codigo_barras'],
+        limit: perPage,
+        offset,
+        order: orderArr
+    });
+
+    const { categorias, fornecedores, marcas } = await getViewDependencies();
+
+    const renderData = {
         produtos,
+        total: count,
+        page,
+        perPage,
         categorias,
         fornecedores,
         marcas,
-        categoria_nome: null,
-        fornecedor_nome: null,
-        marca_nome: null,
-    });
+        querySearch: search,
+        queryCategoria: id_categoria,
+        queryFornecedor: id_fornecedor,
+        queryMarca: id_marca,
+        queryOrder: order,
+    };
+
+    if (req.query.ajax === '1' || req.xhr) {
+        res.render('admin/produtos/_produtos-table', renderData);
+    } else {
+        res.render('admin/produtos/index', renderData);
+    }
 }));
 
 router.get('/produtos/categoria/:id_categoria', asyncHandler(async (req, res) => {
@@ -77,6 +123,34 @@ router.get('/produtos/marca/:id_marca', asyncHandler(async (req, res) => {
         categoria_nome: null,
         fornecedor_nome: null,
         marca_nome: marca?.nome_marca || 'Marca desconhecida'
+    });
+}));
+
+router.get('/produtos/:id_produto/json', asyncHandler(async (req, res) => {
+    const [id_produto] = parseIntValue(req.params.id_produto);
+    numberValidation(id_produto);
+
+    const { produto } = await produtoDetails(id_produto);
+
+    console.log(produto.marca.nome_marca);
+
+    res.json({
+        id_produto: produto.id_produto,
+        nome: produto.nome,
+        codigo_barras: produto.codigo_barras || null,
+        preco_compra: produto.preco_compra,
+        preco_venda: produto.preco_venda,
+        quantidade_estoque: produto.quantidade_estoque,
+        categoria: produto.id_categoria || null,
+        nome_fornecedor: produto.fornecedore.nome_fornecedor,
+        nome_marca: produto.marca.nome_marca,
+        lotes: (produto.lote || []).map(l => ({
+            id_lote: l.id_lote,
+            numero_lote: l.numero_lote,
+            quantidade: l.quantidade,
+            preco_venda: l.preco_venda,
+            data_validade: l.data_validade
+        }))
     });
 }));
 

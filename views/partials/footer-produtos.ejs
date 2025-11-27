@@ -1,0 +1,128 @@
+<script src="/socket.io/socket.io.js"></script>
+
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+<script src="/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+<script src="/js/app.js" type="module"></script>
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.datatables.net/2.3.4/js/dataTables.min.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+    (function () {
+        document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(el => {
+            new bootstrap.Tooltip(el);
+        });
+
+        const sidebar = document.getElementById('adminSidebar');
+        const toggle = document.getElementById('sidebarToggle');
+        const icon = toggle?.querySelector('i');
+
+        if (!sidebar || !toggle || !icon) return;
+
+        const collapsed = localStorage.getItem('sidebarCollapsed') === 'true';
+
+        sidebar.setAttribute('data-collapsed', collapsed ? 'true' : 'false');
+        document.body.setAttribute('data-sidebar-collapsed', collapsed ? 'true' : 'false');
+
+        icon.classList.remove('bi-chevron-left', 'bi-chevron-right');
+        icon.classList.add(collapsed ? 'bi-chevron-right' : 'bi-chevron-left');
+
+        if (collapsed) {
+            document.querySelectorAll('#sidebarAccordion .accordion-collapse.show').forEach(c => {
+                try {
+                    const inst = bootstrap.Collapse.getInstance(c) || new bootstrap.Collapse(c, { toggle: false });
+                    inst.hide();
+                } catch (e) { }
+            });
+        }
+
+        setTimeout(() => {
+            sidebar.removeAttribute('data-init');
+        }, 50);
+
+        toggle.addEventListener('click', () => {
+            const isCollapsed = sidebar.getAttribute('data-collapsed') === 'true';
+            const nextState = !isCollapsed;
+
+            sidebar.setAttribute('data-collapsed', nextState ? 'true' : 'false');
+            document.body.setAttribute('data-sidebar-collapsed', nextState ? 'true' : 'false');
+            localStorage.setItem('sidebarCollapsed', nextState ? 'true' : 'false');
+
+            icon.classList.toggle('bi-chevron-left');
+            icon.classList.toggle('bi-chevron-right');
+
+            if (nextState) {
+                document.querySelectorAll('#sidebarAccordion .accordion-collapse.show').forEach(c => {
+                    try {
+                        const inst = bootstrap.Collapse.getInstance(c) || new bootstrap.Collapse(c, { toggle: false });
+                        inst.hide();
+                    } catch (e) { }
+                });
+            }
+        });
+    })();
+
+    (function () {
+        const sidebar = document.getElementById('adminSidebar');
+        const flyout = document.getElementById('sidebarFlyout');
+        let flyoutTimeout;
+
+        document.querySelectorAll('#sidebarAccordion .accordion-button').forEach(btn => {
+            const collapseId = btn.getAttribute('data-bs-target');
+            const collapseEl = document.querySelector(collapseId);
+
+            // Hover para mostrar flyout
+            btn.addEventListener('mouseenter', () => {
+                const isCollapsed = sidebar.getAttribute('data-collapsed') === 'true';
+                if (!isCollapsed || !collapseEl) return;
+
+                const clone = collapseEl.cloneNode(true);
+                clone.classList.remove('collapse');
+                clone.classList.add('flyout-content');
+                clone.style.display = 'block';
+
+                flyout.innerHTML = '';
+                flyout.appendChild(clone);
+                flyout.style.top = `${btn.getBoundingClientRect().top}px`;
+                flyout.style.left = `${sidebar.getBoundingClientRect().right}px`;
+                flyout.style.display = 'block';
+            });
+
+            // Delay para esconder o flyout
+            btn.addEventListener('mouseleave', () => {
+                flyoutTimeout = setTimeout(() => {
+                    if (!flyout.matches(':hover')) {
+                        flyout.style.display = 'none';
+                    }
+                }, 200);
+            });
+
+            // Bloqueia expansão quando colapsado
+            btn.addEventListener('click', (e) => {
+                const isCollapsed = sidebar.getAttribute('data-collapsed') === 'true';
+                if (isCollapsed) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                }
+            });
+        });
+
+        flyout.addEventListener('mouseenter', () => {
+            clearTimeout(flyoutTimeout);
+            flyout.style.display = 'block';
+        });
+
+        flyout.addEventListener('mouseleave', () => {
+            flyout.style.display = 'none';
+        });
+    })();
+
+
+
+    const saved = localStorage.getItem('sidebarCollapsed') === 'true';
+    document.body.setAttribute('data-sidebar-collapsed', saved ? 'true' : 'false');
+</script>
+
+
+<%- include('./caixa-venda-erro.ejs') %>

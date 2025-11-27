@@ -25,11 +25,25 @@ export function setupMultiFieldEdit({
     const fields = {};
     const originalValues = {};
 
+    function getProcessedValue(key, element) {
+        let value = element.value.trim();
+
+        if (key === 'preco_venda' || key === 'preco_compra' || key.toLowerCase().includes('preco')) {
+            value = value.replace(',', '.');
+
+            if (value !== '') {
+                const n = Number.parseFloat(value);
+                return Number.isFinite(n) ? Number(n.toFixed(2)) : value;
+            }
+        }
+        return value;
+    }
+
     for (const [key, selector] of Object.entries(fieldMap)) {
         const el = document.querySelector(selector);
         if (el) {
             fields[key] = el;
-            originalValues[key] = el.value.trim();
+            originalValues[key] = getProcessedValue(key, el);
         }
     }
 
@@ -56,19 +70,9 @@ export function setupMultiFieldEdit({
         event.preventDefault();
 
         const updatedValues = {};
+        
         for (const [key, el] of Object.entries(fields)) {
-            let value = el.value.trim();
-
-            if (key === 'preco_venda' || key === 'preco_compra' || hey.toLowerCase().includes('preco')) {
-                value = value.replace(',', '.');
-
-                if (value !== '') {
-                    const n = Number.parseFloat(value);
-                    value = Number.isFinite(n) ? Number(n.toFixed(2)) : value;
-                }
-            }
-
-            updatedValues[key] = value;
+            updatedValues[key] = getProcessedValue(key, el);
         }
 
         const isUnchanged = Object.keys(updatedValues).every(
@@ -80,7 +84,11 @@ export function setupMultiFieldEdit({
             return;
         }
 
-        const missingRequired = requiredFields.some(key => !updatedValues[key]);
+        const missingRequired = requiredFields.some(key => {
+            const val = updatedValues[key];
+            return val === '' || val === null || val === undefined;
+        });
+
         if (missingRequired) {
             showErrorPopup(errorMessages.required);
             return;
@@ -109,5 +117,6 @@ export function setupMultiFieldEdit({
             showErrorPopup(errorMessages.network);
         }
     });
+    
     validateForm();
 }

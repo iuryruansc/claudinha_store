@@ -34,9 +34,6 @@ router.post('/lotes/save', asyncHandler(async (req, res) => {
     stringValidation(numero_lote);
     dateValidation(parsedValidade);
 
-    console.log(parsedPrecoVenda);
-
-
     const novoLote = await createLoteWithMovimentacao({
         id_produto: parsedId,
         preco_compra: parsedPrecoCompra,

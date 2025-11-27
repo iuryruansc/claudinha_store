@@ -68,15 +68,6 @@ const getAllProdutos = async () => {
         dependenciesPromise
     ]);
 
-    for (const produto of produtos) {
-        let quant = 0
-        const lotes = await Lote.findAll({ where: { id_produto: produto.id_produto } });
-        for (const lote of lotes) {
-            quant += Number(lote.quantidade || 0);
-        }
-        produto.setDataValue('quantidade_estoque', quant);
-    }
-
     return { produtos, categorias, fornecedores, marcas };
 };
 
@@ -126,6 +117,27 @@ const deleteProduto = async (id) => {
     });
 };
 
+const produtoDetails = async (id_produto) => {
+    const produto = await Produto.findByPk(id_produto, {
+        include: [
+            { model: Fornecedor, attributes: ['id_fornecedor', 'nome_fornecedor'] },
+            { model: Marca, attributes: ['id_marca', 'nome_marca'] }
+        ]
+    });
+
+    if (!produto) throw new Error('Produto não encontrado');
+
+    const lotes = await Lote.findAll({
+        where: { id_produto: id_produto },
+        attributes: ['id_lote', 'numero_lote', 'quantidade', 'preco_venda', 'data_validade', 'numero_lote'],
+        order: [['data_validade', 'ASC']]
+    });
+
+    produto.setDataValue('lote', lotes);
+
+    return { produto };
+};
+
 module.exports = {
     findProdutoById,
     getViewDependencies,
@@ -137,5 +149,6 @@ module.exports = {
     getEditData,
     createProduto,
     updateProduto,
-    deleteProduto
+    deleteProduto,
+    produtoDetails
 }

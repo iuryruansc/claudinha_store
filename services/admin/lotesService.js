@@ -76,20 +76,6 @@ const getAllLotes = async () => {
     return { lotes };
 };
 
-const createLote = async (loteData) => {
-    return await connection.transaction(async (t) => {
-        const lote = await Lote.create(loteData, { transaction: t });
-        const quantidade = Number(loteData.quantidade) || 0;
-        if (quantidade !== 0) {
-            await Produto.increment(
-                { quantidade_estoque: quantidade },
-                { where: { id_produto: loteData.id_produto }, transaction: t }
-            );
-        }
-        return lote;
-    });
-};
-
 const updateLote = async (id, updateData, id_funcionario) => {
     return await connection.transaction(async (t) => {
         const lote = await Lote.findByPk(id, { transaction: t });
@@ -274,9 +260,15 @@ const createLoteWithMovimentacao = async (data, id_funcionario) => {
             observacao: 'Entrada via cadastro de lote'
         }, { transaction: t });
 
+        const quantidade = Number(novoLote.quantidade) || 0;
+        if (quantidade !== 0) {
+            await produto.increment('quantidade_estoque', { by: quantidade, transaction: t });
+            await produto.reload({ transaction: t });
+        }
+
+
         const precoAntigo = parseFloat(produto.preco_venda);
         const precoNovo = parseFloat(data.preco_venda);
-
         if (precoNovo != precoAntigo) {
             await produto.update({ preco_venda: data.preco_venda }, { transaction: t })
         }
@@ -289,7 +281,6 @@ module.exports = {
     findLoteById,
     getViewDependencies,
     getAllLotes,
-    createLote,
     updateLote,
     deleteLote,
     adicionarQuantidadeAoLote,
