@@ -78,11 +78,14 @@ router.post('/lotes/delete/:id_lote', asyncHandler(async (req, res) => {
 
 router.post('/lotes/update/:id_lote', asyncHandler(async (req, res) => {
     const [parsedId] = parseIntValue(req.params.id_lote);
-    const [parsedNumLote] = req.body.numero_lote;
+    const { numero_lote } = req.body;
     const { localizacao } = req.body;
     const id_funcionario = req.session.userId;
     const parsedValidade = parseDateValue(req.body.data_validade);
     const [preco_compra, preco_venda] = parseFloatValue(req.body.preco_compra, req.body.preco_venda);
+
+    console.log(numero_lote);
+    
 
     numberValidation(parsedId, preco_compra, preco_venda);
     dateValidation(parsedValidade);
@@ -101,7 +104,7 @@ router.post('/lotes/update/:id_lote', asyncHandler(async (req, res) => {
 
     const loteAtualizado = await updateLote(parsedId, ({
         localizacao,
-        numero_lote: parsedNumLote,
+        numero_lote,
         data_validade: parsedValidade,
         preco_compra,
     }), id_funcionario);
