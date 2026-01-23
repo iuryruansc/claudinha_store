@@ -1,4 +1,4 @@
-import { on, disconnect } from '/js/services/socket-service.js';
+import { on, disconnect } from './services/socket-service.js';
 
 console.log('Global app script loaded. Listening for forceDisconnect.');
 

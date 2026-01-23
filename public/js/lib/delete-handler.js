@@ -1,11 +1,16 @@
-import { showErrorPopup } from "/js/lib/show-error-popup.js";
+import { showErrorPopup } from "./show-error-popup.js";
 
 export function setupRowDelete(deleteForms, toggleExcluir, tableBody) {
 
     toggleExcluir.addEventListener("change", () => {
-        tableBody.classList.toggle("delete-enabled", toggleExcluir.checked);
+        const isChecked = toggleExcluir.checked;
+        tableBody.classList.toggle("delete-enabled", isChecked);
 
-        if (toggleExcluir.checked) {
+        document.querySelectorAll(".excluir-btn").forEach(btn => {
+            btn.style.display = isChecked ? "inline-block" : "none";
+        });
+
+        if (isChecked) {
 
             document
                 .querySelectorAll(".excluir-btn")

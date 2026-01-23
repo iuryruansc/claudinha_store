@@ -144,7 +144,7 @@ const createVenda = async (vendaData, id_funcionario, id_caixa) => {
 
         const venda = await Venda.create({
             valor_total: 0,
-            id_cliente: vendaData.id_cliente || null,
+            id_cliente: vendaData.id_cliente && vendaData.id_cliente !== '0' ? vendaData.id_cliente : null,
             id_funcionario,
             id_caixa,
             status: 'PENDENTE'
@@ -261,6 +261,17 @@ const createVenda = async (vendaData, id_funcionario, id_caixa) => {
                 }, { transaction: t });
             }
             await PagamentoParcial.destroy({ where: { id_venda: venda.id_venda }, transaction: t });
+        }
+
+        // Atualizar quantidade_estoque dos produtos vendidos
+        const produtosVendidos = [...new Set(itens.map(item => item.id_produto))];
+        for (const id_produto of produtosVendidos) {
+            const lotesProduto = await Lote.findAll({
+                where: { id_produto },
+                transaction: t
+            });
+            const totalQuantidade = lotesProduto.reduce((sum, lote) => sum + lote.quantidade, 0);
+            await Produto.update({ quantidade_estoque: totalQuantidade }, { where: { id_produto }, transaction: t });
         }
 
         return venda;

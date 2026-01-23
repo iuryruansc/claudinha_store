@@ -155,18 +155,18 @@ io.use((socket, next) => {
     }
 
     const userId = session.user.id_funcionario;
-    if (activeUserSockets.has(userId)) {
-      const oldSocketId = activeUserSockets.get(userId);
-
-      if (oldSocketId !== socket.id) {
-        const oldSocket = io.sockets.sockets.get(oldSocketId);
-        if (oldSocket) {
-          console.log(`Forçando desconexão do socket antigo ${oldSocketId} para o usuário ${userId}`);
-          oldSocket.emit('forceDisconnect', 'Detectamos que sua conta foi acessada em uma nova aba ou dispositivo. Para sua segurança, apenas uma sessão pode permanecer ativa. Feche essa aba ou clique em entendido para desativar outras abas e utilizar esta.');
-          oldSocket.disconnect(true);
-        }
-      }
-    }
+    /*     if (activeUserSockets.has(userId)) {
+          const oldSocketId = activeUserSockets.get(userId);
+    
+          if (oldSocketId !== socket.id) {
+            const oldSocket = io.sockets.sockets.get(oldSocketId);
+            if (oldSocket) {
+              console.log(`Forçando desconexão do socket antigo ${oldSocketId} para o usuário ${userId}`);
+              oldSocket.emit('forceDisconnect', 'Detectamos que sua conta foi acessada em uma nova aba ou dispositivo. Para sua segurança, apenas uma sessão pode permanecer ativa. Feche essa aba ou clique em entendido para desativar outras abas e utilizar esta.');
+              oldSocket.disconnect(true);
+            }
+          }
+        } */
 
     next();
   });
