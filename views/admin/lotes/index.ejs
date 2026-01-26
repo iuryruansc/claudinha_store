@@ -44,6 +44,7 @@
                                                         <th>Preço de Compra</th>
                                                         <th>Preço de Venda</th>
                                                         <th>Lote</th>
+                                                        <th style="display: none;">Código de Barras</th>
                                                         <th class="text-center">Quantidade</th>
                                                         <th>Localização</th>
                                                         <th>Status da Validade</th>
@@ -88,6 +89,9 @@
                                                                 </td>
                                                                 <td class="text-center">
                                                                     <%= lote.numero_lote %>
+                                                                </td>
+                                                                <td style="display: none;">
+                                                                    <%= produto.codigo_barras %>
                                                                 </td>
                                                                 <td class="text-center fw-bold">
                                                                     <%= lote.quantidade %>
