@@ -1,135 +1,268 @@
 <%- include('../../partials/header.ejs') %>
-<%- include('../../partials/navbar.ejs') %>
+    <%- include('../../partials/navbar.ejs') %>
 
-<body>
-    <main class="main-content">
-        <div class="container my-4">
+        <body>
+            <main class="main-content">
+                <div class="container my-4">
 
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <h2 class="mb-0 h4">
-                    <i class="bi bi-receipt-cutoff me-2"></i>
-                    Detalhes da Venda #<%= venda.id_venda %>
-                </h2>
-                <% if(venda.status === 'CONCLUIDA') { %>
-                    <span class="badge bg-success fs-6">Concluída</span>
-                <% } else { %>
-                    <span class="badge bg-warning text-dark fs-6">Pendente</span>
-                <% } %>
-            </div>
-
-            <div class="card shadow-sm mb-4">
-                <div class="card-body d-flex justify-content-around text-center">
-                    <div>
-                        <small class="text-muted d-block">Data da Venda</small>
-                        <i class="bi bi-calendar me-1"></i> <%= new Date(venda.data_hora).toLocaleString('pt-BR') %>
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h2 class="mb-0 h4">
+                            <i class="bi bi-receipt-cutoff me-2"></i>
+                            Detalhes da Venda #<%= venda.id_venda %>
+                        </h2>
+                        <% if(venda.status==='CONCLUIDA' ) { %>
+                            <span class="badge bg-success fs-6">Concluída</span>
+                            <% } else { %>
+                                <span class="badge bg-warning text-dark fs-6">Pendente</span>
+                                <% } %>
                     </div>
-                    <div>
-                        <small class="text-muted d-block">Cliente</small>
-                        <i class="bi bi-person-circle me-1"></i> <%= venda.cliente ? venda.cliente.nome : 'Anônimo' %>
-                    </div>
-                    <div>
-                        <small class="text-muted d-block">Vendedor</small>
-                        <i class="bi bi-person-badge me-1"></i> <%= venda.funcionario ? venda.funcionario.nome : 'Não identificado' %>
-                    </div>
-                </div>
-            </div>
 
-            <div class="row g-4">
-                <div class="col-lg-7">
-                    <div class="card shadow-sm">
-                        <div class="card-header"><h5 class="mb-0 fs-5">Itens da Venda</h5></div>
-                        <div class="card-body">
-                            <div class="table-responsive">
-                                <table class="table align-middle">
-                                    <thead>
-                                        <tr>
-                                            <th>Produto</th>
-                                            <th class="text-center">Qtd.</th>
-                                            <th class="text-end">Preço Un.</th>
-                                            <th class="text-end">Subtotal</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <% venda.itemvendas.forEach(item => { %>
-                                            <tr>
-                                                <td><%= item.produto ? item.produto.nome : 'Produto Excluído' %></td>
-                                                <td class="text-center"><%= item.quantidade %></td>
-                                                <td class="text-end"><%= parseFloat(item.preco_unitario).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) %></td>
-                                                <td class="text-end fw-semibold"><%= (item.quantidade * item.preco_unitario).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) %></td>
-                                            </tr>
-                                        <% }) %>
-                                    </tbody>
-                                    <tfoot>
-                                        <tr class="border-top">
-                                            <td colspan="3" class="text-end">Subtotal dos Itens</td>
-                                            <td class="text-end fw-semibold"><%= parseFloat(venda.valor_total).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) %></td>
-                                        </tr>
-                                        </tfoot>
-                                </table>
+                    <div class="card shadow-sm mb-4">
+                        <div class="card-body d-flex justify-content-around text-center">
+                            <div>
+                                <small class="text-muted d-block">Data da Venda</small>
+                                <i class="bi bi-calendar me-1"></i>
+                                <%= new Date(venda.data_hora).toLocaleString('pt-BR') %>
+                            </div>
+                            <div>
+                                <small class="text-muted d-block">Cliente</small>
+                                <i class="bi bi-person-circle me-1"></i>
+                                <%= venda.cliente ? venda.cliente.nome : 'Anônimo' %>
+                            </div>
+                            <div>
+                                <small class="text-muted d-block">Vendedor</small>
+                                <i class="bi bi-person-badge me-1"></i>
+                                <%= venda.funcionario ? venda.funcionario.nome : 'Não identificado' %>
                             </div>
                         </div>
                     </div>
-                </div>
 
-                <div class="col-lg-5">
-                    <div class="card shadow-sm mb-4">
-                         <div class="card-header"><h5 class="mb-0 fs-5">Resumo Financeiro</h5></div>
-                         <ul class="list-group list-group-flush">
-                            <li class="list-group-item d-flex justify-content-between"><span>Total da Venda:</span> <span class="fw-semibold"><%= parseFloat(venda.valor_total).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) %></span></li>
-                            <li class="list-group-item d-flex justify-content-between"><span>Valor Pago:</span> <span class="text-success fw-semibold"><%= totalPago.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) %></span></li>
-                            <li class="list-group-item d-flex justify-content-between">
-                                <% if(saldo <= 0) { %>
-                                    <span>Troco:</span> <span class="fw-semibold"><%= Math.abs(saldo).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) %></span>
-                                <% } else { %>
-                                    <span>Saldo Devedor:</span> <span class="text-danger fw-semibold"><%= Math.abs(saldo).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) %></span>
-                                <% } %>
-                            </li>
-                         </ul>
+                    <div class="row g-4">
+                        <div class="col-lg-7">
+                            <div class="card shadow-sm">
+                                <div class="card-header">
+                                    <h5 class="mb-0 fs-5">Itens da Venda</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="table-responsive">
+                                        <table class="table align-middle">
+                                            <thead>
+                                                <tr>
+                                                    <th>Produto</th>
+                                                    <th class="text-center">Qtd.</th>
+                                                    <th class="text-end">Preço Un.</th>
+                                                    <th class="text-end">Desconto</th>
+                                                    <th class="text-end">Subtotal</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <% venda.itemvendas.forEach(item=> { %>
+                                                    <tr>
+                                                        <td>
+                                                            <%= item.produto ? item.produto.nome : 'Produto Excluído' %>
+                                                        </td>
+                                                        <td class="text-center">
+                                                            <%= item.quantidade %>
+                                                        </td>
+                                                        <td class="text-end">
+                                                            <%= parseFloat(item.preco_unitario).toLocaleString('pt-BR',
+                                                                { style: 'currency' , currency: 'BRL' }) %>
+                                                        </td>
+                                                        <td class="text-end">
+                                                            <% let descontoDisplay='-' ; if (item.desconto_tipo &&
+                                                                item.desconto_tipo !=='none' &&
+                                                                parseFloat(item.desconto_valor)> 0) {
+                                                                if (item.desconto_tipo === 'porcentagem') {
+                                                                descontoDisplay = item.desconto_valor + '%';
+                                                                } else if (item.desconto_tipo === 'valor_fixo') {
+                                                                const precoItem = item.quantidade *
+                                                                parseFloat(item.preco_unitario);
+                                                                const descontoAplicado =
+                                                                Math.min(parseFloat(item.desconto_valor), precoItem);
+                                                                descontoDisplay =
+                                                                descontoAplicado.toLocaleString('pt-BR', { style:
+                                                                'currency', currency: 'BRL' });
+                                                                }
+                                                                }
+                                                                %>
+                                                                <%= descontoDisplay %>
+                                                        </td>
+                                                        <td class="text-end fw-semibold">
+                                                            <% let precoItem=item.quantidade *
+                                                                parseFloat(item.preco_unitario); let descontoItem=0; if
+                                                                (item.desconto_tipo==='porcentagem' &&
+                                                                parseFloat(item.desconto_valor)> 0) {
+                                                                descontoItem = precoItem *
+                                                                (parseFloat(item.desconto_valor) / 100);
+                                                                } else if (item.desconto_tipo === 'valor_fixo' &&
+                                                                parseFloat(item.desconto_valor) > 0) {
+                                                                descontoItem = parseFloat(item.desconto_valor);
+                                                                }
+                                                                const subtotalComDesconto = precoItem - descontoItem;
+                                                                %>
+                                                                <%= subtotalComDesconto.toLocaleString('pt-BR', {
+                                                                    style: 'currency' , currency: 'BRL' }) %>
+                                                        </td>
+                                                    </tr>
+                                                    <% }) %>
+                                            </tbody>
+                                            <tfoot>
+                                                <tr class="border-top">
+                                                    <td colspan="4" class="text-end">Subtotal dos Itens</td>
+                                                    <td class="text-end fw-semibold">
+                                                        <% let subtotalItens=0; venda.itemvendas.forEach(item=> {
+                                                            let precoItem = item.quantidade *
+                                                            parseFloat(item.preco_unitario);
+                                                            let descontoItem = 0;
+                                                            if (item.desconto_tipo === 'porcentagem' &&
+                                                            parseFloat(item.desconto_valor) > 0) {
+                                                            descontoItem = precoItem * (parseFloat(item.desconto_valor)
+                                                            / 100);
+                                                            } else if (item.desconto_tipo === 'valor_fixo' &&
+                                                            parseFloat(item.desconto_valor) > 0) {
+                                                            descontoItem = parseFloat(item.desconto_valor);
+                                                            }
+                                                            subtotalItens += precoItem - descontoItem;
+                                                            });
+                                                            %>
+                                                            <%= subtotalItens.toLocaleString('pt-BR', {
+                                                                style: 'currency' , currency: 'BRL' }) %>
+                                                    </td>
+                                                </tr>
+                                            </tfoot>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-5">
+                            <div class="card shadow-sm mb-4">
+                                <div class="card-header">
+                                    <h5 class="mb-0 fs-5">Resumo Financeiro</h5>
+                                </div>
+                                <ul class="list-group list-group-flush">
+                                    <li class="list-group-item d-flex justify-content-between"><span>Subtotal (itens com
+                                            desconto):</span> <span class="fw-semibold">
+                                            <% let subtotalComDescontoItem=0; venda.itemvendas.forEach(item=> {
+                                                let precoItem = item.quantidade * parseFloat(item.preco_unitario);
+                                                let descontoItem = 0;
+                                                if (item.desconto_tipo === 'porcentagem' &&
+                                                parseFloat(item.desconto_valor) > 0) {
+                                                descontoItem = precoItem * (parseFloat(item.desconto_valor) / 100);
+                                                } else if (item.desconto_tipo === 'valor_fixo' &&
+                                                parseFloat(item.desconto_valor) > 0) {
+                                                descontoItem = parseFloat(item.desconto_valor);
+                                                }
+                                                subtotalComDescontoItem += precoItem - descontoItem;
+                                                });
+                                                %>
+                                                <%= subtotalComDescontoItem.toLocaleString('pt-BR', { style: 'currency'
+                                                    , currency: 'BRL' }) %>
+                                        </span></li>
+                                    <% if (parseFloat(venda.desconto_global)> 0) { %>
+                                        <li class="list-group-item d-flex justify-content-between text-danger">
+                                            <span>Desconto Global:</span>
+                                            <span class="fw-semibold">- <%=
+                                                    parseFloat(venda.desconto_global).toLocaleString('pt-BR', {
+                                                    style: 'currency' , currency: 'BRL' }) %></span>
+                                        </li>
+                                        <% } %>
+                                            <li class="list-group-item d-flex justify-content-between border-top-2">
+                                                <span class="fw-semibold">Total da Venda:</span> <span
+                                                    class="fw-semibold">
+                                                    <%= parseFloat(venda.valor_total).toLocaleString('pt-BR', {
+                                                        style: 'currency' , currency: 'BRL' }) %>
+                                                </span></li>
+                                            <li class="list-group-item d-flex justify-content-between"><span>Valor
+                                                    Pago:</span>
+                                                <span class="text-success fw-semibold">
+                                                    <%= totalPago.toLocaleString('pt-BR', { style: 'currency' ,
+                                                        currency: 'BRL' }) %>
+                                                </span>
+                                            </li>
+                                            <li class="list-group-item d-flex justify-content-between">
+                                                <% if(saldo <=0) { %>
+                                                    <span>Troco:</span> <span class="fw-semibold">
+                                                        <%= Math.abs(saldo).toLocaleString('pt-BR', { style: 'currency'
+                                                            , currency: 'BRL' }) %>
+                                                    </span>
+                                                    <% } else { %>
+                                                        <span>Saldo Devedor:</span> <span
+                                                            class="text-danger fw-semibold">
+                                                            <%= Math.abs(saldo).toLocaleString('pt-BR', {
+                                                                style: 'currency' , currency: 'BRL' }) %>
+                                                        </span>
+                                                        <% } %>
+                                            </li>
+                                </ul>
+                            </div>
+
+                            <div class="card shadow-sm">
+                                <div class="card-header">
+                                    <h5 class="mb-0 fs-5">Histórico de Pagamentos</h5>
+                                </div>
+                                <div class="list-group list-group-flush">
+                                    <% if (venda.pagamentos.length===0 && venda.pagamentoparcials.length===0) { %>
+                                        <div class="list-group-item text-center text-muted">
+                                            Nenhum pagamento registrado para esta venda.
+                                        </div>
+                                        <% } else { %>
+                                            <% venda.pagamentos.forEach(p=> { %>
+                                                <div class="list-group-item">
+                                                    <div class="d-flex w-100 justify-content-between">
+                                                        <h6 class="mb-1 text-capitalize">
+                                                            <%= p.forma_pagamento.replace('_', ' ' ) %>
+                                                        </h6>
+                                                        <small>
+                                                            <%= new Date(p.createdAt).toLocaleDateString('pt-BR') %>
+                                                        </small>
+                                                    </div>
+                                                    <p class="mb-1">Valor: <%=
+                                                            parseFloat(p.valor_total).toLocaleString('pt-BR', {
+                                                            style: 'currency' , currency: 'BRL' }) %>
+                                                    </p>
+                                                    <% if(p.parcelapagamentos && p.parcelapagamentos.length> 0) { %>
+                                                        <small class="text-muted">
+                                                            <%= p.parcelapagamentos.length %> parcela(s)
+                                                        </small>
+                                                        <% } %>
+                                                </div>
+                                                <% }) %>
+
+                                                    <% venda.pagamentoparcials.forEach(pp=> { %>
+                                                        <div class="list-group-item">
+                                                            <div class="d-flex w-100 justify-content-between">
+                                                                <h6 class="mb-1 text-capitalize">Pagamento Parcial - <%=
+                                                                        pp.forma_pagamento.replace('_', ' ' ) %>
+                                                                </h6>
+                                                                <small>
+                                                                    <%= new
+                                                                        Date(pp.data_pagamento).toLocaleDateString('pt-BR')
+                                                                        %>
+                                                                </small>
+                                                            </div>
+                                                            <p class="mb-1">Valor: <%=
+                                                                    parseFloat(pp.valor_pago).toLocaleString('pt-BR', {
+                                                                    style: 'currency' , currency: 'BRL' }) %>
+                                                            </p>
+                                                        </div>
+                                                        <% }) %>
+                                                            <% } %>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
-                    <div class="card shadow-sm">
-                         <div class="card-header"><h5 class="mb-0 fs-5">Histórico de Pagamentos</h5></div>
-                         <div class="list-group list-group-flush">
-                                    <% if (venda.pagamentos.length === 0 && venda.pagamentoparcials.length === 0) { %>
-            <div class="list-group-item text-center text-muted">
-                Nenhum pagamento registrado para esta venda.
-            </div>
-        <% } else { %>
-                            <% venda.pagamentos.forEach(p => { %>
-                                <div class="list-group-item">
-                                    <div class="d-flex w-100 justify-content-between">
-                                        <h6 class="mb-1 text-capitalize"><%= p.forma_pagamento.replace('_', ' ') %></h6>
-                                        <small><%= new Date(p.createdAt).toLocaleDateString('pt-BR') %></small>
-                                    </div>
-                                    <p class="mb-1">Valor: <%= parseFloat(p.valor_total).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) %></p>
-                                    <% if(p.parcelapagamentos && p.parcelapagamentos.length > 0) { %>
-                                        <small class="text-muted"><%= p.parcelapagamentos.length %> parcela(s)</small>
-                                    <% } %>
-                                </div>
-                            <% }) %>
-                            
-                             <% venda.pagamentoparcials.forEach(pp => { %>
-                                <div class="list-group-item">
-                                    <div class="d-flex w-100 justify-content-between">
-                                        <h6 class="mb-1 text-capitalize">Pagamento Parcial - <%= pp.forma_pagamento.replace('_', ' ') %></h6>
-                                        <small><%= new Date(pp.data_pagamento).toLocaleDateString('pt-BR') %></small>
-                                    </div>
-                                    <p class="mb-1">Valor: <%= parseFloat(pp.valor_pago).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) %></p>
-                                </div>
-                             <% }) %>
-                             <% } %>
-                         </div>
+                    <div class="text-end mt-4 border-top pt-3">
+                        <a href="/admin/vendas" class="btn btn-secondary"><i
+                                class="bi bi-arrow-left-circle me-2"></i>Voltar para a Lista</a>
+                        <a href="#" class="btn btn-primary"><i class="bi bi-printer me-2"></i>Imprimir Recibo</a>
                     </div>
                 </div>
-            </div>
+            </main>
+        </body>
 
-             <div class="text-end mt-4 border-top pt-3">
-                <a href="/admin/vendas" class="btn btn-secondary"><i class="bi bi-arrow-left-circle me-2"></i>Voltar para a Lista</a>
-                <a href="#" class="btn btn-primary"><i class="bi bi-printer me-2"></i>Imprimir Recibo</a>
-            </div>
-        </div>
-    </main>
-</body>
+        <%- include('../../partials/footer.ejs') %>
 
-<%- include('../../partials/footer.ejs') %>
-</html>
+            </html>

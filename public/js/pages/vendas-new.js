@@ -36,7 +36,11 @@ document.addEventListener('DOMContentLoaded', () => {
             AppState.elementos.addItemBtn.addEventListener('click', () => this.addProductRow(null));
             AppState.elementos.itemsContainer.addEventListener('click', (e) => this.handleItemActions(e));
             AppState.elementos.itemsContainer.addEventListener('change', (e) => this.handleItemChange(e));
-            AppState.elementos.itemsContainer.addEventListener('input', () => UIManager.updateAll());
+            AppState.elementos.itemsContainer.addEventListener('input', (e) => {
+                this.handleItemInput(e);
+                UIManager.updateAll();
+            });
+            AppState.elementos.itemsContainer.addEventListener('change', (e) => this.handleDescontoChange(e));
             AppState.elementos.barcodeInput.addEventListener('keydown', (e) => this.handleBarcodeScan(e));
         },
 
@@ -63,9 +67,24 @@ document.addEventListener('DOMContentLoaded', () => {
             <input type="number" 
                    name="itens[${AppState.itemIndex}][quantidade]" 
                    class="form-control quantidade-input" 
-                   value="1" min="1">
+                   value="1" min="1"
+                   data-max="999999">
         </td>
         <td class="price-cell">R$ 0,00</td>
+        <td>
+            <div class="input-group input-group-sm">
+                <select class="form-select desconto-tipo-input" style="max-width: 60px;">
+                    <option value="none" selected>Sem</option>
+                    <option value="porcentagem">%</option>
+                    <option value="valor_fixo">R$</option>
+                </select>
+                <input type="number" 
+                       class="form-control desconto-valor-input" 
+                       placeholder="0" 
+                       min="0" 
+                       step="0.01">
+            </div>
+        </td>
         <td class="text-end">
             <i class="bi bi-trash icon-action remove-item-btn" 
                title="Remover Item" 
@@ -78,6 +97,12 @@ document.addEventListener('DOMContentLoaded', () => {
         <input type="hidden" 
                name="itens[${AppState.itemIndex}][preco]" 
                class="preco-item">
+        <input type="hidden" 
+               name="itens[${AppState.itemIndex}][desconto_tipo]" 
+               class="desconto-tipo-hidden">
+        <input type="hidden" 
+               name="itens[${AppState.itemIndex}][desconto_valor]" 
+               class="desconto-valor-hidden">
     `;
 
             AppState.elementos.itemsContainer.appendChild(row);
@@ -195,12 +220,22 @@ document.addEventListener('DOMContentLoaded', () => {
                 const priceCell = row.querySelector('.price-cell');
                 const loteInput = row.querySelector('.lote-id');
                 const precoInput = row.querySelector('.preco-item');
+                const quantidadeInput = row.querySelector('.quantidade-input');
 
                 const precoFinal = precoBaseDoProduto;
+                const quantidadeMax = dataDoLote.quantidade_disponivel || 999999;
 
                 priceCell.textContent = `R$ ${UIManager.formatCurrency(precoFinal)}`;
                 loteInput.value = dataDoLote.id_lote || '';
                 precoInput.value = precoFinal.toFixed(2);
+                quantidadeInput.max = quantidadeMax;
+                quantidadeInput.dataset.max = quantidadeMax;
+
+                // Validar se a quantidade atual excede o máximo
+                if (parseInt(quantidadeInput.value) > quantidadeMax) {
+                    quantidadeInput.value = quantidadeMax;
+                }
+
                 UIManager.updateAll();
             };
 
@@ -241,6 +276,43 @@ document.addEventListener('DOMContentLoaded', () => {
                     AppState.elementos.barcodeInput.value = '';
                     AppState.elementos.barcodeInput.focus();
                 });
+        },
+
+        handleItemInput(e) {
+            // Valida a quantidade máxima permitida
+            if (e.target.classList.contains('quantidade-input')) {
+                const maxQtd = parseInt(e.target.dataset.max) || 999999;
+                const qtdAtual = parseInt(e.target.value) || 0;
+
+                if (qtdAtual > maxQtd) {
+                    e.target.value = maxQtd;
+                }
+                UIManager.updateAll();
+            }
+        },
+
+        handleDescontoChange(e) {
+            if (e.target.classList.contains('desconto-tipo-input')) {
+                const row = e.target.closest('tr');
+                const tipoHidden = row.querySelector('.desconto-tipo-hidden');
+                const valorHidden = row.querySelector('.desconto-valor-hidden');
+                const tipoSelect = row.querySelector('.desconto-tipo-input');
+                const valorInput = row.querySelector('.desconto-valor-input');
+
+                tipoHidden.value = tipoSelect.value;
+                valorHidden.value = valorInput.value || '0';
+                UIManager.updateAll();
+            } else if (e.target.classList.contains('desconto-valor-input')) {
+                const row = e.target.closest('tr');
+                const tipoHidden = row.querySelector('.desconto-tipo-hidden');
+                const valorHidden = row.querySelector('.desconto-valor-hidden');
+                const tipoSelect = row.querySelector('.desconto-tipo-input');
+                const valorInput = row.querySelector('.desconto-valor-input');
+
+                tipoHidden.value = tipoSelect.value;
+                valorHidden.value = valorInput.value || '0';
+                UIManager.updateAll();
+            }
         },
 
         handleItemActions(e) {
@@ -348,7 +420,19 @@ document.addEventListener('DOMContentLoaded', () => {
             document.querySelectorAll('.item-row').forEach(row => {
                 const qtd = parseInt(row.querySelector('.quantidade-input').value) || 0;
                 const preco = parseFloat(row.querySelector('.preco-item').value) || 0;
-                subtotal += preco * qtd;
+                const tipoDesconto = row.querySelector('.desconto-tipo-input').value;
+                const valorDesconto = parseFloat(row.querySelector('.desconto-valor-input').value) || 0;
+
+                let precoItem = preco * qtd;
+                let descontoItem = 0;
+
+                if (tipoDesconto === 'porcentagem' && valorDesconto > 0) {
+                    descontoItem = precoItem * (valorDesconto / 100);
+                } else if (tipoDesconto === 'valor_fixo' && valorDesconto > 0) {
+                    descontoItem = valorDesconto;
+                }
+
+                subtotal += precoItem - descontoItem;
             });
 
             const discountType = AppState.elementos.globalDiscountType.value;
