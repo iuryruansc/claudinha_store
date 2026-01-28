@@ -1,0 +1,167 @@
+<%- include('../../partials/header.ejs') %>
+    <%- include('../../partials/navbar.ejs') %>
+
+        <body>
+            <main class="main-content">
+                <div class="container my-4">
+
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h2 class="mb-0 h4">
+                            <i class="bi bi-arrow-counterclockwise me-2"></i>
+                            Detalhes do Reembolso #<%= reembolso.id_reembolso %>
+                        </h2>
+                        <a href="/admin/reembolsos" class="btn btn-sm btn-outline-secondary">
+                            <i class="bi bi-arrow-left"></i> Voltar
+                        </a>
+                    </div>
+
+                    <div class="card shadow-sm mb-4">
+                        <div class="card-body d-flex justify-content-around text-center">
+                            <div>
+                                <small class="text-muted d-block">Status</small>
+                                <% if (reembolso.status==='CONCLUIDO' ) { %>
+                                    <span class="badge bg-success fs-6">Concluído</span>
+                                    <% } else if (reembolso.status==='PROCESSANDO' ) { %>
+                                        <span class="badge bg-info fs-6">Processando</span>
+                                        <% } else { %>
+                                            <span class="badge bg-secondary fs-6">Cancelado</span>
+                                            <% } %>
+                            </div>
+                            <div>
+                                <small class="text-muted d-block">Tipo</small>
+                                <% if (reembolso.tipo==='TOTAL' ) { %>
+                                    <span class="badge bg-danger fs-6">Reembolso Total</span>
+                                    <% } else { %>
+                                        <span class="badge bg-warning text-dark fs-6">Reembolso Parcial</span>
+                                        <% } %>
+                            </div>
+                            <div>
+                                <small class="text-muted d-block">Data</small>
+                                <i class="bi bi-calendar me-1"></i>
+                                <%= new Date(reembolso.data_reembolso).toLocaleString('pt-BR') %>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row g-4">
+                        <div class="col-lg-7">
+                            <div class="card shadow-sm">
+                                <div class="card-header">
+                                    <h5 class="mb-0 fs-5">Itens Reembolsados</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="table-responsive">
+                                        <table class="table align-middle">
+                                            <thead class="table-light">
+                                                <tr>
+                                                    <th>Produto</th>
+                                                    <th class="text-center">Qtd.</th>
+                                                    <th class="text-end">Preço Un.</th>
+                                                    <th class="text-end">Subtotal</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <% reembolso.itemreembolsos.forEach(item=> { %>
+                                                    <tr>
+                                                        <td>
+                                                            <%= item.produto?.nome || 'Produto Excluído' %>
+                                                        </td>
+                                                        <td class="text-center">
+                                                            <%= item.quantidade %>
+                                                        </td>
+                                                        <td class="text-end">
+                                                            <%= parseFloat(item.preco_unitario).toLocaleString('pt-BR',
+                                                                { style: 'currency' , currency: 'BRL' }) %>
+                                                        </td>
+                                                        <td class="text-end fw-semibold">
+                                                            <% let precoItem=item.quantidade *
+                                                                parseFloat(item.preco_unitario); let descontoItem=0; if
+                                                                (item.desconto_tipo==='porcentagem' &&
+                                                                parseFloat(item.desconto_valor)> 0) {
+                                                                descontoItem = precoItem *
+                                                                (parseFloat(item.desconto_valor) / 100);
+                                                                } else if (item.desconto_tipo === 'valor_fixo' &&
+                                                                parseFloat(item.desconto_valor) > 0) {
+                                                                descontoItem = parseFloat(item.desconto_valor);
+                                                                }
+                                                                const subtotal = precoItem - descontoItem;
+                                                                %>
+                                                                <%= subtotal.toLocaleString('pt-BR', { style: 'currency'
+                                                                    , currency: 'BRL' }) %>
+                                                        </td>
+                                                    </tr>
+                                                    <% }) %>
+                                            </tbody>
+                                            <tfoot>
+                                                <tr class="border-top">
+                                                    <td colspan="3" class="text-end fw-semibold">Total Reembolsado</td>
+                                                    <td class="text-end fw-semibold">
+                                                        <%= parseFloat(reembolso.valor_total).toLocaleString('pt-BR', {
+                                                            style: 'currency' , currency: 'BRL' }) %>
+                                                    </td>
+                                                </tr>
+                                            </tfoot>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-5">
+                            <div class="card shadow-sm mb-4">
+                                <div class="card-header">
+                                    <h5 class="mb-0 fs-5">Informações do Reembolso</h5>
+                                </div>
+                                <div class="card-body">
+                                    <ul class="list-group list-group-flush">
+                                        <li class="list-group-item d-flex justify-content-between">
+                                            <span>Venda:</span>
+                                            <a href="/admin/vendas/detalhes/<%= reembolso.id_venda %>"
+                                                class="fw-semibold">#<%= reembolso.id_venda %></a>
+                                        </li>
+                                        <li class="list-group-item d-flex justify-content-between">
+                                            <span>Cliente:</span>
+                                            <span class="fw-semibold">
+                                                <%= reembolso.venda?.cliente?.nome || 'Anônimo' %>
+                                            </span>
+                                        </li>
+                                        <li class="list-group-item d-flex justify-content-between">
+                                            <span>Processado por:</span>
+                                            <span class="fw-semibold">
+                                                <%= reembolso.funcionario?.nome || '-' %>
+                                            </span>
+                                        </li>
+                                        <% if (reembolso.motivo) { %>
+                                            <li class="list-group-item">
+                                                <span class="d-block mb-1"><strong>Motivo:</strong></span>
+                                                <p class="mb-0">
+                                                    <%= reembolso.motivo %>
+                                                </p>
+                                            </li>
+                                            <% } %>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <% if (reembolso.status !=='CANCELADO' ) { %>
+                                <div class="card shadow-sm">
+                                    <div class="card-body">
+                                        <form method="POST"
+                                            action="/admin/reembolsos/<%= reembolso.id_reembolso %>/cancelar">
+                                            <button type="submit" class="btn btn-outline-danger w-100"
+                                                onclick="return confirm('Tem certeza que deseja cancelar este reembolso? Os itens serão removidos do estoque novamente.');">
+                                                <i class="bi bi-x-circle"></i> Cancelar Reembolso
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+                                <% } %>
+                        </div>
+                    </div>
+                </div>
+            </main>
+
+            <%- include('../../partials/footer.ejs') %>
+        </body>
+
+        </html>

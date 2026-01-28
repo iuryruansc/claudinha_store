@@ -10,11 +10,17 @@
                             <i class="bi bi-receipt-cutoff me-2"></i>
                             Detalhes da Venda #<%= venda.id_venda %>
                         </h2>
-                        <% if(venda.status==='CONCLUIDA' ) { %>
-                            <span class="badge bg-success fs-6">Concluída</span>
-                            <% } else { %>
-                                <span class="badge bg-warning text-dark fs-6">Pendente</span>
-                                <% } %>
+                        <div class="d-flex gap-2 align-items-center">
+                            <% if(venda.status==='CONCLUIDA' ) { %>
+                                <span class="badge bg-success fs-6">Concluída</span>
+                                <% } else { %>
+                                    <span class="badge bg-warning text-dark fs-6">Pendente</span>
+                                    <% } %>
+                                        <button type="button" class="btn btn-sm btn-outline-danger"
+                                            data-bs-toggle="modal" data-bs-target="#reembolsoModal">
+                                            <i class="bi bi-arrow-counterclockwise"></i> Reembolsar
+                                        </button>
+                        </div>
                     </div>
 
                     <div class="card shadow-sm mb-4">
@@ -173,7 +179,8 @@
                                                     class="fw-semibold">
                                                     <%= parseFloat(venda.valor_total).toLocaleString('pt-BR', {
                                                         style: 'currency' , currency: 'BRL' }) %>
-                                                </span></li>
+                                                </span>
+                                            </li>
                                             <li class="list-group-item d-flex justify-content-between"><span>Valor
                                                     Pago:</span>
                                                 <span class="text-success fw-semibold">
@@ -261,6 +268,175 @@
                     </div>
                 </div>
             </main>
+
+            <!-- Modal de Reembolso -->
+            <div class="modal fade" id="reembolsoModal" tabindex="-1">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title"><i class="bi bi-arrow-counterclockwise me-2"></i>Processar Reembolso
+                            </h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <form id="reembolsoForm" method="POST" action="/admin/reembolsos/criar">
+                            <div class="modal-body">
+                                <input type="hidden" name="id_venda" value="<%= venda.id_venda %>">
+
+                                <div class="mb-3">
+                                    <label class="form-label">Selecione os itens para reembolsar:</label>
+                                    <div id="itensContainer" class="border rounded p-3"
+                                        style="max-height: 300px; overflow-y: auto;">
+                                        <div class="text-center text-muted">Carregando itens...</div>
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label">Tipo de Reembolso:</label>
+                                    <select id="tipoReembolso" name="tipo" class="form-select">
+                                        <option value="PARCIAL">Reembolso Parcial (apenas alguns itens)</option>
+                                        <option value="TOTAL">Reembolso Total (toda a venda)</option>
+                                    </select>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label">Motivo do Reembolso:</label>
+                                    <textarea name="motivo" class="form-control" rows="3"
+                                        placeholder="Descreva o motivo do reembolso..."></textarea>
+                                </div>
+
+                                <div class="alert alert-info">
+                                    <strong>Valor Total a Reembolsar:</strong>
+                                    <h5 id="valorReembolso">R$ 0,00</h5>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary"
+                                    data-bs-dismiss="modal">Cancelar</button>
+                                <button type="submit" class="btn btn-danger">
+                                    <i class="bi bi-check-circle"></i> Processar Reembolso
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <script>
+                document.getElementById('reembolsoModal').addEventListener('show.bs.modal', async function () {
+                    const itensContainer = document.getElementById('itensContainer');
+                    itensContainer.innerHTML = '<div class="text-center text-muted">Carregando itens...</div>';
+
+                    try {
+                        const response = await fetch('/admin/vendas/<%= venda.id_venda %>/reembolso/novo');
+                        const itens = await response.json();
+
+                        if (!itens || itens.length === 0) {
+                            itensContainer.innerHTML = '<div class="alert alert-warning">Nenhum item disponível para reembolso.</div>';
+                            return;
+                        }
+
+                        let html = '';
+                        itens.forEach(item => {
+                            html += `
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input item-reembolso" type="checkbox" 
+                                           value="${item.id_item_venda}" data-preco="${item.preco_unitario}" 
+                                           data-desconto-tipo="${item.desconto_tipo || 'none'}" data-desconto-valor="${item.desconto_valor || 0}"
+                                           data-quantidade-max="${item.qtd_disponivel_reembolso}">
+                                    <label class="form-check-label">
+                                        <strong>${item.produto?.nome || 'Produto Excluído'}</strong>
+                                        <br>
+                                        <small class="text-muted">
+                                            Qtd. original: ${item.quantidade} | Reembolsada: ${item.qtd_reembolsada} | Disponível: ${item.qtd_disponivel_reembolso}
+                                        </small>
+                                        <br>
+                                        <small class="text-muted">
+                                            Preço: R$ ${parseFloat(item.preco_unitario).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                                        </small>
+                                    </label>
+                                    <div class="ms-4 mt-1">
+                                        <input type="number" class="form-control form-control-sm" style="width: 100px;" 
+                                               name="itens_reembolsar_qtd_${item.id_item_venda}" 
+                                               placeholder="Qtd." min="1" max="${item.qtd_disponivel_reembolso}"
+                                               disabled>
+                                    </div>
+                                </div>
+                            `;
+                        });
+                        itensContainer.innerHTML = html;
+
+                        // Event listeners para checkboxes
+                        document.querySelectorAll('.item-reembolso').forEach(checkbox => {
+                            checkbox.addEventListener('change', function () {
+                                const qtdInput = document.querySelector(`input[name="itens_reembolsar_qtd_${this.value}"]`);
+                                qtdInput.disabled = !this.checked;
+                                if (this.checked && !qtdInput.value) {
+                                    qtdInput.value = this.dataset.quantidadeMax;
+                                }
+                                calcularValorReembolso();
+                            });
+                        });
+
+                        document.querySelectorAll('input[name^="itens_reembolsar_qtd_"]').forEach(input => {
+                            input.addEventListener('input', calcularValorReembolso);
+                        });
+
+                    } catch (error) {
+                        itensContainer.innerHTML = '<div class="alert alert-danger">Erro ao carregar itens: ' + error.message + '</div>';
+                    }
+                });
+
+                function calcularValorReembolso() {
+                    let total = 0;
+                    document.querySelectorAll('.item-reembolso:checked').forEach(checkbox => {
+                        const qtdInput = document.querySelector(`input[name="itens_reembolsar_qtd_${checkbox.value}"]`);
+                        const qtd = parseInt(qtdInput.value) || 0;
+                        const preco = parseFloat(checkbox.dataset.preco);
+                        let precoItem = qtd * preco;
+
+                        const tipoDesconto = checkbox.dataset.descontoTipo;
+                        const valorDesconto = parseFloat(checkbox.dataset.descontoValor) || 0;
+                        let desconto = 0;
+
+                        if (tipoDesconto === 'porcentagem' && valorDesconto > 0) {
+                            desconto = precoItem * (valorDesconto / 100);
+                        } else if (tipoDesconto === 'valor_fixo' && valorDesconto > 0) {
+                            desconto = valorDesconto;
+                        }
+
+                        total += precoItem - desconto;
+                    });
+
+                    document.getElementById('valorReembolso').textContent =
+                        total.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+                }
+
+                document.getElementById('reembolsoForm').addEventListener('submit', function (e) {
+                    const checkedItems = document.querySelectorAll('.item-reembolso:checked');
+                    if (checkedItems.length === 0) {
+                        e.preventDefault();
+                        alert('Selecione pelo menos um item para reembolsar!');
+                        return false;
+                    }
+
+                    // Adicionar dados dos itens ao formulário
+                    const itensReembolsar = [];
+                    checkedItems.forEach(checkbox => {
+                        const qtdInput = document.querySelector(`input[name="itens_reembolsar_qtd_${checkbox.value}"]`);
+                        itensReembolsar.push({
+                            id_item_venda: checkbox.value,
+                            quantidade: parseInt(qtdInput.value)
+                        });
+                    });
+
+                    // Criar um campo hidden com os dados serializados
+                    const hiddenInput = document.createElement('input');
+                    hiddenInput.type = 'hidden';
+                    hiddenInput.name = 'itens_reembolsar';
+                    hiddenInput.value = JSON.stringify(itensReembolsar);
+                    this.appendChild(hiddenInput);
+                });
+            </script>
         </body>
 
         <%- include('../../partials/footer.ejs') %>

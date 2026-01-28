@@ -100,8 +100,12 @@ router.post('/vendas/save', asyncHandler(async (req, res) => {
 
     const vendaCompleta = await Venda.findByPk(venda.id_venda, {
         include: [
-            { model: Cliente },
-            { model: ItemVenda, include: [{ model: Produto }] }
+            { model: Cliente, as: 'cliente' },
+            {
+                model: ItemVenda,
+                as: 'itemvendas',
+                include: [{ model: Produto, as: 'produto' }]
+            }
         ]
     });
 

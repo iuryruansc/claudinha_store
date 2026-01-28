@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const asyncHandler = require('../../utils/handlers/async-handler');
-const Produtos = require('../../models/produto')
+const Produtos = require('../../models/Produto');
 const { stringValidation, checkAssociations, numberValidation } = require('../../utils/data/data-validation');
 const { parseIntValue } = require('../../utils/data/data-parsers');
 const { getAllMarcas, findMarcaById, createMarca, deleteMarca, updateMarca } = require('../../services/admin/marcasService');

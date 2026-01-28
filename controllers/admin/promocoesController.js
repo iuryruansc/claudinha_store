@@ -1,9 +1,9 @@
 const express = require('express');
 const router = express.Router();
 const asyncHandler = require('../../utils/handlers/async-handler');
-const Desconto = require('../../models/desconto');
-const Produto = require('../../models/produto');
-const Lote = require('../../models/lote')
+const Desconto = require('../../models/Desconto');
+const Produto = require('../../models/Produto');
+const Lote = require('../../models/Lote');
 const { Op } = require('sequelize');
 const formatDate = require('../../utils/data/date-formatter');
 const { createDescontoParaLoteMaisProximo } = require('../../services/admin/descontosService');

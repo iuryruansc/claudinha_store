@@ -5,6 +5,7 @@ const Funcionario = require('../../models/Funcionario')
 const Cliente = require('../../models/Cliente');
 const ItemVenda = require('../../models/ItemVenda');
 const Lote = require('../../models/Lote');
+const Reembolso = require('../../models/Reembolso');
 const Desconto = require('../../models/Desconto');
 const Produto = require('../../models/Produto');
 const Pagamento = require('../../models/Pagamento');
@@ -15,7 +16,7 @@ const { modelValidation } = require('../../utils/data/data-validation');
 
 const findVendaById = async (id) => {
     const venda = await Venda.findByPk(id, {
-        include: [{ model: ItemVenda }]
+        include: [{ model: ItemVenda, as: 'itemvendas' }]
     });
     modelValidation(venda);
     return venda;
@@ -49,12 +50,19 @@ const getAllVendas = async () => {
         include: [
             {
                 model: ItemVenda,
+                as: 'itemvendas',
                 include: [{
                     model: Produto,
+                    as: 'produto'
                 }]
             },
             {
                 model: Cliente,
+                as: 'cliente'
+            },
+            {
+                model: Reembolso,
+                as: 'reembolsos'
             }
         ],
         order: [['data_hora', 'DESC']]

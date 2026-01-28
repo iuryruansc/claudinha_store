@@ -1,5 +1,5 @@
 const sequelize = require('../../database/database');
-require('../../models/Associations');
+require('../../models/associations');
 
 async function syncDatabase(alter = false) {
   try {
