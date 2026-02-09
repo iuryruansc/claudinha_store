@@ -1,5 +1,5 @@
 const cron = require('node-cron');
-const UserMeta = require('../models/userMeta');
+const UserMeta = require('../models/UserMeta');
 const { Op } = require('sequelize');
 
 function startTokenCleanup() {

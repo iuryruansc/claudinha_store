@@ -1,0 +1,123 @@
+<%- include('../../partials/header.ejs') %>
+    <%- include('../../partials/navbar.ejs') %>
+
+        <body>
+            <main class="main-content">
+                <div class="container my-4">
+
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h2 class="mb-0 h4">
+                            <i class="bi bi-arrow-counterclockwise me-2"></i>
+                            Reembolsos
+                        </h2>
+                        <a href="/admin/vendas" class="btn btn-sm btn-outline-secondary">
+                            <i class="bi bi-arrow-left"></i> Voltar às Vendas
+                        </a>
+                    </div>
+
+                    <% if (error_msg && error_msg.length> 0) { %>
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            <%= error_msg %>
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                        <% } %>
+
+                            <% if (success_msg && success_msg.length> 0) { %>
+                                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                                    <%= success_msg %>
+                                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                </div>
+                                <% } %>
+
+                                    <div class="card shadow-sm">
+                                        <div class="card-header">
+                                            <h5 class="mb-0 fs-5">Histórico de Reembolsos</h5>
+                                        </div>
+                                        <div class="card-body">
+                                            <% if (reembolsos && reembolsos.length> 0) { %>
+                                                <div class="table-responsive">
+                                                    <table class="table table-hover align-middle">
+                                                        <thead class="table-light">
+                                                            <tr>
+                                                                <th>#</th>
+                                                                <th>Venda</th>
+                                                                <th>Cliente</th>
+                                                                <th>Tipo</th>
+                                                                <th>Valor</th>
+                                                                <th>Status</th>
+                                                                <th>Data</th>
+                                                                <th class="text-center">Ações</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            <% reembolsos.forEach(r=> { %>
+                                                                <tr>
+                                                                    <td>
+                                                                        <strong>#<%= r.id_reembolso %></strong>
+                                                                    </td>
+                                                                    <td>
+                                                                        <a
+                                                                            href="/admin/vendas/detalhes/<%= r.id_venda %>">#
+                                                                            <%= r.id_venda %></a>
+                                                                    </td>
+                                                                    <td>
+                                                                        <%= r.Venda?.cliente?.nome || 'Anônimo' %>
+                                                                    </td>
+                                                                    <td>
+                                                                        <% if (r.tipo==='TOTAL' ) { %>
+                                                                            <span class="badge bg-danger">Total</span>
+                                                                            <% } else { %>
+                                                                                <span
+                                                                                    class="badge bg-warning text-dark">Parcial</span>
+                                                                                <% } %>
+                                                                    </td>
+                                                                    <td>
+                                                                        <%= parseFloat(r.valor_total).toLocaleString('pt-BR',
+                                                                            { style: 'currency' , currency: 'BRL' }) %>
+                                                                    </td>
+                                                                    <td>
+                                                                        <% if (r.status==='CONCLUIDO' ) { %>
+                                                                            <span
+                                                                                class="badge bg-success">Concluído</span>
+                                                                            <% } else if (r.status==='PROCESSANDO' ) {
+                                                                                %>
+                                                                                <span
+                                                                                    class="badge bg-info">Processando</span>
+                                                                                <% } else if (r.status==='CANCELADO' ) {
+                                                                                    %>
+                                                                                    <span
+                                                                                        class="badge bg-secondary">Cancelado</span>
+                                                                                    <% } %>
+                                                                    </td>
+                                                                    <td>
+                                                                        <%= new
+                                                                            Date(r.data_reembolso).toLocaleString('pt-BR')
+                                                                            %>
+                                                                    </td>
+                                                                    <td class="text-center">
+                                                                        <a href="/admin/reembolsos/detalhes/<%= r.id_reembolso %>"
+                                                                            class="btn btn-sm btn-outline-primary"
+                                                                            title="Ver detalhes">
+                                                                            <i class="bi bi-eye"></i>
+                                                                        </a>
+                                                                    </td>
+                                                                </tr>
+                                                                <% }) %>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                                <% } else { %>
+                                                    <div class="alert alert-info text-center py-4">
+                                                        <i class="bi bi-inbox" style="font-size: 2rem;"></i>
+                                                        <p class="mb-0 mt-2">Nenhum reembolso registrado.</p>
+                                                    </div>
+                                                    <% } %>
+                                        </div>
+                                    </div>
+                </div>
+            </main>
+
+            <%- include('../../partials/footer.ejs') %>
+        </body>
+
+        </html>

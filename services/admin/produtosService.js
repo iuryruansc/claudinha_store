@@ -109,6 +109,13 @@ const updateProduto = async (id, updateData) => {
     });
 };
 
+const updateProdutoAfterLoteChange = async (id, updateData, transaction) => {
+    return await Produto.update(updateData, {
+        where: { id_produto: id },
+        transaction
+    });
+}
+
 const deleteProduto = async (id) => {
     return await Produto.destroy({
         where: {
@@ -150,5 +157,6 @@ module.exports = {
     createProduto,
     updateProduto,
     deleteProduto,
-    produtoDetails
+    produtoDetails,
+    updateProdutoAfterLoteChange
 }

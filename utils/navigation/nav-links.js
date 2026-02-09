@@ -32,6 +32,7 @@ const navLinks = [
         icon: 'bi-wallet2',
         dropdown: [
             { label: 'Histórico de Pagamentos', href: '/admin/pagamentos', icon: 'bi-clock-history' },
+            { label: 'Reembolsos', href: '/admin/reembolsos', icon: 'bi-arrow-counterclockwise' },
             {
                 label: 'Relatórios',
                 icon: 'bi-graph-up-arrow',

@@ -21,7 +21,7 @@ const Produto = connection.define('produto', {
     },
     quantidade_estoque: {
         type: Sequelize.INTEGER,
-        allowNull: false,
+        allowNull: true,
         defaultValue: 0
     },
     id_categoria: {

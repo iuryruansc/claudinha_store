@@ -28,6 +28,11 @@ const Venda = connection.define('venda', {
         type: Sequelize.DECIMAL(10, 2),
         allowNull: false,
     },
+    desconto_global: {
+        type: Sequelize.DECIMAL(10, 2),
+        allowNull: true,
+        defaultValue: 0
+    },
     status: {
         type: Sequelize.STRING,
         allowNull: false,

@@ -1,5 +1,5 @@
 const cron = require('node-cron');
-const ca = require('../models/desconto');
+const ca = require('../models/Desconto');
 const { Op } = require('sequelize');
 
 function startPromoCleanup() {

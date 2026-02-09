@@ -5,6 +5,7 @@ const Funcionario = require('../../models/Funcionario')
 const Cliente = require('../../models/Cliente');
 const ItemVenda = require('../../models/ItemVenda');
 const Lote = require('../../models/Lote');
+const Reembolso = require('../../models/Reembolso');
 const Desconto = require('../../models/Desconto');
 const Produto = require('../../models/Produto');
 const Pagamento = require('../../models/Pagamento');
@@ -15,7 +16,7 @@ const { modelValidation } = require('../../utils/data/data-validation');
 
 const findVendaById = async (id) => {
     const venda = await Venda.findByPk(id, {
-        include: [{ model: ItemVenda }]
+        include: [{ model: ItemVenda, as: 'itemvendas' }]
     });
     modelValidation(venda);
     return venda;
@@ -49,12 +50,19 @@ const getAllVendas = async () => {
         include: [
             {
                 model: ItemVenda,
+                as: 'itemvendas',
                 include: [{
                     model: Produto,
+                    as: 'produto'
                 }]
             },
             {
                 model: Cliente,
+                as: 'cliente'
+            },
+            {
+                model: Reembolso,
+                as: 'reembolsos'
             }
         ],
         order: [['data_hora', 'DESC']]
@@ -122,7 +130,8 @@ const findLoteParaVenda = async (id_produto) => {
         preco_produto: precoOriginal,
         preco_final: parseFloat(precoFinal.toFixed(2)),
         desconto: descontoAplicado,
-        produto: lote.produto
+        produto: lote.produto,
+        quantidade_disponivel: lote.quantidade
     };
 };
 
@@ -134,7 +143,9 @@ const createVenda = async (vendaData, id_funcionario, id_caixa) => {
         const itens = vendaData.itens.map(item => ({
             ...item,
             quantidade: parseInt(item.quantidade, 10),
-            preco: parseFloat(item.preco)
+            preco: parseFloat(item.preco),
+            desconto_tipo: item.desconto_tipo || 'none',
+            desconto_valor: parseFloat(item.desconto_valor) || 0
         }));
         const pagamentos = pagamentosValidos.map(pg => ({
             ...pg,
@@ -144,7 +155,8 @@ const createVenda = async (vendaData, id_funcionario, id_caixa) => {
 
         const venda = await Venda.create({
             valor_total: 0,
-            id_cliente: vendaData.id_cliente || null,
+            desconto_global: parseFloat(vendaData.desconto) || 0,
+            id_cliente: vendaData.id_cliente && vendaData.id_cliente !== '0' ? vendaData.id_cliente : null,
             id_funcionario,
             id_caixa,
             status: 'PENDENTE'
@@ -189,7 +201,9 @@ const createVenda = async (vendaData, id_funcionario, id_caixa) => {
                     id_lote: lote.id_lote,
                     id_produto: item.id_produto,
                     quantidade: quantidadeARetirar,
-                    preco_unitario: precoUnitarioCorreto.toFixed(2)
+                    preco_unitario: precoUnitarioCorreto.toFixed(2),
+                    desconto_tipo: item.desconto_tipo || 'none',
+                    desconto_valor: item.desconto_valor || 0
                 }, { transaction: t });
 
                 await MovimentacaoEstoque.create({
@@ -206,9 +220,29 @@ const createVenda = async (vendaData, id_funcionario, id_caixa) => {
         }
 
         const itensRevalidados = await ItemVenda.findAll({ where: { id_venda: venda.id_venda }, transaction: t });
-        const valor_total_final_correto = itensRevalidados.reduce((acc, iv) => acc + (parseFloat(iv.preco_unitario) * iv.quantidade), 0);
+        const valor_total_final_correto = itensRevalidados.reduce((acc, iv) => {
+            let precoItem = parseFloat(iv.preco_unitario) * iv.quantidade;
+            let descontoItem = 0;
 
-        await venda.update({ valor_total: valor_total_final_correto }, { transaction: t });
+            if (iv.desconto_tipo === 'porcentagem' && parseFloat(iv.desconto_valor) > 0) {
+                descontoItem = precoItem * (parseFloat(iv.desconto_valor) / 100);
+            } else if (iv.desconto_tipo === 'valor_fixo' && parseFloat(iv.desconto_valor) > 0) {
+                descontoItem = parseFloat(iv.desconto_valor);
+            }
+
+            return acc + (precoItem - descontoItem);
+        }, 0);
+
+        // Aplicar desconto global se existir
+        let valorFinalComDesconto = valor_total_final_correto;
+        if (vendaData.desconto) {
+            const desconto = parseFloat(vendaData.desconto);
+            if (desconto > 0) {
+                valorFinalComDesconto -= desconto;
+            }
+        }
+
+        await venda.update({ valor_total: Math.max(0, valorFinalComDesconto) }, { transaction: t });
 
         let totalPago = 0;
         for (const pg of pagamentos) {
@@ -247,7 +281,7 @@ const createVenda = async (vendaData, id_funcionario, id_caixa) => {
             }
         }
 
-        const restante = valor_total_final_correto - totalPago;
+        const restante = valorFinalComDesconto - totalPago;
 
         if (restante <= 0.005) {
             await venda.update({ status: 'CONCLUIDA' }, { transaction: t });
@@ -261,6 +295,17 @@ const createVenda = async (vendaData, id_funcionario, id_caixa) => {
                 }, { transaction: t });
             }
             await PagamentoParcial.destroy({ where: { id_venda: venda.id_venda }, transaction: t });
+        }
+
+        // Atualizar quantidade_estoque dos produtos vendidos
+        const produtosVendidos = [...new Set(itens.map(item => item.id_produto))];
+        for (const id_produto of produtosVendidos) {
+            const lotesProduto = await Lote.findAll({
+                where: { id_produto },
+                transaction: t
+            });
+            const totalQuantidade = lotesProduto.reduce((sum, lote) => sum + lote.quantidade, 0);
+            await Produto.update({ quantidade_estoque: totalQuantidade }, { where: { id_produto }, transaction: t });
         }
 
         return venda;

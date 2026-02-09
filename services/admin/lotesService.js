@@ -4,6 +4,7 @@ const Lote = require('../../models/Lote');
 const Produto = require('../../models/Produto');
 const MovimentacaoEstoque = require('../../models/MovimentacaoEstoque');
 const { modelValidation } = require('../../utils/data/data-validation');
+const { updateProdutoAfterLoteChange } = require('./produtosService');
 
 const findLoteById = async (id) => {
     const lote = await Lote.findByPk(id);
@@ -79,6 +80,7 @@ const getAllLotes = async () => {
 const updateLote = async (id, updateData, id_funcionario) => {
     return await connection.transaction(async (t) => {
         const lote = await Lote.findByPk(id, { transaction: t });
+
         modelValidation(lote);
 
         const quantidadeAntiga = lote.quantidade;
@@ -88,6 +90,18 @@ const updateLote = async (id, updateData, id_funcionario) => {
 
         const diferenca = quantidadeNova - quantidadeAntiga;
         if (diferenca !== 0) {
+
+            const lotes = await Lote.findAll({
+                where: {
+                    id_produto: lote.id_produto
+                },
+                transaction: t
+            });
+
+            const totalQuantidade = lotes.reduce((soma, lote) => soma + lote.quantidade, 0);
+
+            updateProdutoAfterLoteChange(lote.id_produto, { quantidade_estoque: totalQuantidade }, t);
+
             await MovimentacaoEstoque.create({
                 id_lote: id,
                 data_hora: new Date(),
@@ -102,11 +116,39 @@ const updateLote = async (id, updateData, id_funcionario) => {
     });
 };
 
-const deleteLote = async (id) => {
-    return await Lote.destroy({
-        where: {
-            id_lote: id
-        }
+const deleteLote = async (id, id_funcionario) => {
+    return await connection.transaction(async (t) => {
+        const lote = await Lote.findByPk(id, { transaction: t });
+        modelValidation(lote);
+
+        const id_produto = lote.id_produto;
+        const quantidadeRemovida = lote.quantidade;
+
+        const lotesAtuais = await Lote.findAll({
+            where: {
+                id_produto: id_produto
+            },
+            transaction: t
+        });
+
+        const totalQuantidadeAtual = lotesAtuais.reduce((soma, lote) => soma + lote.quantidade, 0);
+
+        await MovimentacaoEstoque.create({
+            id_lote: id,
+            data_hora: new Date(),
+            tipo: 'SAIDA_EXCLUSAO',
+            quantidade: quantidadeRemovida,
+            id_funcionario,
+            observacao: 'Exclusão de lote.'
+        }, { transaction: t });
+
+        const totalQuantidade = totalQuantidadeAtual - quantidadeRemovida;
+
+        updateProdutoAfterLoteChange(id_produto, { quantidade_estoque: totalQuantidade }, t);
+
+        await lote.destroy({ transaction: t });
+
+        return true;
     });
 };
 

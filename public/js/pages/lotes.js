@@ -1,5 +1,5 @@
 import { setupRowDelete } from '/js/lib/delete-handler.js';
-import * as socket from '/js/services/socket-service.js';
+import * as socket from '../services/socket-service.js';
 import * as updaters from '/js/ui/lotes-updaters.js';
 
 function setupWebSocketListeners() {
@@ -64,6 +64,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 editLoteModalEl.querySelector('#edit-produto-nome').textContent = lote.produto?.nome || 'N/A';
                 editLoteModalEl.querySelector('#edit-id-lote').value = lote.id_lote;
                 editLoteModalEl.querySelector('#edit-id-produto').value = lote.id_produto;
+                editLoteModalEl.querySelector('#edit-quantidade-lote').value = lote.quantidade;
                 editLoteModalEl.querySelector('#edit-numero-lote').value = lote.numero_lote;
                 editLoteModalEl.querySelector('#edit-localizacao').value = lote.localizacao;
                 editLoteModalEl.querySelector('#edit-data-validade').value = lote.data_validade?.substring(0, 7);

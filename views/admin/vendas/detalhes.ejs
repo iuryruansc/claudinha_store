@@ -1,135 +1,444 @@
 <%- include('../../partials/header.ejs') %>
-<%- include('../../partials/navbar.ejs') %>
+    <%- include('../../partials/navbar.ejs') %>
 
-<body>
-    <main class="main-content">
-        <div class="container my-4">
+        <body>
+            <main class="main-content">
+                <div class="container my-4">
 
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <h2 class="mb-0 h4">
-                    <i class="bi bi-receipt-cutoff me-2"></i>
-                    Detalhes da Venda #<%= venda.id_venda %>
-                </h2>
-                <% if(venda.status === 'CONCLUIDA') { %>
-                    <span class="badge bg-success fs-6">Concluída</span>
-                <% } else { %>
-                    <span class="badge bg-warning text-dark fs-6">Pendente</span>
-                <% } %>
-            </div>
-
-            <div class="card shadow-sm mb-4">
-                <div class="card-body d-flex justify-content-around text-center">
-                    <div>
-                        <small class="text-muted d-block">Data da Venda</small>
-                        <i class="bi bi-calendar me-1"></i> <%= new Date(venda.data_hora).toLocaleString('pt-BR') %>
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h2 class="mb-0 h4">
+                            <i class="bi bi-receipt-cutoff me-2"></i>
+                            Detalhes da Venda #<%= venda.id_venda %>
+                        </h2>
+                        <div class="d-flex gap-2 align-items-center">
+                            <% if(venda.status==='CONCLUIDA' ) { %>
+                                <span class="badge bg-success fs-6">Concluída</span>
+                                <% } else { %>
+                                    <span class="badge bg-warning text-dark fs-6">Pendente</span>
+                                    <% } %>
+                                        <button type="button" class="btn btn-sm btn-outline-danger"
+                                            data-bs-toggle="modal" data-bs-target="#reembolsoModal">
+                                            <i class="bi bi-arrow-counterclockwise"></i> Reembolsar
+                                        </button>
+                        </div>
                     </div>
-                    <div>
-                        <small class="text-muted d-block">Cliente</small>
-                        <i class="bi bi-person-circle me-1"></i> <%= venda.cliente ? venda.cliente.nome : 'Anônimo' %>
-                    </div>
-                    <div>
-                        <small class="text-muted d-block">Vendedor</small>
-                        <i class="bi bi-person-badge me-1"></i> <%= venda.funcionario ? venda.funcionario.nome : 'Não identificado' %>
-                    </div>
-                </div>
-            </div>
 
-            <div class="row g-4">
-                <div class="col-lg-7">
-                    <div class="card shadow-sm">
-                        <div class="card-header"><h5 class="mb-0 fs-5">Itens da Venda</h5></div>
-                        <div class="card-body">
-                            <div class="table-responsive">
-                                <table class="table align-middle">
-                                    <thead>
-                                        <tr>
-                                            <th>Produto</th>
-                                            <th class="text-center">Qtd.</th>
-                                            <th class="text-end">Preço Un.</th>
-                                            <th class="text-end">Subtotal</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <% venda.itemvendas.forEach(item => { %>
-                                            <tr>
-                                                <td><%= item.produto ? item.produto.nome : 'Produto Excluído' %></td>
-                                                <td class="text-center"><%= item.quantidade %></td>
-                                                <td class="text-end"><%= parseFloat(item.preco_unitario).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) %></td>
-                                                <td class="text-end fw-semibold"><%= (item.quantidade * item.preco_unitario).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) %></td>
-                                            </tr>
-                                        <% }) %>
-                                    </tbody>
-                                    <tfoot>
-                                        <tr class="border-top">
-                                            <td colspan="3" class="text-end">Subtotal dos Itens</td>
-                                            <td class="text-end fw-semibold"><%= parseFloat(venda.valor_total).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) %></td>
-                                        </tr>
-                                        </tfoot>
-                                </table>
+                    <div class="card shadow-sm mb-4">
+                        <div class="card-body d-flex justify-content-around text-center">
+                            <div>
+                                <small class="text-muted d-block">Data da Venda</small>
+                                <i class="bi bi-calendar me-1"></i>
+                                <%= new Date(venda.data_hora).toLocaleString('pt-BR') %>
+                            </div>
+                            <div>
+                                <small class="text-muted d-block">Cliente</small>
+                                <i class="bi bi-person-circle me-1"></i>
+                                <%= venda.cliente ? venda.cliente.nome : 'Anônimo' %>
+                            </div>
+                            <div>
+                                <small class="text-muted d-block">Vendedor</small>
+                                <i class="bi bi-person-badge me-1"></i>
+                                <%= venda.funcionario ? venda.funcionario.nome : 'Não identificado' %>
                             </div>
                         </div>
                     </div>
-                </div>
 
-                <div class="col-lg-5">
-                    <div class="card shadow-sm mb-4">
-                         <div class="card-header"><h5 class="mb-0 fs-5">Resumo Financeiro</h5></div>
-                         <ul class="list-group list-group-flush">
-                            <li class="list-group-item d-flex justify-content-between"><span>Total da Venda:</span> <span class="fw-semibold"><%= parseFloat(venda.valor_total).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) %></span></li>
-                            <li class="list-group-item d-flex justify-content-between"><span>Valor Pago:</span> <span class="text-success fw-semibold"><%= totalPago.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) %></span></li>
-                            <li class="list-group-item d-flex justify-content-between">
-                                <% if(saldo <= 0) { %>
-                                    <span>Troco:</span> <span class="fw-semibold"><%= Math.abs(saldo).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) %></span>
-                                <% } else { %>
-                                    <span>Saldo Devedor:</span> <span class="text-danger fw-semibold"><%= Math.abs(saldo).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) %></span>
-                                <% } %>
-                            </li>
-                         </ul>
+                    <div class="row g-4">
+                        <div class="col-lg-7">
+                            <div class="card shadow-sm">
+                                <div class="card-header">
+                                    <h5 class="mb-0 fs-5">Itens da Venda</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="table-responsive">
+                                        <table class="table align-middle">
+                                            <thead>
+                                                <tr>
+                                                    <th>Produto</th>
+                                                    <th class="text-center">Qtd.</th>
+                                                    <th class="text-end">Preço Un.</th>
+                                                    <th class="text-end">Desconto</th>
+                                                    <th class="text-end">Subtotal</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <% venda.itemvendas.forEach(item=> { %>
+                                                    <tr>
+                                                        <td>
+                                                            <%= item.produto ? item.produto.nome : 'Produto Excluído' %>
+                                                        </td>
+                                                        <td class="text-center">
+                                                            <%= item.quantidade %>
+                                                        </td>
+                                                        <td class="text-end">
+                                                            <%= parseFloat(item.preco_unitario).toLocaleString('pt-BR',
+                                                                { style: 'currency' , currency: 'BRL' }) %>
+                                                        </td>
+                                                        <td class="text-end">
+                                                            <% let descontoDisplay='-' ; if (item.desconto_tipo &&
+                                                                item.desconto_tipo !=='none' &&
+                                                                parseFloat(item.desconto_valor)> 0) {
+                                                                if (item.desconto_tipo === 'porcentagem') {
+                                                                descontoDisplay = item.desconto_valor + '%';
+                                                                } else if (item.desconto_tipo === 'valor_fixo') {
+                                                                const precoItem = item.quantidade *
+                                                                parseFloat(item.preco_unitario);
+                                                                const descontoAplicado =
+                                                                Math.min(parseFloat(item.desconto_valor), precoItem);
+                                                                descontoDisplay =
+                                                                descontoAplicado.toLocaleString('pt-BR', { style:
+                                                                'currency', currency: 'BRL' });
+                                                                }
+                                                                }
+                                                                %>
+                                                                <%= descontoDisplay %>
+                                                        </td>
+                                                        <td class="text-end fw-semibold">
+                                                            <% let precoItem=item.quantidade *
+                                                                parseFloat(item.preco_unitario); let descontoItem=0; if
+                                                                (item.desconto_tipo==='porcentagem' &&
+                                                                parseFloat(item.desconto_valor)> 0) {
+                                                                descontoItem = precoItem *
+                                                                (parseFloat(item.desconto_valor) / 100);
+                                                                } else if (item.desconto_tipo === 'valor_fixo' &&
+                                                                parseFloat(item.desconto_valor) > 0) {
+                                                                descontoItem = parseFloat(item.desconto_valor);
+                                                                }
+                                                                const subtotalComDesconto = precoItem - descontoItem;
+                                                                %>
+                                                                <%= subtotalComDesconto.toLocaleString('pt-BR', {
+                                                                    style: 'currency' , currency: 'BRL' }) %>
+                                                        </td>
+                                                    </tr>
+                                                    <% }) %>
+                                            </tbody>
+                                            <tfoot>
+                                                <tr class="border-top">
+                                                    <td colspan="4" class="text-end">Subtotal dos Itens</td>
+                                                    <td class="text-end fw-semibold">
+                                                        <% let subtotalItens=0; venda.itemvendas.forEach(item=> {
+                                                            let precoItem = item.quantidade *
+                                                            parseFloat(item.preco_unitario);
+                                                            let descontoItem = 0;
+                                                            if (item.desconto_tipo === 'porcentagem' &&
+                                                            parseFloat(item.desconto_valor) > 0) {
+                                                            descontoItem = precoItem * (parseFloat(item.desconto_valor)
+                                                            / 100);
+                                                            } else if (item.desconto_tipo === 'valor_fixo' &&
+                                                            parseFloat(item.desconto_valor) > 0) {
+                                                            descontoItem = parseFloat(item.desconto_valor);
+                                                            }
+                                                            subtotalItens += precoItem - descontoItem;
+                                                            });
+                                                            %>
+                                                            <%= subtotalItens.toLocaleString('pt-BR', {
+                                                                style: 'currency' , currency: 'BRL' }) %>
+                                                    </td>
+                                                </tr>
+                                            </tfoot>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-5">
+                            <div class="card shadow-sm mb-4">
+                                <div class="card-header">
+                                    <h5 class="mb-0 fs-5">Resumo Financeiro</h5>
+                                </div>
+                                <ul class="list-group list-group-flush">
+                                    <li class="list-group-item d-flex justify-content-between"><span>Subtotal (itens com
+                                            desconto):</span> <span class="fw-semibold">
+                                            <% let subtotalComDescontoItem=0; venda.itemvendas.forEach(item=> {
+                                                let precoItem = item.quantidade * parseFloat(item.preco_unitario);
+                                                let descontoItem = 0;
+                                                if (item.desconto_tipo === 'porcentagem' &&
+                                                parseFloat(item.desconto_valor) > 0) {
+                                                descontoItem = precoItem * (parseFloat(item.desconto_valor) / 100);
+                                                } else if (item.desconto_tipo === 'valor_fixo' &&
+                                                parseFloat(item.desconto_valor) > 0) {
+                                                descontoItem = parseFloat(item.desconto_valor);
+                                                }
+                                                subtotalComDescontoItem += precoItem - descontoItem;
+                                                });
+                                                %>
+                                                <%= subtotalComDescontoItem.toLocaleString('pt-BR', { style: 'currency'
+                                                    , currency: 'BRL' }) %>
+                                        </span></li>
+                                    <% if (parseFloat(venda.desconto_global)> 0) { %>
+                                        <li class="list-group-item d-flex justify-content-between text-danger">
+                                            <span>Desconto Global:</span>
+                                            <span class="fw-semibold">- <%=
+                                                    parseFloat(venda.desconto_global).toLocaleString('pt-BR', {
+                                                    style: 'currency' , currency: 'BRL' }) %></span>
+                                        </li>
+                                        <% } %>
+                                            <li class="list-group-item d-flex justify-content-between border-top-2">
+                                                <span class="fw-semibold">Total da Venda:</span> <span
+                                                    class="fw-semibold">
+                                                    <%= parseFloat(venda.valor_total).toLocaleString('pt-BR', {
+                                                        style: 'currency' , currency: 'BRL' }) %>
+                                                </span>
+                                            </li>
+                                            <li class="list-group-item d-flex justify-content-between"><span>Valor
+                                                    Pago:</span>
+                                                <span class="text-success fw-semibold">
+                                                    <%= totalPago.toLocaleString('pt-BR', { style: 'currency' ,
+                                                        currency: 'BRL' }) %>
+                                                </span>
+                                            </li>
+                                            <li class="list-group-item d-flex justify-content-between">
+                                                <% if(saldo <=0) { %>
+                                                    <span>Troco:</span> <span class="fw-semibold">
+                                                        <%= Math.abs(saldo).toLocaleString('pt-BR', { style: 'currency'
+                                                            , currency: 'BRL' }) %>
+                                                    </span>
+                                                    <% } else { %>
+                                                        <span>Saldo Devedor:</span> <span
+                                                            class="text-danger fw-semibold">
+                                                            <%= Math.abs(saldo).toLocaleString('pt-BR', {
+                                                                style: 'currency' , currency: 'BRL' }) %>
+                                                        </span>
+                                                        <% } %>
+                                            </li>
+                                </ul>
+                            </div>
+
+                            <div class="card shadow-sm">
+                                <div class="card-header">
+                                    <h5 class="mb-0 fs-5">Histórico de Pagamentos</h5>
+                                </div>
+                                <div class="list-group list-group-flush">
+                                    <% if (venda.pagamentos.length===0 && venda.pagamentoparcials.length===0) { %>
+                                        <div class="list-group-item text-center text-muted">
+                                            Nenhum pagamento registrado para esta venda.
+                                        </div>
+                                        <% } else { %>
+                                            <% venda.pagamentos.forEach(p=> { %>
+                                                <div class="list-group-item">
+                                                    <div class="d-flex w-100 justify-content-between">
+                                                        <h6 class="mb-1 text-capitalize">
+                                                            <%= p.forma_pagamento.replace('_', ' ' ) %>
+                                                        </h6>
+                                                        <small>
+                                                            <%= new Date(p.createdAt).toLocaleDateString('pt-BR') %>
+                                                        </small>
+                                                    </div>
+                                                    <p class="mb-1">Valor: <%=
+                                                            parseFloat(p.valor_total).toLocaleString('pt-BR', {
+                                                            style: 'currency' , currency: 'BRL' }) %>
+                                                    </p>
+                                                    <% if(p.parcelapagamentos && p.parcelapagamentos.length> 0) { %>
+                                                        <small class="text-muted">
+                                                            <%= p.parcelapagamentos.length %> parcela(s)
+                                                        </small>
+                                                        <% } %>
+                                                </div>
+                                                <% }) %>
+
+                                                    <% venda.pagamentoparcials.forEach(pp=> { %>
+                                                        <div class="list-group-item">
+                                                            <div class="d-flex w-100 justify-content-between">
+                                                                <h6 class="mb-1 text-capitalize">Pagamento Parcial - <%=
+                                                                        pp.forma_pagamento.replace('_', ' ' ) %>
+                                                                </h6>
+                                                                <small>
+                                                                    <%= new
+                                                                        Date(pp.data_pagamento).toLocaleDateString('pt-BR')
+                                                                        %>
+                                                                </small>
+                                                            </div>
+                                                            <p class="mb-1">Valor: <%=
+                                                                    parseFloat(pp.valor_pago).toLocaleString('pt-BR', {
+                                                                    style: 'currency' , currency: 'BRL' }) %>
+                                                            </p>
+                                                        </div>
+                                                        <% }) %>
+                                                            <% } %>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
-                    <div class="card shadow-sm">
-                         <div class="card-header"><h5 class="mb-0 fs-5">Histórico de Pagamentos</h5></div>
-                         <div class="list-group list-group-flush">
-                                    <% if (venda.pagamentos.length === 0 && venda.pagamentoparcials.length === 0) { %>
-            <div class="list-group-item text-center text-muted">
-                Nenhum pagamento registrado para esta venda.
-            </div>
-        <% } else { %>
-                            <% venda.pagamentos.forEach(p => { %>
-                                <div class="list-group-item">
-                                    <div class="d-flex w-100 justify-content-between">
-                                        <h6 class="mb-1 text-capitalize"><%= p.forma_pagamento.replace('_', ' ') %></h6>
-                                        <small><%= new Date(p.createdAt).toLocaleDateString('pt-BR') %></small>
+                    <div class="text-end mt-4 border-top pt-3">
+                        <a href="/admin/vendas" class="btn btn-secondary"><i
+                                class="bi bi-arrow-left-circle me-2"></i>Voltar para a Lista</a>
+                        <a href="#" class="btn btn-primary"><i class="bi bi-printer me-2"></i>Imprimir Recibo</a>
+                    </div>
+                </div>
+            </main>
+
+            <!-- Modal de Reembolso -->
+            <div class="modal fade" id="reembolsoModal" tabindex="-1">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title"><i class="bi bi-arrow-counterclockwise me-2"></i>Processar Reembolso
+                            </h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <form id="reembolsoForm" method="POST" action="/admin/reembolsos/criar">
+                            <div class="modal-body">
+                                <input type="hidden" name="id_venda" value="<%= venda.id_venda %>">
+
+                                <div class="mb-3">
+                                    <label class="form-label">Selecione os itens para reembolsar:</label>
+                                    <div id="itensContainer" class="border rounded p-3"
+                                        style="max-height: 300px; overflow-y: auto;">
+                                        <div class="text-center text-muted">Carregando itens...</div>
                                     </div>
-                                    <p class="mb-1">Valor: <%= parseFloat(p.valor_total).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) %></p>
-                                    <% if(p.parcelapagamentos && p.parcelapagamentos.length > 0) { %>
-                                        <small class="text-muted"><%= p.parcelapagamentos.length %> parcela(s)</small>
-                                    <% } %>
                                 </div>
-                            <% }) %>
-                            
-                             <% venda.pagamentoparcials.forEach(pp => { %>
-                                <div class="list-group-item">
-                                    <div class="d-flex w-100 justify-content-between">
-                                        <h6 class="mb-1 text-capitalize">Pagamento Parcial - <%= pp.forma_pagamento.replace('_', ' ') %></h6>
-                                        <small><%= new Date(pp.data_pagamento).toLocaleDateString('pt-BR') %></small>
-                                    </div>
-                                    <p class="mb-1">Valor: <%= parseFloat(pp.valor_pago).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) %></p>
+
+                                <div class="mb-3">
+                                    <label class="form-label">Tipo de Reembolso:</label>
+                                    <select id="tipoReembolso" name="tipo" class="form-select">
+                                        <option value="PARCIAL">Reembolso Parcial (apenas alguns itens)</option>
+                                        <option value="TOTAL">Reembolso Total (toda a venda)</option>
+                                    </select>
                                 </div>
-                             <% }) %>
-                             <% } %>
-                         </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label">Motivo do Reembolso:</label>
+                                    <textarea name="motivo" class="form-control" rows="3"
+                                        placeholder="Descreva o motivo do reembolso..."></textarea>
+                                </div>
+
+                                <div class="alert alert-info">
+                                    <strong>Valor Total a Reembolsar:</strong>
+                                    <h5 id="valorReembolso">R$ 0,00</h5>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary"
+                                    data-bs-dismiss="modal">Cancelar</button>
+                                <button type="submit" class="btn btn-danger">
+                                    <i class="bi bi-check-circle"></i> Processar Reembolso
+                                </button>
+                            </div>
+                        </form>
                     </div>
                 </div>
             </div>
 
-             <div class="text-end mt-4 border-top pt-3">
-                <a href="/admin/vendas" class="btn btn-secondary"><i class="bi bi-arrow-left-circle me-2"></i>Voltar para a Lista</a>
-                <a href="#" class="btn btn-primary"><i class="bi bi-printer me-2"></i>Imprimir Recibo</a>
-            </div>
-        </div>
-    </main>
-</body>
+            <script>
+                document.getElementById('reembolsoModal').addEventListener('show.bs.modal', async function () {
+                    const itensContainer = document.getElementById('itensContainer');
+                    itensContainer.innerHTML = '<div class="text-center text-muted">Carregando itens...</div>';
 
-<%- include('../../partials/footer.ejs') %>
-</html>
+                    try {
+                        const response = await fetch('/admin/vendas/<%= venda.id_venda %>/reembolso/novo');
+                        const itens = await response.json();
+
+                        if (!itens || itens.length === 0) {
+                            itensContainer.innerHTML = '<div class="alert alert-warning">Nenhum item disponível para reembolso.</div>';
+                            return;
+                        }
+
+                        let html = '';
+                        itens.forEach(item => {
+                            html += `
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input item-reembolso" type="checkbox" 
+                                           value="${item.id_item_venda}" data-preco="${item.preco_unitario}" 
+                                           data-desconto-tipo="${item.desconto_tipo || 'none'}" data-desconto-valor="${item.desconto_valor || 0}"
+                                           data-quantidade-max="${item.qtd_disponivel_reembolso}">
+                                    <label class="form-check-label">
+                                        <strong>${item.produto?.nome || 'Produto Excluído'}</strong>
+                                        <br>
+                                        <small class="text-muted">
+                                            Qtd. original: ${item.quantidade} | Reembolsada: ${item.qtd_reembolsada} | Disponível: ${item.qtd_disponivel_reembolso}
+                                        </small>
+                                        <br>
+                                        <small class="text-muted">
+                                            Preço: R$ ${parseFloat(item.preco_unitario).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                                        </small>
+                                    </label>
+                                    <div class="ms-4 mt-1">
+                                        <input type="number" class="form-control form-control-sm" style="width: 100px;" 
+                                               name="itens_reembolsar_qtd_${item.id_item_venda}" 
+                                               placeholder="Qtd." min="1" max="${item.qtd_disponivel_reembolso}"
+                                               disabled>
+                                    </div>
+                                </div>
+                            `;
+                        });
+                        itensContainer.innerHTML = html;
+
+                        // Event listeners para checkboxes
+                        document.querySelectorAll('.item-reembolso').forEach(checkbox => {
+                            checkbox.addEventListener('change', function () {
+                                const qtdInput = document.querySelector(`input[name="itens_reembolsar_qtd_${this.value}"]`);
+                                qtdInput.disabled = !this.checked;
+                                if (this.checked && !qtdInput.value) {
+                                    qtdInput.value = this.dataset.quantidadeMax;
+                                }
+                                calcularValorReembolso();
+                            });
+                        });
+
+                        document.querySelectorAll('input[name^="itens_reembolsar_qtd_"]').forEach(input => {
+                            input.addEventListener('input', calcularValorReembolso);
+                        });
+
+                    } catch (error) {
+                        itensContainer.innerHTML = '<div class="alert alert-danger">Erro ao carregar itens: ' + error.message + '</div>';
+                    }
+                });
+
+                function calcularValorReembolso() {
+                    let total = 0;
+                    document.querySelectorAll('.item-reembolso:checked').forEach(checkbox => {
+                        const qtdInput = document.querySelector(`input[name="itens_reembolsar_qtd_${checkbox.value}"]`);
+                        const qtd = parseInt(qtdInput.value) || 0;
+                        const preco = parseFloat(checkbox.dataset.preco);
+                        let precoItem = qtd * preco;
+
+                        const tipoDesconto = checkbox.dataset.descontoTipo;
+                        const valorDesconto = parseFloat(checkbox.dataset.descontoValor) || 0;
+                        let desconto = 0;
+
+                        if (tipoDesconto === 'porcentagem' && valorDesconto > 0) {
+                            desconto = precoItem * (valorDesconto / 100);
+                        } else if (tipoDesconto === 'valor_fixo' && valorDesconto > 0) {
+                            desconto = valorDesconto;
+                        }
+
+                        total += precoItem - desconto;
+                    });
+
+                    document.getElementById('valorReembolso').textContent =
+                        total.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+                }
+
+                document.getElementById('reembolsoForm').addEventListener('submit', function (e) {
+                    const checkedItems = document.querySelectorAll('.item-reembolso:checked');
+                    if (checkedItems.length === 0) {
+                        e.preventDefault();
+                        alert('Selecione pelo menos um item para reembolsar!');
+                        return false;
+                    }
+
+                    // Adicionar dados dos itens ao formulário
+                    const itensReembolsar = [];
+                    checkedItems.forEach(checkbox => {
+                        const qtdInput = document.querySelector(`input[name="itens_reembolsar_qtd_${checkbox.value}"]`);
+                        itensReembolsar.push({
+                            id_item_venda: checkbox.value,
+                            quantidade: parseInt(qtdInput.value)
+                        });
+                    });
+
+                    // Criar um campo hidden com os dados serializados
+                    const hiddenInput = document.createElement('input');
+                    hiddenInput.type = 'hidden';
+                    hiddenInput.name = 'itens_reembolsar';
+                    hiddenInput.value = JSON.stringify(itensReembolsar);
+                    this.appendChild(hiddenInput);
+                });
+            </script>
+        </body>
+
+        <%- include('../../partials/footer.ejs') %>
+
+            </html>

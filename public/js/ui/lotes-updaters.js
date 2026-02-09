@@ -1,4 +1,4 @@
-import { setupRowDelete } from '/js/lib/delete-handler.js';
+import { setupRowDelete } from '../lib/delete-handler.js';
 
 function criarHtmlCelulasLote(lote) {
     return `

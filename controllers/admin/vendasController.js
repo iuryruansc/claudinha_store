@@ -32,11 +32,7 @@ router.get('/vendas/detalhes/:id', asyncHandler(async (req, res) => {
 
 router.get('/vendas/new', asyncHandler(async (req, res) => {
     const { clientes, produtos } = await vendaService.getViewDependencies();
-    let clienteDefaultId = 1;
-    if (Array.isArray(clientes) && clientes.length) {
-        const anon = clientes.find(c => c.is_anonymous || String(c.nome || '').toLowerCase().includes('anônim') || String(c.nome || '').toLowerCase().includes('anonim'));
-        clienteDefaultId = (anon ? anon.id_cliente : (clientes[0].id_cliente || 1));
-    }
+    const clienteDefaultId = 0;
     const formasPagamento = [
         { id_forma_pagamento: 'dinheiro', nome: 'Dinheiro' },
         { id_forma_pagamento: 'cartao_credito', nome: 'Cartão de Crédito' },
@@ -104,8 +100,12 @@ router.post('/vendas/save', asyncHandler(async (req, res) => {
 
     const vendaCompleta = await Venda.findByPk(venda.id_venda, {
         include: [
-            { model: Cliente },
-            { model: ItemVenda, include: [{ model: Produto }] }
+            { model: Cliente, as: 'cliente' },
+            {
+                model: ItemVenda,
+                as: 'itemvendas',
+                include: [{ model: Produto, as: 'produto' }]
+            }
         ]
     });
 
@@ -120,7 +120,7 @@ router.post('/vendas/save', asyncHandler(async (req, res) => {
         novaVenda: {
             id: venda.id_venda,
             vendedor: req.session.user.nome,
-            cliente: vendaData.nome_cliente || 'Anônimo',
+            cliente: vendaCompleta.cliente ? vendaCompleta.cliente.nome : 'Anônimo',
             valor: venda.valor_total,
             status: venda.status,
             timestamp: new Date()

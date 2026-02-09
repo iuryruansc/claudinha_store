@@ -2,7 +2,7 @@ import { setupMultiFieldNew } from '/js/lib/multi-field-new.js';
 import { showErrorPopup } from '/js/lib/show-error-popup.js';
 import { initModalTrigger } from "/js/lib/modal-trigger.js";
 
-import * as socket from '/js/services/socket-service.js';
+import * as socket from '../services/socket-service.js';
 import * as updaters from '/js/ui/dashboard-updaters.js';
 
 function setupWebSocketListeners() {

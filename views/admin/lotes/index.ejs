@@ -63,8 +63,10 @@
                                                 </thead>
                                                 <tbody id="lotes-table-body">
                                                     <% lotes.forEach(lote=> { %>
-                                                        <% const produto=lote.produto; let statusTexto=`Válido até ${new
-                                                            Date(lote.data_validade).toLocaleDateString('pt-BR')}`; if
+                                                        <% const produto=lote.produto; let date=new
+                                                            Date(lote.data_validade); let month=String(date.getMonth() +
+                                                            1).padStart(2, '0' ); let year=date.getFullYear(); let
+                                                            statusTexto=`Válido até ${month}/${year}`; if
                                                             (lote.statusValidade==='vencido' ) { statusTexto=`Vencido há
                                                             ${Math.abs(lote.diffDias)} dia(s)`; } else if (lote.diffDias
                                                             <=30) { statusTexto=`Vence em ${lote.diffDias} dia(s)`; } %>
@@ -87,6 +89,9 @@
                                                                 <td class="text-center">
                                                                     <%= lote.numero_lote %>
                                                                 </td>
+                                                                <td style="display: none;">
+                                                                    <%= produto.codigo_barras %>
+                                                                </td>
                                                                 <td class="text-center fw-bold">
                                                                     <%= lote.quantidade %>
                                                                 </td>
@@ -98,15 +103,6 @@
                                                                 </td>
                                                                 <td class="text-center">
                                                                     <div class="btn-group">
-                                                                        <button class="btn btn-sm btn-outline-success"
-                                                                            data-bs-toggle="modal"
-                                                                            data-bs-target="#addQuantidadeModal"
-                                                                            data-lote-id="<%= lote.id_lote %>"
-                                                                            data-lote-numero="<%= lote.numero_lote %>"
-                                                                            data-produto-nome="<%= produto ? produto.nome : '' %>"
-                                                                            title="Adicionar quantidade">
-                                                                            <i class="bi bi-plus-lg"></i>
-                                                                        </button>
                                                                         <button
                                                                             class="btn btn-sm btn-outline-primary edit-lote-btn"
                                                                             data-bs-toggle="modal"

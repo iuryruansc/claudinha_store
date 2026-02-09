@@ -1,4 +1,4 @@
-import { on } from '/js/services/socket-service.js';
+import { on } from '../services/socket-service.js';
 
 $(document).ready(function () {
     const table = $('#table-data').DataTable();

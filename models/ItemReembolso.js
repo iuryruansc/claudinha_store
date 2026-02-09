@@ -1,27 +1,27 @@
 const Sequelize = require('sequelize');
 const connection = require('../database/database');
 
-const ItemVenda = connection.define('itemvenda', {
-    id_item: {
+const ItemReembolso = connection.define('itemreembolsos', {
+    id_item_reembolso: {
         type: Sequelize.INTEGER,
         primaryKey: true,
         autoIncrement: true
     },
-    id_venda: {
+    id_reembolso: {
         type: Sequelize.INTEGER,
-        allowNull: false,
+        allowNull: false
     },
-    id_lote: {
+    id_item_venda: {
         type: Sequelize.INTEGER,
-        allowNull: false,
+        allowNull: false
     },
     id_produto: {
         type: Sequelize.INTEGER,
-        allowNull: false,
-        references: {
-            model: 'produto',
-            key: 'id_produto'
-        }
+        allowNull: false
+    },
+    id_lote: {
+        type: Sequelize.INTEGER,
+        allowNull: false
     },
     quantidade: {
         type: Sequelize.INTEGER,
@@ -42,8 +42,8 @@ const ItemVenda = connection.define('itemvenda', {
         defaultValue: 0
     }
 }, {
-    tableName: 'itemvenda',
+    tableName: 'itemreembolsos',
     timestamps: false
 });
 
-module.exports = ItemVenda;
+module.exports = ItemReembolso;
