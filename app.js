@@ -19,6 +19,7 @@ const navLinks = require('./utils/navigation/nav-links');
 const errorHandler = require('./utils/handlers/error-handler');
 const tokenCleanUp = require('./utils/clean-tokens');
 const startPromoCleanup = require('./utils/clean-promos');
+const backupService = require('./services/backup/backupService');
 
 //Routers
 const adminRouter = require('./routes/adminRoutes');
@@ -137,6 +138,9 @@ tokenCleanUp();
 
 //Cleaning Promos
 startPromoCleanup();
+
+// Start daily DB backup scheduler
+backupService.start();
 
 const httpsServer = https.createServer(options, app);
 const io = new Server(httpsServer);

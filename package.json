@@ -30,6 +30,7 @@
     "express-session": "^1.18.2",
     "helmet": "^8.1.0",
     "mysql2": "^3.14.3",
+    "mysqldump": "^3.2.0",
     "node-cron": "^4.2.1",
     "nodemailer": "^7.0.6",
     "sequelize": "^6.37.7",

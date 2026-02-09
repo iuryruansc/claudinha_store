@@ -32,6 +32,7 @@ Estas são as bibliotecas necessárias para a aplicação rodar em produção.
 | `helmet`          | `^8.1.0`   | Aumenta a segurança da aplicação configurando diversos headers HTTP.                                            |
 | `mysql2`          | `^3.14.3`  | Driver do Node.js para se conectar ao banco de dados MySQL.                                                     |
 | `node-cron`       | `^4.2.1`   | Agendador de tarefas (cron jobs) em JavaScript.                                                                 |
+| `mysqldump`       | `latest`   | Biblioteca para exportar o banco de dados MySQL para um arquivo `.sql`.                                         |
 | `nodemailer`      | `^7.0.6`   | Módulo para envio de e-mails.                                                                                   |
 | `redis`           | `^5.8.2`   | Banco de dados em memória, frequentemente usado para cache ou sessões.                                          |
 | `sequelize`       | `^6.37.7`  | ORM (Object-Relational Mapper) para interagir com o MySQL de forma moderna.                                     |
@@ -47,3 +48,15 @@ Estas são as ferramentas utilizadas apenas durante o processo de desenvolviment
 | Dependência           | Versão   | Propósito no Projeto                                       |
 | :-------------------- | :------- | :--------------------------------------------------------- |
 | `prettier-plugin-ejs` | `^1.0.3` | Plugin para o Prettier formatar código em arquivos `.ejs`. |
+
+---
+
+## Backup e Agendamento
+
+O projeto usa `node-cron` para agendamento de tarefas e `mysqldump` (pacote npm) para gerar dumps do banco MySQL.
+
+- **Serviço responsável:** `services/backup/backupService.js`
+- **Script de execução manual:** `scripts/runBackup.js`
+- **Agendamento padrão:** diário às 02:00 (timezone America/Sao_Paulo).
+
+Recomenda-se configurar um mecanismo externo de retenção e rotação dos arquivos em `backups/` (ex.: script que limpa antigos, política no servidor ou cópia para storage externo).

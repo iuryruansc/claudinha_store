@@ -12,28 +12,28 @@
 
 O sistema oferece um conjunto completo de ferramentas para a gestão da loja, incluindo:
 
-* **Painel de Controle (Dashboard):** Visualização rápida de métricas e informações importantes.
-* **🛒 Gestão de Vendas:**
-    * Registro de novas vendas (PDV).
-    * Gerenciamento e histórico de vendas realizadas.
-    * Controle e gerenciamento de caixas.
-* **📦 Gestão de Estoque:**
-    * Gerenciamento de lotes de produtos.
-    * Controle de movimentações (entradas e saídas).
-* **📚 Gestão de Catálogo:**
-    * Cadastro e gerenciamento de Produtos.
-    * Organização por Categorias e Marcas.
-    * Cadastro de Fornecedores.
-* **💰 Módulo Financeiro:**
-    * Histórico de pagamentos.
-    * Geração de relatórios de vendas e de produtos.
-* **👥 Gestão de Pessoas:**
-    * Cadastro e gerenciamento de Clientes.
-    * Cadastro e gerenciamento de Funcionários.
-* **🔐 Segurança:**
-    * Bloqueio de múltiplas sessões por usuário, garantindo que cada conta seja acessada de um único local por vez.
-* **⚙️ Configurações:**
-    * Configuração de Pontos de Venda (PDVs).
+- **Painel de Controle (Dashboard):** Visualização rápida de métricas e informações importantes.
+- **🛒 Gestão de Vendas:**
+  - Registro de novas vendas (PDV).
+  - Gerenciamento e histórico de vendas realizadas.
+  - Controle e gerenciamento de caixas.
+- **📦 Gestão de Estoque:**
+  - Gerenciamento de lotes de produtos.
+  - Controle de movimentações (entradas e saídas).
+- **📚 Gestão de Catálogo:**
+  - Cadastro e gerenciamento de Produtos.
+  - Organização por Categorias e Marcas.
+  - Cadastro de Fornecedores.
+- **💰 Módulo Financeiro:**
+  - Histórico de pagamentos.
+  - Geração de relatórios de vendas e de produtos.
+- **👥 Gestão de Pessoas:**
+  - Cadastro e gerenciamento de Clientes.
+  - Cadastro e gerenciamento de Funcionários.
+- **🔐 Segurança:**
+  - Bloqueio de múltiplas sessões por usuário, garantindo que cada conta seja acessada de um único local por vez.
+- **⚙️ Configurações:**
+  - Configuração de Pontos de Venda (PDVs).
 
 ---
 
@@ -41,10 +41,10 @@ O sistema oferece um conjunto completo de ferramentas para a gestão da loja, in
 
 Este projeto foi construído com um ecossistema moderno baseado em JavaScript e Node.js.
 
-* **Backend:** Node.js, Express.js
-* **Frontend:** EJS (Embedded JavaScript templates), Bootstrap 5
-* **Banco de Dados:** MySQL com o ORM Sequelize
-* **Comunicação em Tempo Real:** Socket.IO
+- **Backend:** Node.js, Express.js
+- **Frontend:** EJS (Embedded JavaScript templates), Bootstrap 5
+- **Banco de Dados:** MySQL com o ORM Sequelize
+- **Comunicação em Tempo Real:** Socket.IO
 
 Para uma lista completa e detalhada de todas as dependências do projeto, suas versões e o papel de cada uma, por favor, consulte o nosso arquivo **[TECH_STACK.md](./TECH_STACK.md)**.
 
@@ -56,25 +56,28 @@ Siga os passos abaixo para configurar e executar o projeto em seu ambiente local
 
 ### Pré-requisitos
 
-* [Node.js](https://nodejs.org/en/) (versão 14 ou superior)
-* [MySQL](https://www.mysql.com/)
+- [Node.js](https://nodejs.org/en/) (versão 14 ou superior)
+- [MySQL](https://www.mysql.com/)
 
 ### Passos para Instalação
 
 1.  **Clone o repositório:**
+
     ```bash
     git clone [https://github.com/iuryruansc/claudinha_store.git](https://github.com/iuryruansc/claudinha_store.git)
     cd claudinha_store
     ```
 
 2.  **Instale as dependências:**
+
     ```bash
     npm install
     ```
 
 3.  **Configure as variáveis de ambiente:**
-    * Crie o arquivo `.env`.
-    * Abra o arquivo `.env` e preencha com as suas credenciais do banco de dados e outras configurações necessárias.
+    - Crie o arquivo `.env`.
+    - Abra o arquivo `.env` e preencha com as suas credenciais do banco de dados e outras configurações necessárias.
+
     ```env
     DB_HOST=localhost
     DB_USER=seu_usuario_mysql
@@ -98,11 +101,36 @@ Após iniciar, a aplicação estará disponível em `https://localhost:3000` (ou
 
 No diretório do projeto, você pode executar:
 
-* `npm start`: Inicia o servidor em modo de produção.
-* `nodemon app.js` Inicia e Reinicia o servidor automaticamente a cada mudança detectada.
-* `npm test`: Atualmente, exibe um erro padrão (nenhum teste configurado).
+- `npm start`: Inicia o servidor em modo de produção.
+- `nodemon app.js` Inicia e Reinicia o servidor automaticamente a cada mudança detectada.
+- `npm test`: Atualmente, exibe um erro padrão (nenhum teste configurado).
 
 ---
+
+## 🔁 Backup Diário
+
+O projeto possui um serviço de backup automático que exporta o banco MySQL diariamente.
+
+- **Onde está o serviço:** `services/backup/backupService.js`
+- **Agendamento padrão:** todo dia às 02:00 (fuso America/Sao_Paulo).
+- **Local dos arquivos de backup:** pasta `backups` no root do projeto (ex.: c:\claudinha_store\backups).
+- **Dependências usadas:** `node-cron` (agendamento) e `mysqldump` (exportação do banco).
+- **Executar backup manualmente:**
+
+```bash
+# usa as variáveis do arquivo .env
+node -r dotenv/config scripts\\runBackup.js
+```
+
+- **Variáveis de ambiente necessárias:** `DB_HOST`, `DB_USER`, `DB_PASS`, `DB_NAME`, `SESSION_SECRET` (já utilizadas pelo projeto).
+
+Se preferir, adicione um script npm no `package.json` para facilitar a execução manual:
+
+```json
+"scripts": {
+    "backup:manual": "node -r dotenv/config scripts/runBackup.js"
+}
+```
 
 ## 📝 Licença
 
