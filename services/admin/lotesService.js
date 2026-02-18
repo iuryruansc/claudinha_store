@@ -77,6 +77,70 @@ const getAllLotes = async () => {
     return { lotes };
 };
 
+const getLotesByBarcode = async (barcodeQuery) => {
+    const lotesGeral = await Lote.findAll({
+        include: [{
+            model: Produto,
+            as: 'produto',
+            where: {
+                codigo_barras: { [Op.like]: `%${barcodeQuery}%` }
+            },
+            required: true
+        }],
+        order: [
+            ['data_validade', 'ASC'],
+            ['quantidade', 'ASC']
+        ]
+    });
+
+    const totaisPorProdutoId = {};
+
+    for (const lote of lotesGeral) {
+        const produtoId = lote.id_produto;
+
+        if (!totaisPorProdutoId[produtoId]) {
+            totaisPorProdutoId[produtoId] = 0;
+        }
+
+        totaisPorProdutoId[produtoId] += lote.quantidade;
+    }
+
+    const hoje = new Date();
+    const lotes = lotesGeral.map(lote => {
+        const dataValidade = new Date(lote.data_validade);
+        const diffDias = Math.ceil((dataValidade - hoje) / (1000 * 60 * 60 * 24));
+
+        let statusValidade = 'ok';
+        if (diffDias < 0) {
+            statusValidade = 'vencido';
+        } else if (diffDias <= 7) {
+            statusValidade = 'critico';
+        } else if (diffDias <= 30) {
+            statusValidade = 'atencao';
+        }
+
+        const qtdTotalProduto = totaisPorProdutoId[lote.produtoId];
+
+        let statusQuantidade = 'ok';
+        if (qtdTotalProduto === 0) {
+            statusQuantidade = 'zerado';
+        } else if (qtdTotalProduto <= 5) {
+            statusQuantidade = 'critico';
+        } else if (qtdTotalProduto <= 10) {
+            statusQuantidade = 'baixo';
+        }
+
+        return {
+            ...lote.get({ plain: true }),
+            diffDias: diffDias,
+            statusValidade: statusValidade,
+            statusQuantidade: statusQuantidade,
+        };
+    });
+
+    return { lotes };
+};
+
 const updateLote = async (id, updateData, id_funcionario) => {
     return await connection.transaction(async (t) => {
         const lote = await Lote.findByPk(id, { transaction: t });
@@ -328,5 +392,6 @@ module.exports = {
     adicionarQuantidadeAoLote,
     getLowStockLotes,
     createLoteWithMovimentacao,
-    getLotesProximosVencimento
+    getLotesProximosVencimento,
+    getLotesByBarcode
 }

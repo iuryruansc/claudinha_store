@@ -6,12 +6,21 @@ const Lote = require('../../models/Lote')
 const Produto = require('../../models/Produto')
 const { stringValidation, numberValidation, dateValidation } = require('../../utils/data/data-validation');
 const { parseIntValue, parseDateValue, parseFloatValue } = require('../../utils/data/data-parsers');
-const { getAllLotes, updateLote, deleteLote, adicionarQuantidadeAoLote, createLoteWithMovimentacao } = require('../../services/admin/lotesService');
+const { getAllLotes, getLotesByBarcode, updateLote, deleteLote, adicionarQuantidadeAoLote, createLoteWithMovimentacao } = require('../../services/admin/lotesService');
 const { updateProduto } = require('../../services/admin/produtosService');
 const { formatarLoteParaTabela } = require('../../services/admin/loteFormatter');
 
 router.get('/lotes', asyncHandler(async (req, res) => {
-    const { lotes } = await getAllLotes();
+    const q = (req.query.q || '').trim();
+    let lotesResult;
+
+    if (q) {
+        lotesResult = await getLotesByBarcode(q);
+    } else {
+        lotesResult = await getAllLotes();
+    }
+
+    const { lotes } = lotesResult;
 
     const alertaEstoqueBaixo = lotes.some(lote =>
         lote.statusQuantidade === 'baixo' ||
@@ -19,7 +28,7 @@ router.get('/lotes', asyncHandler(async (req, res) => {
         lote.statusQuantidade === 'zerado'
     );
 
-    res.render('admin/lotes/', { lotes, alertaEstoqueBaixo, formatDate });
+    res.render('admin/lotes/', { lotes, alertaEstoqueBaixo, formatDate, q });
 }));
 
 router.post('/lotes/save', asyncHandler(async (req, res) => {

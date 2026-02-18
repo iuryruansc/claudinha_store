@@ -36,6 +36,12 @@
 
                                 <div class="card shadow-sm">
                                     <div class="card-body">
+                                        <form class="d-flex mb-3" method="GET" action="/admin/lotes">
+                                            <input name="q" class="form-control me-2"
+                                                placeholder="Buscar por código de barras"
+                                                value="<%= typeof q !== 'undefined' ? q : '' %>">
+                                            <button class="btn btn-primary">Buscar</button>
+                                        </form>
                                         <div class="table-responsive">
                                             <table id="table-data" class="table table-hover align-middle">
                                                 <thead class="table-dark">
@@ -88,9 +94,6 @@
                                                                 </td>
                                                                 <td class="text-center">
                                                                     <%= lote.numero_lote %>
-                                                                </td>
-                                                                <td style="display: none;">
-                                                                    <%= produto.codigo_barras %>
                                                                 </td>
                                                                 <td class="text-center fw-bold">
                                                                     <%= lote.quantidade %>
